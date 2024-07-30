@@ -1,0 +1,15 @@
+.coinPress {
+    animation: pressCoin 0.1s ease-in-out;
+}
+
+@keyframes pressCoin {
+    0% {
+        transform: scale(1) rotate(0deg) translateX(0);
+    }
+    50% {
+        transform: scale(0.9) rotate(15deg) translateX(5px);
+    }
+    100% {
+        transform: scale(1) rotate(0deg) translateX(0);
+    }
+}
