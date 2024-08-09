@@ -460,9 +460,9 @@ const CoinMania: React.FC = () => {
                         </button>
                     </div>
 
-                    <div className="w-full bg-[#f9c035] rounded-md items-center px-2 my-2">
+                    <div className="w-full rounded-md items-center px-2 my-2">
                         <div
-                            className="bg-gradient-to-r from-[#f3c45a] to-[#fffad0] opacity-10 h-2 rounded-md"
+                            className="bg-gradient-to-r from-[#f3c45a] to-[#fffad0] h-2 rounded-md"
                             style={{width: `${(energy / (userData?.maxenergy ?? 1000)) * 100}%`}}
                         >
                         </div>
