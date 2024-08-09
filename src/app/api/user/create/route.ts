@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     try {
         const { id, first_name, last_name, username, referal_id } = await req.json();
 
-        if (!id || !username || !first_name) {
+        if (!id || !first_name) {
             return NextResponse.json({ error: "Invalid input data" }, { status: 400 });
         }
 
