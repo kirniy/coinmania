@@ -39,6 +39,15 @@ const BonusPage = () => {
                 const data = await response.json();
                 setUserData(data.user);
                 setScore(data.user.scores || 0); // Set score after fetching user data
+
+                const lastSpinTime = data.user.last_spin_time ? new Date(data.user.last_spin_time) : new Date(0);
+                const isSameDay = lastSpinTime.toDateString() === new Date().toDateString();
+
+                let availableSpinCount = isSameDay
+                    ? MAX_SPINS_PER_DAY - data.user.daily_spin_count ?? 0
+                    : MAX_SPINS_PER_DAY;
+
+                setSpinsLeft(availableSpinCount);
             } catch (error) {
                 setError(error.message);
             } finally {
@@ -148,9 +157,10 @@ const BonusPage = () => {
             const data = await response.json();
             console.log("Spin check response:", data);
 
-            if (!data.result) {
+            if (data.isSpinLimitReached) {
                 setMessage("Daily spin limit reached");
                 setSpinning(false);
+                setSpinsLeft(0);
                 return;
             }
 

@@ -30,14 +30,31 @@ export async function POST(req: NextRequest) {
         // Check spin restrictions
         const now = new Date();
         const lastSpinTime = user.last_spin_time ? new Date(user.last_spin_time) : new Date(0);
-        const spinsToday = user.daily_spin_count;
         const isSameDay = lastSpinTime.toDateString() === now.toDateString();
+        const spinsToday = isSameDay
+            ? user.daily_spin_count ?? 0
+            : 0;
 
-        const hasSpinLimit = isSameDay && spinsToday >= 2;
+        const isSpinLimitReached = isSameDay && spinsToday >= 2;
+
+        if (!isSpinLimitReached) {
+            const { error: updateError } = await supabase
+            .from('users')
+            .update({
+                daily_spin_count: spinsToday + 1,
+                last_spin_time: new Date(),
+            })
+            .eq('id', userId)
+
+            if (updateError) {
+                console.error("Failed to update user:", updateError);
+                return NextResponse.json({ result: false, error: "Failed to update user" }, { status: 500 });
+            }
+        }
 
         return NextResponse.json({
-            result: !hasSpinLimit,
-            newSpinCount: hasSpinLimit ? spinsToday : (isSameDay ? spinsToday + 1 : 1),
+            isSpinLimitReached: isSpinLimitReached,
+            newSpinCount: isSpinLimitReached ? 0 : (isSameDay ? spinsToday - 1 : 1),
         });
     } catch (error) {
         console.error("Error processing request:", error);
