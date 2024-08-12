@@ -23,6 +23,7 @@ export const WebAppProvider = ({ children }: IProps) => {
       app.ready();
       app.isClosingConfirmationEnabled = true;
       app.disableVerticalSwipes();
+      app.expand();
     }
 
     const addUserToContext = async () => {
