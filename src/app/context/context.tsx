@@ -1,63 +1,70 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState } from 'react';
 import type { TelegramWebApps } from 'telegram-webapps-types-new';
 
 interface IProps {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }
 
-export const webAppContext = createContext<TelegramWebApps.WebApp>({} as TelegramWebApps.WebApp);
+export const webAppContext = createContext<TelegramWebApps.WebApp>(
+  {} as TelegramWebApps.WebApp
+);
 
 export const WebAppProvider = ({ children }: IProps) => {
-    const [app, setApp] = useState({} as TelegramWebApps.WebApp);
+  const [app, setApp] = useState({} as TelegramWebApps.WebApp);
 
-    useEffect(() => {
-        setApp(window.Telegram.WebApp);
-    }, []);
+  useEffect(() => {
+    setApp(window.Telegram.WebApp);
+  }, []);
 
-    useEffect(() => {
-        if (!app) return;
-        if (app.ready) app.ready();
+  useEffect(() => {
+    if (!app) return;
 
-        const addUserToContext = async () => {
-            const userId = app.initDataUnsafe?.user?.id;
-            const username = app.initDataUnsafe?.user?.username;
-            const firstName = app.initDataUnsafe?.user?.first_name;
-            const lastName = app.initDataUnsafe?.user?.last_name;
-            const scores = Number('0');
-            const referralId = app.initDataUnsafe?.start_param; // Получаем реферальный ID из start_param
+    if (app.ready) {
+      app.ready();
+      app.isClosingConfirmationEnabled = true;
+      app.disableVerticalSwipes();
+    }
 
-            if (!userId || !firstName) {
-                console.error("User data is missing");
-                return;
-            }
+    const addUserToContext = async () => {
+      const userId = app.initDataUnsafe?.user?.id;
+      const username = app.initDataUnsafe?.user?.username;
+      const firstName = app.initDataUnsafe?.user?.first_name;
+      const lastName = app.initDataUnsafe?.user?.last_name;
+      const scores = Number('0');
+      const referralId = app.initDataUnsafe?.start_param; // Получаем реферальный ID из start_param
 
-            try {
-                const response = await fetch('/api/user/create', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        id: userId,
-                        first_name: firstName,
-                        last_name: lastName,
-                        username: username,
-                        scores: scores,
-                        referal_id: referralId
-                    }),
-                });
+      if (!userId || !firstName) {
+        console.error('User data is missing');
+        return;
+      }
 
-                const result = await response.json();
-                console.log(result.message);
-            } catch (error) {
-                console.error("Error adding user to context:", error);
-            }
-        };
+      try {
+        const response = await fetch('/api/user/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            id: userId,
+            first_name: firstName,
+            last_name: lastName,
+            username: username,
+            scores: scores,
+            referal_id: referralId
+          })
+        });
 
-        addUserToContext();
-    }, [app]);
+        const result = await response.json();
+        console.log(result.message);
+      } catch (error) {
+        console.error('Error adding user to context:', error);
+      }
+    };
 
-    return (
-        <webAppContext.Provider value={app}>{children}</webAppContext.Provider>
-    );
+    addUserToContext();
+  }, [app]);
+
+  return (
+    <webAppContext.Provider value={app}>{children}</webAppContext.Provider>
+  );
 };
