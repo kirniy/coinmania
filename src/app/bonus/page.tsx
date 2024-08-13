@@ -1,23 +1,26 @@
 "use client";
 
-import {useContext, useEffect, useState} from "react";
-import { webAppContext } from "../context";
+import { useContext, useEffect } from "react"
+import { webAppContext } from "../context"
 // import Bonus from "@/components/screens/bonus/bonus";
-import Bonus from "@/components/screens_new/bonus/Bonus";
-import Loader from "@/components/loader/loader";
+import Loader from "@/components/loader/loader"
+import Bonus from "@/components/screens_new/bonus/Bonus"
+import { LoadingContext } from '../context/LoaderContext'
 
 export default function Home() {
     const app = useContext(webAppContext);
-    const [loading, setLoading] = useState(true);
+    const { isLoading, setLoading } = useContext(LoadingContext);
 
     useEffect(() => {
         if (app.version) {
-            setLoading(false);
+            setTimeout(() => {
+                setLoading(false);
+              }, 3000)
         }
     }, [app.version]);
 
-    if (loading) {
-        return <Loader loading={loading} />;
+    if (isLoading) {
+        return <Loader loading={isLoading} />;
     }
 
     return (
@@ -25,7 +28,7 @@ export default function Home() {
             {app.version ? (
                 <Bonus />
             ) : (
-                <Loader loading={loading} />
+                <Loader loading={isLoading} />
             )}
         </>
     );

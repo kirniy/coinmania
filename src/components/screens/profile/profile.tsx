@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useContext, useEffect, useState } from 'react';
-import Header from "@/components/header/header";
-import { webAppContext } from "@/app/context";
-import Loader from "@/components/loader/loader";
+import { webAppContext } from "@/app/context"
+import { LoadingContext } from '@/app/context/LoaderContext'
+import Header from "@/components/header/header"
+import Loader from "@/components/loader/loader"
+import { useContext, useEffect, useState } from 'react'
 
 interface UserData {
     scores: number;
@@ -11,9 +12,9 @@ interface UserData {
 
 const Profile = () => {
     const app = useContext(webAppContext);
+    const { isLoading, setLoading } = useContext(LoadingContext);
     const [userData, setUserData] = useState<UserData | null>(null);
     const [error, setError] = useState<string | null>(null);
-    const [loading, setLoading] = useState(true);
     const [referralsCount, setReferralsCount] = useState(0);
 
     useEffect(() => {
@@ -65,8 +66,8 @@ const Profile = () => {
         });
     };
 
-    if (loading) {
-        return <Loader loading={loading} />;
+    if (isLoading) {
+        return <Loader loading={isLoading} />;
     }
 
     return (

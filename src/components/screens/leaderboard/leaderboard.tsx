@@ -1,7 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react';
-import Header from "@/components/header/header";
-import { webAppContext } from "@/app/context";
-import Loader from "@/components/loader/loader";
+import { webAppContext } from "@/app/context"
+import { LoadingContext } from '@/app/context/LoaderContext'
+import Header from "@/components/header/header"
+import Loader from "@/components/loader/loader"
+import { useContext, useEffect, useState } from 'react'
 
 interface User {
     first_name: string;
@@ -10,8 +11,8 @@ interface User {
 
 const Leaderboard = () => {
     const app = useContext(webAppContext);
+    const { isLoading, setLoading } = useContext(LoadingContext);
     const [users, setUsers] = useState<User[]>([]);
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -45,8 +46,8 @@ const Leaderboard = () => {
         fetchUsers();
     }, []);
 
-    if (loading) {
-        return <Loader loading={loading} />;
+    if (isLoading) {
+        return <Loader loading={isLoading} />;
     }
 
     return (

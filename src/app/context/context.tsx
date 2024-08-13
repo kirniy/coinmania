@@ -1,5 +1,5 @@
-import React, { createContext, useEffect, useState } from 'react';
-import type { TelegramWebApps } from 'telegram-webapps-types-new';
+import React, { createContext, useEffect, useState } from 'react'
+import type { TelegramWebApps } from 'telegram-webapps-types-new'
 
 interface IProps {
   children: React.ReactNode;

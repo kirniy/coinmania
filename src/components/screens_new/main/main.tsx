@@ -1,16 +1,11 @@
 "use client";
 
-import React, { useContext, useEffect, useState, useRef, useCallback } from 'react';
-import { webAppContext } from "@/app/context";
-import supabase from "@/db/supabase";
-import Loader from "@/components/loader/loader";
-import { Button, Link } from "@nextui-org/react";
-import TapIcon from '@mui/icons-material/TouchApp';
-import BonusIcon from '@mui/icons-material/CardGiftcard';
-import TasksIcon from '@mui/icons-material/Assignment';
-import TopIcon from '@mui/icons-material/EmojiEvents';
-import FrensIcon from '@mui/icons-material/People';
-import Footer from "@/components/footer/Footer";
+import { webAppContext } from "@/app/context"
+import { LoadingContext } from '@/app/context/LoaderContext'
+import Footer from "@/components/footer/Footer"
+import Loader from '@/components/loader/loader'
+import supabase from "@/db/supabase"
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 
 interface UserData {
     id: string;
@@ -44,10 +39,10 @@ type ClickType = {
 
 const CoinMania: React.FC = () => {
     const app = useContext(webAppContext);
+    const { isLoading, setLoading } = useContext(LoadingContext);
     const [userData, setUserData] = useState<UserData | null>(null);
     const [points, setPoints] = useState(0);
     const [energy, setEnergy] = useState(1000);
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     const [isPressed, setIsPressed] = useState(false);
@@ -326,8 +321,8 @@ const CoinMania: React.FC = () => {
         }
     };
 
-    if (loading) {
-        return <Loader loading={loading} />;
+    if (isLoading) {
+        return <Loader loading={isLoading} />;
     }
 
     return (

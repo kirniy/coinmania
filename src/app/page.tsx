@@ -1,21 +1,24 @@
 'use client';
 
-import Loader from '@/components/loader/loader';
-import CoinMania from '@/components/screens_new/main/main';
-import MobileDetect from 'mobile-detect';
-import { useContext, useEffect, useState } from 'react';
-import { webAppContext } from './context';
+import Loader from '@/components/loader/loader'
+import CoinMania from '@/components/screens_new/main/main'
+import MobileDetect from 'mobile-detect'
+import { useContext, useEffect, useState } from 'react'
+import { webAppContext } from './context'
+import { LoadingContext } from './context/LoaderContext'
 
 export default function Home() {
   const app = useContext(webAppContext);
+  const { isLoading, setLoading } = useContext(LoadingContext);
 
   const [isMobile, setIsMobile] = useState(false);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const md = new MobileDetect(window.navigator.userAgent);
     setIsMobile(!!md.mobile());
-    setLoading(false);
+    setTimeout(() => {
+      setLoading(false);
+    }, 3000)
     document.addEventListener('gesturestart', function (e) {
       e.preventDefault();
       document.body.style.zoom = '0.99';
@@ -32,8 +35,8 @@ export default function Home() {
     });
   }, []);
 
-  if (loading) {
-    return <Loader loading={loading} />;
+  if (isLoading) {
+    return <Loader loading={isLoading} />;
   }
 
   // if (!isMobile) {
@@ -50,5 +53,5 @@ export default function Home() {
   //     );
   // }
 
-  return <>{app.version ? <CoinMania /> : <Loader loading={loading} />}</>;
+  return <>{app.version ? <CoinMania /> : <Loader loading={isLoading} />}</>;
 }

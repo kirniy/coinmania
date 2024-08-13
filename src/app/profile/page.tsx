@@ -1,23 +1,25 @@
 "use client";
 
-import {useContext, useEffect, useState} from "react";
-import { webAppContext } from "../context";
+import Loader from "@/components/loader/loader"
 import Profile from "@/components/screens/profile/profile"
-import CoinMania from "@/components/screens/main/main";
-import Loader from "@/components/loader/loader";
+import { useContext, useEffect } from "react"
+import { webAppContext } from "../context"
+import { LoadingContext } from '../context/LoaderContext'
 
 export default function Home() {
     const app = useContext(webAppContext);
-    const [loading, setLoading] = useState(true);
+    const { isLoading, setLoading } = useContext(LoadingContext);
 
     useEffect(() => {
         if (app.version) {
-            setLoading(false);
+            setTimeout(() => {
+                setLoading(false);
+              }, 3000)
         }
     }, [app.version]);
 
-    if (loading) {
-        return <Loader loading={loading} />;
+    if (isLoading) {
+        return <Loader loading={isLoading} />;
     }
 
     return (
@@ -37,7 +39,7 @@ export default function Home() {
                 {app.version ? (
                     <Profile />
                 ) : (
-                    <Loader loading={loading} />
+                    <Loader loading={isLoading} />
                 )}
             </>
         </>

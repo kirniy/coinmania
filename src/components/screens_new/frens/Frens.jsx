@@ -1,17 +1,18 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { Users, XCircle } from 'lucide-react';
-import Footer from "@/components/footer/Footer";
-import Loader from "@/components/loader/loader";
-import { webAppContext } from "@/app/context";
-import styles from './FriendsPage.module.css';  // Импортируем стили
+import { webAppContext } from "@/app/context"
+import { LoadingContext } from '@/app/context/LoaderContext'
+import Footer from "@/components/footer/Footer"
+import Loader from "@/components/loader/loader"
+import { Users, XCircle } from 'lucide-react'
+import { useContext, useEffect, useState } from 'react'
+import styles from './FriendsPage.module.css'; // Импортируем стили
 
 const FriendsPage = () => {
     const app = useContext(webAppContext);
+    const { isLoading, setLoading } = useContext(LoadingContext);
     const [showLeaderboard, setShowLeaderboard] = useState(false);
     const [isInvitePressed, setIsInvitePressed] = useState(false);
     const [userData, setUserData] = useState(null);
     const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(true);
     const [referralsCount, setReferralsCount] = useState(0);
     const [users, setUsers] = useState([]);
 
@@ -120,8 +121,8 @@ const FriendsPage = () => {
         </div>
     );
 
-    if (loading) {
-        return <Loader loading={loading} />;
+    if (isLoading) {
+        return <Loader loading={isLoading} />;
     }
 
     return (
