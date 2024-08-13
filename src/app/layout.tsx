@@ -1,7 +1,9 @@
+import LockDesctopScreen from '@/components/LockDesctopScreen'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import Script from 'next/script'
 import React from 'react'
+import { isMobile } from 'react-device-detect'
 import './globals.scss'
 import Providers from './providers/providers'
 
@@ -11,6 +13,13 @@ export const metadata: Metadata = {
   title: 'WebApp telegram template',
   description: 'WebApp Telegram template for new projects'
 };
+
+const environment = process.env.NEXT_PUBLIC_ENVIRONMENT;
+let checkIsMobile = isMobile;
+
+if (environment === 'development') {
+  checkIsMobile = true;
+}
 
 export default function RootLayout({
   children
@@ -36,7 +45,9 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className}>
-        <Providers>{children}</Providers>
+        {
+          checkIsMobile ? <Providers>{children}</Providers> : <LockDesctopScreen/>
+        }
       </body>
     </html>
   );
