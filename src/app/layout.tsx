@@ -3,10 +3,11 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import Script from 'next/script'
 import React from 'react'
-import { BrowserView, MobileView, isAndroid, isBrowser, isIOS, isMobile, osName } from 'react-device-detect'
+import { isMobileDevice } from "../libs/DetectMobile"
 import './globals.scss'
 import Providers from './providers/providers'
 
+const environment = process.env.NEXT_PUBLIC_ENVIRONMENT;
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
@@ -14,23 +15,16 @@ export const metadata: Metadata = {
   description: 'WebApp Telegram template for new projects'
 };
 
-const environment = process.env.NEXT_PUBLIC_ENVIRONMENT;
-console.log('environment', process?.env)
-console.log('environment2', process?.env?.NEXT_PUBLIC_ENVIRONMENT)
-let checkIsMobile = isMobile;
-
-console.log('isMobile', BrowserView, MobileView, isBrowser, isMobile, isIOS, isAndroid,osName)
-
-if (environment === 'development') {
-  checkIsMobile = true;
-}
-console.log('checkIsMobile', checkIsMobile)
-
-export default function RootLayout({
+export default async function RootLayout({
   children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  let checkIsMobile = await isMobileDevice();
+
+  if (environment === 'development') {
+    checkIsMobile =  true;
+  }
   return (
     <html lang='ru'>
       <head>
