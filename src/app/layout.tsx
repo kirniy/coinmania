@@ -1,9 +1,9 @@
-import LockDesctopScreen from '@/components/LockDesctopScreen'
+import LockDesctop from '@/components/screens/lock/LockDesctop'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import Script from 'next/script'
 import React from 'react'
-import { isMobileDevice } from "../libs/DetectMobile"
+import { isMobileDevice } from "../helpers/DetectMobile"
 import './globals.scss'
 import Providers from './providers/providers'
 
@@ -45,7 +45,7 @@ export default async function RootLayout({
       </head>
       <body className={inter.className}>
         {
-          checkIsMobile ? <Providers>{children}</Providers> : <LockDesctopScreen/>
+          checkIsMobile ? <Providers>{children}</Providers> : <LockDesctop/>
         }
       </body>
     </html>

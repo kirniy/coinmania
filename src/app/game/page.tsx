@@ -1,7 +1,7 @@
 "use client";
 
 import Loader from "@/components/loader/loader"
-import Slots from "@/components/screens_new/game/Slots"
+import Slots from "@/components/screens/game/Slots"
 import { useContext, useEffect } from "react"
 import { webAppContext } from "../context"
 import { LoadingContext } from '../context/LoaderContext'

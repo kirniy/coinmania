@@ -21,7 +21,7 @@ export const isMobileDevice = () => {
   const { get } = headers()
   const ua = get('user-agent')
 
-  const device =new UAParser(ua || '').getUA()
+  const device = new UAParser(ua || '').getUA()
 
   return toMatch.some((toMatchItem) => {
     return device.match(toMatchItem);

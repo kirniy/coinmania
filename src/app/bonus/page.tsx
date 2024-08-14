@@ -1,10 +1,9 @@
 "use client";
 
+import Loader from "@/components/loader/loader"
+import Bonus from "@/components/screens/bonus/Bonus"
 import { useContext, useEffect } from "react"
 import { webAppContext } from "../context"
-// import Bonus from "@/components/screens/bonus/bonus";
-import Loader from "@/components/loader/loader"
-import Bonus from "@/components/screens_new/bonus/Bonus"
 import { LoadingContext } from '../context/LoaderContext'
 
 export default function Home() {

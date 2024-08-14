@@ -1,10 +1,10 @@
 "use client";
 
-import Loader from "@/components/loader/loader"
-import Frens from "@/components/screens_new/frens/Frens"
-import { useContext, useEffect } from "react"
-import { webAppContext } from "../context"
-import { LoadingContext } from '../context/LoaderContext'
+import Loader from "@/components/loader/loader";
+import Frens from "@/components/screens/frens/Frens";
+import { useContext, useEffect } from "react";
+import { webAppContext } from "../context";
+import { LoadingContext } from '../context/LoaderContext';
 
 export default function Home() {
     const app = useContext(webAppContext);
