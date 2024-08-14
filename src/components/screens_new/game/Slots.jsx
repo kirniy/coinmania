@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react';
-import { ArrowLeft } from 'lucide-react';
-import Footer from "@/components/footer/Footer";
-import { webAppContext } from "@/app/context";
-import styles from './Game.module.css';  // Импортируем стили
+import { webAppContext } from "@/app/context"
+import Footer from "@/components/footer/Footer"
+import { updateUserScores, updateUserSpin } from '@/store/userSlice'
+import { ArrowLeft } from 'lucide-react'
+import { useCallback, useContext, useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import styles from './Game.module.css'; // Импортируем стили
 
 const SYMBOL_WEIGHTS = { "🪩": 0.0301, "🍹": 0.0708, "🎁": 0.1232, "🎉": 0.2283, "💃": 0.5476 };
 const SYMBOLS = Object.entries(SYMBOL_WEIGHTS).flatMap(([s, w]) => Array(Math.round(w * 1000)).fill(s));
@@ -13,49 +15,22 @@ const MAX_SPINS_PER_DAY = 2;
 const createReel = () => Array.from({ length: REEL_SIZE }, () => SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]);
 
 const BonusPage = () => {
+    const dispatch =  useDispatch();
+    const app = useContext(webAppContext);
+    const userData = useSelector((state) => state.user.data);
     const [reels, setReels] = useState([createReel(), createReel(), createReel()]);
     const [reelPositions, setReelPositions] = useState([0, 0, 0]);
-    const [score, setScore] = useState();
     const [spinning, setSpinning] = useState(false);
     const [message, setMessage] = useState("");
     const [showPaytable, setShowPaytable] = useState(false);
     const [backgroundEmojis, setBackgroundEmojis] = useState([]);
     const [winAnimation, setWinAnimation] = useState(null);
     const [winEmojis, setWinEmojis] = useState([]);
-    const [spinsLeft, setSpinsLeft] = useState(MAX_SPINS_PER_DAY);
-    const app = useContext(webAppContext);
-    const [userData, setUserData] = useState(null);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isLargeScreen, setIsLargeScreen] = useState(false);
 
     useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const response = await fetch(`/api/user/data?id=${app.initDataUnsafe.user?.id}`);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                setUserData(data.user);
-                setScore(data.user.scores || 0); // Set score after fetching user data
-
-                const lastSpinTime = data.user.last_spin_time ? new Date(data.user.last_spin_time) : new Date(0);
-                const isSameDay = lastSpinTime.toDateString() === new Date().toDateString();
-
-                let availableSpinCount = isSameDay
-                    ? MAX_SPINS_PER_DAY - data.user.daily_spin_count ?? 0
-                    : MAX_SPINS_PER_DAY;
-
-                setSpinsLeft(availableSpinCount);
-            } catch (error) {
-                setError(error.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchUserData();
-
         const handleResize = () => {
             setIsLargeScreen(window.innerWidth >= 576);
         };
@@ -139,7 +114,7 @@ const BonusPage = () => {
     };
 
     const spin = useCallback(async () => {
-        if (spinning || spinsLeft <= 0) return;
+        if (spinning || userData.daily_spin_count <= 0) return;
 
         setSpinning(true);
         setMessage("");
@@ -160,11 +135,11 @@ const BonusPage = () => {
             if (data.isSpinLimitReached) {
                 setMessage("Daily spin limit reached");
                 setSpinning(false);
-                setSpinsLeft(0);
+                dispatch(updateUserSpin(0));
                 return;
             }
 
-            setSpinsLeft(data.newSpinCount);
+            dispatch(updateUserSpin(data.newSpinCount));
 
             const newReels = [createReel(), createReel(), createReel()];
             const spinDuration = 2000;
@@ -182,7 +157,7 @@ const BonusPage = () => {
                     const result = newReels.map(reel => reel[0]);
                     const win = calculateWin(result);
                     if (win > 0) {
-                        setScore(prevScore => prevScore + win);
+                        dispatch(updateUserScores(userData.scores + win));
                         setMessage(`You won ${win}⭐️!`);
                         playWinAnimation(win, result);
 
@@ -211,7 +186,7 @@ const BonusPage = () => {
             setMessage("Error checking spin restrictions");
             setSpinning(false);
         }
-    }, [spinning, spinsLeft, score, app.initDataUnsafe.user?.id]);
+    }, [spinning, userData.daily_spin_count, userData.scores, app.initDataUnsafe.user?.id]);
 
     const getVisibleSymbols = (reelIndex) => {
         const position = reelPositions[reelIndex];
@@ -236,7 +211,7 @@ const BonusPage = () => {
                 </div>
 
                 <div className="text-center my-2">
-                    <p className="text-4xl font-bold text-white">⭐️ {score}</p>
+                    <p className="text-4xl font-bold text-white">⭐️ {userData.scores}</p>
                 </div>
 
                 <div className="bg-gradient-to-r from-indigo-700 w-full h-2/3 to-purple-700 rounded-lg p-3 relative bg-opacity-70">
@@ -277,9 +252,9 @@ const BonusPage = () => {
                     <button
                         className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black font-bold py-3 px-4 rounded-lg transform transition duration-200 hover:scale-105 disabled:opacity-50 text-xl"
                         onClick={spin}
-                        disabled={spinning || score < 10 || spinsLeft <= 0}
+                        disabled={spinning || userData.scores < 10 || userData.daily_spin_count <= 0}
                     >
-                        {spinning ? 'Spinning...' : `SPIN 🎰 (${spinsLeft} left)`}
+                        {spinning ? 'Spinning...' : `SPIN 🎰 (${userData.daily_spin_count} left)`}
                     </button>
                 </div>
 

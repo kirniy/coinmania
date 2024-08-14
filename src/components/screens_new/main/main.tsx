@@ -5,17 +5,15 @@ import { LoadingContext } from '@/app/context/LoaderContext'
 import Footer from "@/components/footer/Footer"
 import Loader from '@/components/loader/loader'
 import supabase from "@/db/supabase"
+import { AppDispatch } from '@/store/store'
+import { updateUserEnergy, updateUserScores } from '@/store/userSlice'
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
-interface UserData {
-    id: string;
-    scores: number | null;
-    booster_x2: string | null;
-    booster_x3: string | null;
-    booster_x5: string | null;
-    energy: number | null;
-    last_login_time: string;
-    maxenergy: number; // Добавляем поле maxenergy
+interface RootState {
+    user: {
+        data: any;
+    }
 }
 
 type EmojiType = {
@@ -38,11 +36,10 @@ type ClickType = {
 };
 
 const CoinMania: React.FC = () => {
+    const dispatch: AppDispatch = useDispatch();
     const app = useContext(webAppContext);
+    const userData = useSelector((state: RootState) => state.user.data);
     const { isLoading, setLoading } = useContext(LoadingContext);
-    const [userData, setUserData] = useState<UserData | null>(null);
-    const [points, setPoints] = useState(0);
-    const [energy, setEnergy] = useState(1000);
     const [error, setError] = useState<string | null>(null);
 
     const [isPressed, setIsPressed] = useState(false);
@@ -58,52 +55,28 @@ const CoinMania: React.FC = () => {
 
     const [coinSize, setCoinSize] = useState(360); // Добавляем состояние для размера монеты
 
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const response = await fetch(`/api/user/data?id=${app.initDataUnsafe.user?.id}`);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                console.log('User data fetched:', data);
 
-                setUserData({ ...data.user });
-                setPoints(data.user.scores ?? 0);
-                setEnergy(Math.min(data.user.energy ?? 0, data.user.maxenergy)); // Устанавливаем энергию, не превышающую maxenergy
-            } catch (error: unknown) {
-                if (error instanceof Error) {
-                    setError(error.message);
-                }
-            } finally {
-                setLoading(false);
-            }
-        };
+    // useEffect(() => {
+    //     const saveEnergyAndTime = async () => {
+    //         try {
+    //             const { error } = await supabase
+    //                 .from('users')
+    //                 .update({ energy: userData.energy, last_login_time: new Date().toISOString() })
+    //                 .eq('id', app.initDataUnsafe.user?.id);
 
-        fetchUserData();
-    }, [app.initDataUnsafe.user?.id]);
+    //             if (error) {
+    //                 throw error;
+    //             }
+    //         } catch (error: unknown) {
+    //             if (error instanceof Error) {
+    //                 setError(error.message);
+    //             }
+    //         }
+    //     };
 
-    useEffect(() => {
-        const saveEnergyAndTime = async () => {
-            try {
-                const { error } = await supabase
-                    .from('users')
-                    .update({ energy: energy, last_login_time: new Date().toISOString() })
-                    .eq('id', app.initDataUnsafe.user?.id);
-
-                if (error) {
-                    throw error;
-                }
-            } catch (error: unknown) {
-                if (error instanceof Error) {
-                    setError(error.message);
-                }
-            }
-        };
-
-        const interval = setInterval(saveEnergyAndTime, 2000);
-        return () => clearInterval(interval);
-    }, [energy]);
+    //     const interval = setInterval(saveEnergyAndTime, 2000);
+    //     return () => clearInterval(interval);
+    // }, [userData.energy]);
 
     useEffect(() => {
         const updateCoinSize = () => {
@@ -125,7 +98,7 @@ const CoinMania: React.FC = () => {
     }, []);
 
     const handleButtonClick = async (e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>) => {
-        if (energy <= 0) return;
+        if (userData.energy <= 0) return;
 
         // Проверяем время действия бустера
         const now = new Date();
@@ -144,8 +117,8 @@ const CoinMania: React.FC = () => {
 
         const pointsToAdd = 1 * boosterMultiplier; // Значение с учетом бустера
 
-        setPoints(prevPoints => prevPoints + pointsToAdd);
-        setEnergy(prevEnergy => Math.min(prevEnergy - 1, userData?.maxenergy ?? 0)); // Уменьшаем энергию, не превышая maxenergy
+        dispatch(updateUserScores(userData.scores + pointsToAdd));
+        dispatch(updateUserEnergy(Math.min(userData.energy - 1, userData?.maxenergy ?? 0)));// Уменьшаем энергию, не превышая maxenergy
 
         const rect = coinRef.current?.getBoundingClientRect();
         if (rect) {
@@ -166,7 +139,7 @@ const CoinMania: React.FC = () => {
         try {
             const { error } = await supabase
                 .from('users')
-                .update({ scores: points + pointsToAdd, energy: energy - 1 })
+                .update({ scores: userData.scores + pointsToAdd, energy: userData.energy - 1 })
                 .eq('id', app.initDataUnsafe.user?.id);
 
             if (error) {
@@ -311,7 +284,7 @@ const CoinMania: React.FC = () => {
             if (data.success) {
                 alert(`Энергия сброшена до ${data.energy}`);
                 console.log(`Setting energy to ${data.energy}`); // Add logging to confirm value
-                setEnergy(data.energy);  // Immediately set the new energy value
+                dispatch(updateUserEnergy(data.energy));
             } else {
                 alert(data.error || "Не удалось сбросить энергию");
             }
@@ -374,7 +347,7 @@ const CoinMania: React.FC = () => {
 
                         <div className="flex justify-center items-center">
                             <img src='/images/coin.png' width={30} alt="Coin" className="mr-2" />
-                            <span className="text-3xl font-bold">{points.toLocaleString()}</span>
+                            <span className="text-3xl font-bold">{userData.scores.toLocaleString()}</span>
                         </div>
                     </div>
                 </div>
@@ -447,7 +420,7 @@ const CoinMania: React.FC = () => {
 
                     <div className="justify-between flex mt-4 mx-2">
                         <span className="text-center text-white text-xl font-bold">
-                            ⚡️{energy} / {userData?.maxenergy ?? 1000}
+                            ⚡️{userData.energy} / {userData?.maxenergy ?? 1000}
                         </span>
                         <button onClick={resetEnergy}
                                 className="bg-gradient-to-bl z-9999 from-yellow-400 to-yellow-600 text-sm text-white font-black p-1 rounded-md">
@@ -458,7 +431,7 @@ const CoinMania: React.FC = () => {
                     <div className="w-full rounded-md items-center px-2 my-2">
                         <div
                             className="bg-gradient-to-r from-[#f3c45a] to-[#fffad0] h-2 rounded-md"
-                            style={{width: `${(energy / (userData?.maxenergy ?? 1000)) * 100}%`}}
+                            style={{width: `${(userData.energy / (userData?.maxenergy ?? 1000)) * 100}%`}}
                         >
                         </div>
                     </div>

@@ -5,15 +5,18 @@ import { LoadingContext } from '@/app/context/LoaderContext'
 import Header from "@/components/header/header"
 import Loader from "@/components/loader/loader"
 import { useContext, useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 
-interface UserData {
-    scores: number;
+interface RootState {
+    user: {
+      data: any;
+    }
 }
 
 const Profile = () => {
     const app = useContext(webAppContext);
+    const userData = useSelector((state: RootState) => state.user.data);
     const { isLoading, setLoading } = useContext(LoadingContext);
-    const [userData, setUserData] = useState<UserData | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [referralsCount, setReferralsCount] = useState(0);
 
@@ -22,22 +25,6 @@ const Profile = () => {
     }, [app]);
 
     useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const response = await fetch(`/api/user/data?id=${app.initDataUnsafe.user?.id}`);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                setUserData(data.user);
-            } catch (error) {
-                const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-                setError(errorMessage);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         const fetchReferralsCount = async () => {
             try {
                 const response = await fetch(`/api/user/referrals?id=${app.initDataUnsafe.user?.id}`);
@@ -52,7 +39,6 @@ const Profile = () => {
         };
 
         if (app.initDataUnsafe.user?.id) {
-            fetchUserData();
             fetchReferralsCount();
         }
     }, [app.initDataUnsafe.user?.id]);

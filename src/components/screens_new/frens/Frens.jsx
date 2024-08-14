@@ -4,34 +4,20 @@ import Footer from "@/components/footer/Footer"
 import Loader from "@/components/loader/loader"
 import { Users, XCircle } from 'lucide-react'
 import { useContext, useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 import styles from './FriendsPage.module.css'; // Импортируем стили
 
 const FriendsPage = () => {
     const app = useContext(webAppContext);
+    const userData = useSelector((state) => state.user.data);
     const { isLoading, setLoading } = useContext(LoadingContext);
     const [showLeaderboard, setShowLeaderboard] = useState(false);
     const [isInvitePressed, setIsInvitePressed] = useState(false);
-    const [userData, setUserData] = useState(null);
     const [error, setError] = useState(null);
     const [referralsCount, setReferralsCount] = useState(0);
     const [users, setUsers] = useState([]);
 
     useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const response = await fetch(`/api/user/data?id=${app.initDataUnsafe.user?.id}`);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                setUserData(data.user);
-            } catch (error) {
-                setError(error.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         const fetchReferralsCount = async () => {
             try {
                 const response = await fetch(`/api/user/referrals?id=${app.initDataUnsafe.user?.id}`);
@@ -73,7 +59,6 @@ const FriendsPage = () => {
         };
 
         if (app.initDataUnsafe.user?.id) {
-            fetchUserData();
             fetchReferralsCount();
             fetchUsers();
         }
@@ -135,7 +120,7 @@ const FriendsPage = () => {
                         <span className={styles.userTitle}>Король танцпола</span>
                     </div>
                     <ScoreboardDisplay icon="⭐" value={userData?.scores || 0} color="#f8cc46" fontSize="1.8rem" width="100%" />
-                    <ScoreboardDisplay icon="⚡️" value="995/1000" color="#ffffff" fontSize="1.2rem" width="60%" />
+                    <ScoreboardDisplay icon="⚡️" value={userData?.energy + '/' + userData?.maxenergy } color="#ffffff" fontSize="1.2rem" width="60%" />
                     <h4 className={styles.statsTitle}>📊 Статистика:</h4>
                     <div className={styles.stats}>
                         <div>🪙 Всего нажатий: <span style={{ color: '#f8cc46' }}>{userData?.scores || 0}</span></div>
