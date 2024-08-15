@@ -1,3 +1,4 @@
+import { lockBrowserEvents } from '@/helpers/lockBrowserEvents'
 import React, { createContext, useEffect, useState } from 'react'
 import type { TelegramWebApps } from 'telegram-webapps-types-new'
 
@@ -5,43 +6,33 @@ interface IProps {
   children: React.ReactNode;
 }
 
-export const webAppContext = createContext<TelegramWebApps.WebApp>(
-  {} as TelegramWebApps.WebApp
-);
+interface WebAppContextValue {
+  app: TelegramWebApps.WebApp;
+  isMounted: boolean;
+}
+
+export const webAppContext = createContext<WebAppContextValue>({
+  app: {} as TelegramWebApps.WebApp,
+  isMounted: false,
+});
 
 export const WebAppProvider = ({ children }: IProps) => {
   const [app, setApp] = useState({} as TelegramWebApps.WebApp);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setApp(window.Telegram.WebApp);
   }, []);
 
   useEffect(() => {
-    if (!app) return;
+    if (!app || !app.ready) return;
 
-    if (app.ready) {
-      app.ready();
-      app.isClosingConfirmationEnabled = true;
-      app.disableVerticalSwipes();
-      app.expand();
+    app.ready();
+    app.isClosingConfirmationEnabled = true;
+    app.disableVerticalSwipes();
+    app.expand();
 
-      if (document) {
-        document.addEventListener('gesturestart', function (e) {
-          e.preventDefault();
-          document.body.style.zoom = '0.99';
-        });
-    
-        document.addEventListener('gesturechange', function (e) {
-          e.preventDefault();
-    
-          document.body.style.zoom = '0.99';
-        });
-        document.addEventListener('gestureend', function (e) {
-          e.preventDefault();
-          document.body.style.zoom = '1';
-        });
-      }
-    }
+    lockBrowserEvents();
 
     const addUserToContext = async () => {
       const userId = app.initDataUnsafe?.user?.id;
@@ -74,6 +65,8 @@ export const WebAppProvider = ({ children }: IProps) => {
 
         const result = await response.json();
         console.log(result.message);
+
+        setIsMounted(true);
       } catch (error) {
         console.error('Error adding user to context:', error);
       }
@@ -83,6 +76,8 @@ export const WebAppProvider = ({ children }: IProps) => {
   }, [app]);
 
   return (
-    <webAppContext.Provider value={app}>{children}</webAppContext.Provider>
+    <webAppContext.Provider value={{ app, isMounted }}>
+      {children}
+    </webAppContext.Provider>
   );
 };

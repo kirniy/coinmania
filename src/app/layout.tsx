@@ -1,9 +1,9 @@
 import LockDesctop from '@/components/screens/lock/LockDesctop'
+import { isMobileDevice } from "@/helpers/mobileDetect"
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import Script from 'next/script'
 import React from 'react'
-import { isMobileDevice } from "../helpers/DetectMobile"
 import './globals.scss'
 import Providers from './providers/providers'
 
@@ -11,8 +11,8 @@ const environment = process.env.NEXT_PUBLIC_ENVIRONMENT;
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'WebApp telegram template',
-  description: 'WebApp Telegram template for new projects'
+  title: 'VNVNC CoinMania',
+  description: 'VNVNC CoinMania project'
 };
 
 export default async function RootLayout({

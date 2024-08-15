@@ -81,7 +81,7 @@ const Loader: React.FC<LoaderProps> = ({ loading }) => {
                 <g transform="translate(0, 5)">
                     <rect x="10%" y="130" width="80%" height="6" rx="3" fill="#611e1c"/>
                     <rect x="10%" y="130" width="0" height="6" rx="3" fill="url(#loadingGradient)">
-                        <animate attributeName="width" values="0%;80%;0%" keyTimes="0;0.99;1" dur="2s" repeatCount="indefinite" />
+                        <animate attributeName="width" values="0%;80%;0%" keyTimes="0;0.99;1" dur="3.8s" repeatCount="indefinite" />
                     </rect>
                 </g>
             </svg>

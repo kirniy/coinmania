@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { XCircle } from 'lucide-react';
-import Footer from "@/components/footer/Footer";
-import { webAppContext } from "@/app/context";
-import axios from 'axios';
-import styles from './CoinManiaBonusPage.module.css';  // Импортируем стили
+import { webAppContext } from "@/app/context"
+import Footer from "@/components/footer/Footer"
+import axios from 'axios'
+import { XCircle } from 'lucide-react'
+import { useContext, useEffect, useState } from 'react'
+import styles from './CoinManiaBonusPage.module.css'; // Импортируем стили
 
 const CoinManiaBonusPage = () => {
     const [activeTab, setActiveTab] = useState('Bonus');
@@ -11,7 +11,7 @@ const CoinManiaBonusPage = () => {
     const [showTasks, setShowTasks] = useState(false);
     const [taskStatus, setTaskStatus] = useState({});
     const [loadingTasks, setLoadingTasks] = useState({});
-    const app = useContext(webAppContext);
+    const {app} = useContext(webAppContext);
 
     const tabs = [
         { name: 'Home', icon: '🏠', color: '#f8cc46' },

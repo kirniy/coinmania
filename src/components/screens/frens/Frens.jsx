@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux'
 import styles from './FriendsPage.module.css'; // Импортируем стили
 
 const FriendsPage = () => {
-    const app = useContext(webAppContext);
+    const {app} = useContext(webAppContext);
     const userData = useSelector((state) => state.user.data);
     const { isLoading, setLoading } = useContext(LoadingContext);
     const [showLeaderboard, setShowLeaderboard] = useState(false);
@@ -54,7 +54,7 @@ const FriendsPage = () => {
                 setUsers(testUsers);
                 console.error("Failed to fetch users:", error);
             } finally {
-                setLoading(false);
+
             }
         };
 

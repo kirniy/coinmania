@@ -6,9 +6,9 @@ import Footer from "@/components/footer/Footer"
 import Loader from '@/components/loader/loader'
 import supabase from "@/db/supabase"
 import { AppDispatch } from '@/store/store'
-import { updateUserEnergy, updateUserScores } from '@/store/userSlice'
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { updateUserEnergy, updateUserScores } from '../../../store/userSlice'
 
 interface RootState {
     user: {
@@ -37,7 +37,7 @@ type ClickType = {
 
 const CoinMania: React.FC = () => {
     const dispatch: AppDispatch = useDispatch();
-    const app = useContext(webAppContext);
+    const {app} = useContext(webAppContext);
     const userData = useSelector((state: RootState) => state.user.data);
     const { isLoading, setLoading } = useContext(LoadingContext);
     const [error, setError] = useState<string | null>(null);

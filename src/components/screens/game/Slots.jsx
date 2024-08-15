@@ -1,22 +1,17 @@
 import { webAppContext } from "@/app/context"
 import Footer from "@/components/footer/Footer"
-import { updateUserScores, updateUserSpin } from '@/store/userSlice'
+import { PAYOUTS, REEL_SIZE, SYMBOLS } from '@/constants/game.js'
 import { ArrowLeft } from 'lucide-react'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { updateUserScores, updateUserSpin } from '../../../store/userSlice'
 import styles from './Game.module.css'; // Импортируем стили
-
-const SYMBOL_WEIGHTS = { "🪩": 0.0301, "🍹": 0.0708, "🎁": 0.1232, "🎉": 0.2283, "💃": 0.5476 };
-const SYMBOLS = Object.entries(SYMBOL_WEIGHTS).flatMap(([s, w]) => Array(Math.round(w * 1000)).fill(s));
-const PAYOUTS = { "🪩🪩🪩": 50000, "🍹🍹🍹": 20000, "🎁🎁🎁": 10000, "🎉🎉🎉": 2500, "💃💃💃": 1000, "🪩🪩": 500, "🍹🍹": 400, "🎁🎁": 200, "🎉🎉": 100, "💃💃": 50 };
-const REEL_SIZE = 20;
-const MAX_SPINS_PER_DAY = 2;
 
 const createReel = () => Array.from({ length: REEL_SIZE }, () => SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]);
 
 const BonusPage = () => {
     const dispatch =  useDispatch();
-    const app = useContext(webAppContext);
+    const {app} = useContext(webAppContext);
     const userData = useSelector((state) => state.user.data);
     const [reels, setReels] = useState([createReel(), createReel(), createReel()]);
     const [reelPositions, setReelPositions] = useState([0, 0, 0]);

@@ -1,6 +1,6 @@
 'use client';
 
-import LoadingProvider from '@/app/context/LoaderContext'
+import LoadingProvider, { LoadingContext } from '@/app/context/LoaderContext'
 import store, { AppDispatch } from '@/store/store'
 import { fetchUserData } from '@/store/userSlice'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -14,20 +14,25 @@ interface IPropsProviders {
 
 const AppInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const dispatch: AppDispatch = useDispatch();
-  const app = useContext(webAppContext);
+  const { app, isMounted } = useContext(webAppContext);
+  const { isLoading, setLoading } = useContext(LoadingContext);
 
   useEffect(() => {
-    if (app.initDataUnsafe?.user?.id) {
-      dispatch(fetchUserData(app.initDataUnsafe.user.id));
+    if (isMounted && app.initDataUnsafe?.user?.id) {
+      dispatch(fetchUserData(app.initDataUnsafe.user.id)).then(() => {
+        setTimeout(() => {
+          setLoading(false);
+        }, 3000) // Визуальная задержка
+      });
     }
-  }, [app, dispatch]);
+  }, [isMounted, app, dispatch]);
 
   return <>{children}</>;
 };
 
 const Providers = ({ children }: IPropsProviders) => {
   const queryClient = new QueryClient();
-  
+
   return (
     <QueryClientProvider client={queryClient}>
       <WebAppProvider>

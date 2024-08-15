@@ -1,6 +1,5 @@
+import { MAX_SPINS_PER_DAY } from '@/constants/game.js'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
-
-const MAX_SPINS_PER_DAY = 2;
 
 interface UserData {
   booster_x2: string | null;

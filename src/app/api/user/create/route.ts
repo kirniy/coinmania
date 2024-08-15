@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import supabase from "@/db/supabase";
-import increase_max_energy from "@/app/api/util/add_energy";
+import increase_max_energy from "@/app/api/util/add_energy"
+import supabase from "@/db/supabase"
+import { NextRequest, NextResponse } from 'next/server'
 
 /*
 POST http://localhost:3000/api/user/create
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
                     username: username,
                     referal_id: referal_id,
                     maxenergy: maxenergy,
-
+                    energy: maxenergy,
                 }]);
 
             if (insertError) {
