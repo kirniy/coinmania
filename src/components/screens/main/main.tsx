@@ -56,27 +56,27 @@ const CoinMania: React.FC = () => {
     const [coinSize, setCoinSize] = useState(360); // Добавляем состояние для размера монеты
 
 
-    // useEffect(() => {
-    //     const saveEnergyAndTime = async () => {
-    //         try {
-    //             const { error } = await supabase
-    //                 .from('users')
-    //                 .update({ energy: userData.energy, last_login_time: new Date().toISOString() })
-    //                 .eq('id', app.initDataUnsafe.user?.id);
+    useEffect(() => {
+        const saveEnergyAndTime = async () => {
+            try {
+                const { error } = await supabase
+                    .from('users')
+                    .update({ energy: userData.energy, last_login_time: new Date().toISOString() })
+                    .eq('id', app.initDataUnsafe.user?.id);
 
-    //             if (error) {
-    //                 throw error;
-    //             }
-    //         } catch (error: unknown) {
-    //             if (error instanceof Error) {
-    //                 setError(error.message);
-    //             }
-    //         }
-    //     };
+                if (error) {
+                    throw error;
+                }
+            } catch (error: unknown) {
+                if (error instanceof Error) {
+                    setError(error.message);
+                }
+            }
+        };
 
-    //     const interval = setInterval(saveEnergyAndTime, 2000);
-    //     return () => clearInterval(interval);
-    // }, [userData.energy]);
+        const interval = setInterval(saveEnergyAndTime, 2000);
+        return () => clearInterval(interval);
+    }, [userData.energy]);
 
     useEffect(() => {
         const updateCoinSize = () => {
