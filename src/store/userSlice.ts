@@ -66,6 +66,7 @@ const userSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchUserData.pending, (state) => {
+        console.log('state', state)
         state.status = 'loading';
       })
       .addCase(fetchUserData.fulfilled, (state, action) => {
@@ -74,6 +75,7 @@ const userSlice = createSlice({
           state.error = 'Failed to fetch user data';
           return;
         }
+        console.log('action.payload', action.payload)
         state.status = 'succeeded';
         state.data = action.payload;
         state.data.energy = Math.min(action.payload.energy ?? 0, action.payload.maxenergy);
@@ -88,6 +90,7 @@ const userSlice = createSlice({
         state.data.daily_spin_count = availableSpinCount;
       })
       .addCase(fetchUserData.rejected, (state, action) => {
+        console.log('action', action)
         state.status = 'failed';
         state.error = action.error.message || 'Failed to fetch user data';
       });
