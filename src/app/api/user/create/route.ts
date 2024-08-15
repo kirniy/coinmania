@@ -33,9 +33,10 @@ export async function POST(req: NextRequest) {
             console.error("Failed to fetch user:", fetchError);
             return NextResponse.json({ error: "Failed to fetch user" }, { status: 500 });
         }
-
+        console.log('existingUser')
         // Если пользователь не существует, добавляем его
         if (!existingUser) {
+            console.log('!existingUser')
             const { error: insertError } = await supabase
                 .from('users')
                 .insert([{
