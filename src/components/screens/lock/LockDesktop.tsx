@@ -1,6 +1,6 @@
 import Image from 'next/image'
 
-export default function LockDesctop() {
+export default function LockDesktop() {
   return (
       <div className="h-screen w-full bg-black text-center flex items-center justify-center pt-4">
           <div className="flex flex-col items-center justify-center">
