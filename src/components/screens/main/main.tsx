@@ -2,7 +2,6 @@
 
 import { webAppContext } from "@/app/context"
 import { LoadingContext } from '@/app/context/LoaderContext'
-import Footer from "@/components/footer/Footer"
 import Loader from '@/components/loader/loader'
 import supabase from "@/db/supabase"
 import { AppDispatch } from '@/store/store'
@@ -54,29 +53,6 @@ const CoinMania: React.FC = () => {
     const consecutiveTapsRef = useRef(0);
 
     const [coinSize, setCoinSize] = useState(360); // Добавляем состояние для размера монеты
-
-
-    // useEffect(() => {
-    //     const saveEnergyAndTime = async () => {
-    //         try {
-    //             const { error } = await supabase
-    //                 .from('users')
-    //                 .update({ energy: userData.energy, last_login_time: new Date().toISOString() })
-    //                 .eq('id', app.initDataUnsafe.user?.id);
-
-    //             if (error) {
-    //                 throw error;
-    //             }
-    //         } catch (error: unknown) {
-    //             if (error instanceof Error) {
-    //                 setError(error.message);
-    //             }
-    //         }
-    //     };
-
-    //     const interval = setInterval(saveEnergyAndTime, 2000);
-    //     return () => clearInterval(interval);
-    // }, [userData.energy]);
 
     useEffect(() => {
         const updateCoinSize = () => {
@@ -437,10 +413,6 @@ const CoinMania: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Нижний блок меню */}
-                <div className={'z-50 w-full fixed bottom-0'}>
-                    <Footer activeTab={'Home'}/>
-                </div>
             </div>
         </div>
     );

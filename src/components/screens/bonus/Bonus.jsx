@@ -1,5 +1,4 @@
 import { webAppContext } from "@/app/context"
-import Footer from "@/components/footer/Footer"
 import axios from 'axios'
 import { XCircle } from 'lucide-react'
 import { useContext, useEffect, useState } from 'react'
@@ -187,11 +186,6 @@ const CoinManiaBonusPage = () => {
                 <button onClick={() => setShowTasks(true)} className={styles.tasksButton}>
                     ✅ Задания
                 </button>
-            </div>
-
-            {/* Navigation Bar */}
-            <div className={'z-50 w-full fixed bottom-0'}>
-                <Footer activeTab='Bonus'/>
             </div>
 
             {/* Tasks Pop-up */}

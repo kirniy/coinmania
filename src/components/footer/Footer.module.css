@@ -1,0 +1,66 @@
+.footerContainer {
+  width: 100%;
+  height: 130px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-family: 'Arial', sans-serif;
+  padding: 15px;
+}
+.navbar {
+  width: 100%;
+  height: 100px;
+  position: relative;
+  overflow: hidden;
+  padding: 10px 15px;
+}
+.frostedGlass {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+.nav {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+.tabLink {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 22%;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+.tabIcon {
+  font-size: 32px;
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
+}
+.tabText {
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+.activeIndicator {
+  position: absolute;
+  bottom: -5px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: white;
+}
