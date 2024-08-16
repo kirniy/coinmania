@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import LockDesktop from './screens/lock/LockDesktop'
 
 const useIsMobile = () => {
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(true);
 
   useEffect(() => {
     const toMatch = [
