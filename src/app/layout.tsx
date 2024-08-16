@@ -1,5 +1,4 @@
-import LockDesctop from '@/components/screens/lock/LockDesctop'
-import { isMobileDevice } from "@/helpers/mobileDetect"
+import MobileDetector from '@/components/MobileDetector'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import Script from 'next/script'
@@ -7,9 +6,8 @@ import React from 'react'
 import './globals.scss'
 import Providers from './providers/providers'
 
-export const dynamic = "force-static"
+export const dynamic = "force-static";
 
-const environment = process.env.NEXT_PUBLIC_ENVIRONMENT;
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
@@ -17,16 +15,11 @@ export const metadata: Metadata = {
   description: 'VNVNC CoinMania project'
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  let checkIsMobile = await isMobileDevice();
-
-  if (environment === 'development') {
-    checkIsMobile =  true;
-  }
   return (
     <html lang='ru'>
       <head>
@@ -46,9 +39,9 @@ export default async function RootLayout({
         />
       </head>
       <body className={inter.className}>
-        {
-          checkIsMobile ? <Providers>{children}</Providers> : <LockDesctop/>
-        }
+        <MobileDetector>
+          <Providers>{children}</Providers>
+        </MobileDetector>
       </body>
     </html>
   );
