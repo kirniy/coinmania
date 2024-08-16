@@ -1,5 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import supabase from "@/db/supabase";
+import supabase from "@/db/supabase"
+import { NextRequest, NextResponse } from 'next/server'
+
+export const dynamic = "force-dynamic"
 
 const currentTime = new Date();
 

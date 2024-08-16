@@ -7,6 +7,8 @@ import React from 'react'
 import './globals.scss'
 import Providers from './providers/providers'
 
+export const dynamic = "force-static"
+
 const environment = process.env.NEXT_PUBLIC_ENVIRONMENT;
 const inter = Inter({ subsets: ['latin'] });
 
