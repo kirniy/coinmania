@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server';
-import supabase from "@/db/supabase";
+import supabase from "@/db/supabase"
+import { NextResponse } from 'next/server'
 
-// Define the GET request handler
+export const dynamic = "force-dynamic"
+
 export const GET = async (req: Request) => {
     try {
         const { searchParams } = new URL(req.url);
