@@ -1,0 +1,141 @@
+.background {
+  background: linear-gradient(to bottom, #000, #1a1a1a, #4c0000);
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white;
+  font-weight: 500;
+  user-select: none;
+  position: relative;
+}
+.gradientBackground {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, black, #1a1a1a, #4c0000);
+  z-index: 0;
+  height: 100dvh;
+}
+.radialGradientOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 0;
+}
+
+.emojiLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  overflow: hidden;
+  pointer-events: none;
+}
+.emojiContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.emoji {
+  position: absolute;
+  font-size: 2rem;
+  transition: opacity 1s;
+}
+.content {
+  width: 100%;
+  z-index: 30;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white;
+}
+.header {
+  position: fixed;
+  background: linear-gradient(to bottom, #1a1a1a, transparent);
+  width: 100%;
+  z-index: 40;
+}
+.headerImage {
+  display: block;
+  margin: 0 auto;
+  padding: 2rem 0;
+}
+.scoreSection {
+  position: fixed;
+  top: 6rem;
+  margin: 0 auto;
+  width: 100%;
+  z-index: 100;
+  padding: 0 1rem;
+  text-align: center;
+}
+.score {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.scoreImage {
+  margin-right: 0.5rem;
+}
+.mainCoin {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 40;
+  user-select: none;
+  pointer-events: none;
+}
+.coinImage {
+  pointer-events: auto;
+  user-select: none;
+  transition: transform 0.1s;
+}
+.clickValue {
+  position: absolute;
+  font-size: 2rem;
+  font-weight: bold;
+  pointer-events: none;
+}
+.energySection {
+  position: fixed;
+  bottom: 9rem;
+  width: 100%;
+  z-index: 50;
+}
+.energyInfo {
+  display: flex;
+  justify-content: space-between;
+  margin: 1rem 0.5rem;
+}
+.energyText {
+  color: white;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+.resetButton {
+  background: linear-gradient(to bottom left, #fbbd23, #f59e0b);
+  font-size: 0.875rem;
+  font-weight: 900;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+}
+.energyWrap {
+  padding: 0.25rem 0.5rem;
+}
+.energyBar {
+  width: 100%;
+  border-radius: 0.375rem;
+  padding: 2px;
+  border: 1px solid #fffad0;
+  margin: 0.5rem 0;
+}
+.energyFill {
+  background: linear-gradient(to right, #f3c45a, #fffad0);
+  height: 0.5rem;
+  border-radius: 0.375rem;
+}
