@@ -5,19 +5,11 @@ import { useContext, useEffect, useState } from 'react'
 import styles from './CoinManiaBonusPage.module.css'; // Импортируем стили
 
 const CoinManiaBonusPage = () => {
-    const [activeTab, setActiveTab] = useState('Bonus');
     const [activeBooster, setActiveBooster] = useState(null);
     const [showTasks, setShowTasks] = useState(false);
     const [taskStatus, setTaskStatus] = useState({});
     const [loadingTasks, setLoadingTasks] = useState({});
     const {app} = useContext(webAppContext);
-
-    const tabs = [
-        { name: 'Home', icon: '🏠', color: '#f8cc46' },
-        { name: 'Game', icon: '🎮', color: '#5c35c5' },
-        { name: 'Bonus', icon: '🎁', color: '#842221' },
-        { name: 'Friends', icon: '👥', color: '#2596be' },
-    ];
 
     const boosters = [
         { multiplier: 2, duration: 30, cost: 1000, color: '#f8cc46' },
