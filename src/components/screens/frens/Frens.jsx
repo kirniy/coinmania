@@ -1,6 +1,5 @@
 import { webAppContext } from "@/app/context"
 import { LoadingContext } from '@/app/context/LoaderContext'
-import Footer from "@/components/footer/Footer"
 import Loader from "@/components/loader/loader"
 import { Users, XCircle } from 'lucide-react'
 import { useContext, useEffect, useState } from 'react'
@@ -162,10 +161,6 @@ const FriendsPage = () => {
                 <button onClick={() => setShowLeaderboard(true)} className={styles.leaderboardButton}>
                     🏆 Лидеры VNVNC
                 </button>
-            </div>
-
-            <div className={'z-50 w-full fixed bottom-0'}>
-                <Footer activeTab='Frens' />
             </div>
 
             {showLeaderboard && (
