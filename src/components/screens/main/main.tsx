@@ -87,13 +87,10 @@ const CoinMania: React.FC = () => {
         let boosterMultiplier = 1;
 
         if (userData) {
-            const boosterTypes = ['booster_x2', 'booster_x3', 'booster_x5'] as const;
-            for (const boosterType of boosterTypes) {
-                const boosterEndTime = userData[boosterType];
-                if (boosterEndTime && new Date(boosterEndTime) > now) {
-                    boosterMultiplier = parseInt(boosterType.split('_x')[1]);
-                    break;
-                }
+            const boosterEndTime = new Date(userData.last_tap_boost_time);
+            
+            if (now < boosterEndTime) {
+                boosterMultiplier = 5;
             }
         }
 
