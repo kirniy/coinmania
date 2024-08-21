@@ -36,7 +36,7 @@ const Boosters: React.FC = ({}) => {
                 return;
             }
 
-            dispatch(updateUserFullTankCount(data.newTapBoostCount));
+            dispatch(updateUserFullTankCount(data.newAvailableBoostCount));
             dispatch(updateUserFullTankLastTime(data.endTime));
 
             console.log(`Setting energy to ${data.data}`);
@@ -60,7 +60,7 @@ const Boosters: React.FC = ({}) => {
                 return;
             }
 
-            dispatch(updateUserTapBoosterCount(data.newTapBoostCount));
+            dispatch(updateUserTapBoosterCount(data.newAvailableBoostCount));
             dispatch(updateUserTapBoosterLastTime(data.endTime));
         } catch (error) {
             console.error('Failed to buy booster:', error)
