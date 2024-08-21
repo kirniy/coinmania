@@ -52,7 +52,7 @@ const CoinMania: React.FC = () => {
     const coinRef = useRef<HTMLDivElement>(null);
     const consecutiveTapsRef = useRef(0);
     
-    const [emogis, setEmogis] = useState([])
+    const [emogis, setEmogis] = useState<string[]>([])
     const [speed, setSpeed] = useState(1);
     const handleButtonClickSpeed = () => {
         setSpeed((prevSpeed) => (prevSpeed >= 5 ? 1 : prevSpeed + 1)); // Ограничиваем скорость до 5
