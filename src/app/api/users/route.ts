@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import supabase from "@/db/supabase";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
     try {
         // Получение всех пользователей из базы данных
