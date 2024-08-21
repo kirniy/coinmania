@@ -63,8 +63,8 @@ const FriendsPage = () => {
         }
     }, [app.initDataUnsafe.user?.id]);
 
-    const copyToClipboard = () => {
-        const referralLink = `https://t.me/hearthneuro_bot/demo?startapp=${app.initDataUnsafe.user?.id}`;
+    const copyToClipboard = () => {        
+        const referralLink = `${process.env.NEXT_PUBLIC_TG_APP_URL ?? 'https://t.me/vinovnicabot/demojuly30'}?startapp=${app.initDataUnsafe.user?.id}`;
         navigator.clipboard.writeText(referralLink)
             .then(() => {
                 alert("Скопировано!");
