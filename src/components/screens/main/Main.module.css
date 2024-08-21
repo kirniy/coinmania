@@ -116,14 +116,6 @@
   font-size: 1.25rem;
   font-weight: bold;
 }
-.resetButton {
-  background: linear-gradient(to bottom left, #fbbd23, #f59e0b);
-  font-size: 0.875rem;
-  font-weight: 900;
-  color: white;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.375rem;
-}
 .energyWrap {
   padding: 0.25rem 0.5rem;
 }
