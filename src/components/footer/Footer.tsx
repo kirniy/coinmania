@@ -1,6 +1,6 @@
 "use client";
 
-import { TABS } from '@/constants/TABS.js'
+import { TABS } from '@/constants/tabs.js'
 import { RootState } from '@/store/rootReducer'
 import { setActiveTab } from '@/store/tabSlice'
 import Link from 'next/link'
