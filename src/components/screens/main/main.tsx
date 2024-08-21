@@ -243,23 +243,6 @@ const CoinMania: React.FC = () => {
 
     const id = app.initDataUnsafe.user?.id
 
-    const resetEnergy = async () => {
-        try {
-            const response = await fetch(`/api/util/reset_energy?userid=${id}`);
-            const data = await response.json();
-            if (data.success) {
-                alert(`Энергия сброшена до ${data.energy}`);
-                console.log(`Setting energy to ${data.energy}`); // Add logging to confirm value
-                dispatch(updateUserEnergy(data.energy));
-            } else {
-                alert(data.error || "Не удалось сбросить энергию");
-            }
-        } catch (error) {
-            alert("Произошла ошибка при сбросе энергии");
-            console.error("Error resetting energy:", error);
-        }
-    };
-
     if (isLoading) {
         return <Loader loading={isLoading} />;
     }
@@ -375,9 +358,6 @@ const CoinMania: React.FC = () => {
                         <span className={styles.energyText}>
                             ⚡️{userData.energy} / {userData?.maxenergy ?? 1000}
                         </span>
-                        <button onClick={resetEnergy} className={styles.resetButton}>
-                            Сбросить энергию
-                        </button>
                     </div>
                         <div className={styles.energyWrap}>
                             <div className={styles.energyBar}>
