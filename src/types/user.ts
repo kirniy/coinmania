@@ -12,5 +12,7 @@ export interface UserData {
     last_spin_time: string | null;
     daily_tap_boost_count: number;
     last_tap_boost_time: string | null;
+    daily_full_tank_count: number;
+    last_full_tank_time: string | null;
     referal_id: string | null;
 };
