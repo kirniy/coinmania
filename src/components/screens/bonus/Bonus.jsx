@@ -5,6 +5,7 @@ import { useContext, useEffect, useState } from 'react'
 import styles from './CoinManiaBonusPage.module.css'; // Импортируем стили
 
 import Boosters from './components/Boosters';
+import InfoBox from "@/components/common/InfoBox";
 
 const CoinManiaBonusPage = () => {
     const [activeBooster, setActiveBooster] = useState(null);
@@ -138,6 +139,10 @@ const CoinManiaBonusPage = () => {
                         <h2 className={styles.title}>🚀 Бустеры</h2>
                         <Boosters>
                         </Boosters>
+
+                        <InfoBox>
+                            Каждый бустер можно использовать только 3 раза в день, после истечения 24-х часов их можно будет использовать снова.
+                        </InfoBox>
                     </div>
                 </div>
 
