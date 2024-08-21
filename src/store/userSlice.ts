@@ -1,29 +1,12 @@
 import { MAX_SPINS_PER_DAY } from '@/constants/game.js'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
-
-interface UserData {
-  booster_x2: string | null;
-  booster_x3: string | null;
-  booster_x5: string | null;
-  daily_spin_count: number;
-  energy: number | null;
-  energyresettime: string;
-  first_name: string;
-  id: string;
-  last_login_time: string;
-  last_name: string;
-  last_spin_time: string | null;
-  maxenergy: number;
-  referal_id: string | null;
-  scores: number | null;
-  username: string;
-}
+import { UserData } from '@/types/user';
 
 interface UserState {
   data: UserData | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
-}
+};
 
 const initialState: UserState = {
   data: null,
