@@ -4,6 +4,8 @@ import { XCircle } from 'lucide-react'
 import { useContext, useEffect, useState } from 'react'
 import styles from './CoinManiaBonusPage.module.css'; // Импортируем стили
 
+import Boosters from './components/Boosters';
+
 const CoinManiaBonusPage = () => {
     const [activeBooster, setActiveBooster] = useState(null);
     const [showTasks, setShowTasks] = useState(false);
@@ -11,32 +13,10 @@ const CoinManiaBonusPage = () => {
     const [loadingTasks, setLoadingTasks] = useState({});
     const {app} = useContext(webAppContext);
 
-    const boosters = [
-        { multiplier: 2, duration: 30, cost: 1000, color: '#f8cc46' },
-        { multiplier: 3, duration: 15, cost: 2500, color: '#ff7f50' },
-        { multiplier: 5, duration: 5, cost: 5000, color: '#ff4500' },
-    ];
-
     const tasks = [
         { platform: 'Telegram', channels: ['Маленькая Виновница', 'VNVNC', 'ANGAR'], reward: 5000, duration: 15, color: '#0088cc' },
         { platform: 'Instagram', channels: ['Маленькая Виновница', 'VNVNC', 'ANGAR'], reward: 10000, duration: 240, color: '#c13584' },
     ];
-
-    const activateBooster = async (multiplier) => {
-        try {
-            const boosterType = `x${multiplier}`;
-            const response = await axios.get(`/api/util/buy_booster?userid=${app.initDataUnsafe.user?.id}&boosterType=${boosterType}`);
-            const data = response.data;
-            if (data.success) {
-                alert(`Бустер ${boosterType} приобретен до ${new Date(data.endTime).toLocaleTimeString()}`);
-                setActiveBooster({ multiplier, timeLeft: boosters.find(b => b.multiplier === multiplier).duration * 60 });
-            } else {
-                alert(data.error || "Не удалось приобрести бустер");
-            }
-        } catch (error) {
-            console.error("Failed to buy booster:", error);
-        }
-    };
 
     const subscribeToChannel = async (platform, channel) => {
         try {
@@ -153,25 +133,11 @@ const CoinManiaBonusPage = () => {
         <div className={styles.container}>
             <div className={styles.content}>
                 <div className={styles.bonusSection}>
-                    <h2 className={styles.title}>🎁 Бустеры</h2>
-                    {boosters.map((booster) => {
-                        const isActive = activeBooster && activeBooster.multiplier === booster.multiplier;
-                        const minutes = isActive ? Math.floor(activeBooster.timeLeft / 60) : 0;
-                        const seconds = isActive ? activeBooster.timeLeft % 60 : 0;
 
-                        return (
-                            <button key={booster.multiplier} onClick={() => activateBooster(booster.multiplier)} style={boosterStyle(booster)}>
-                                {isActive
-                                    ? `x${booster.multiplier} - ${minutes}:${seconds.toString().padStart(2, '0')}`
-                                    : `Купить x${booster.multiplier} на ${booster.duration} минут (${booster.cost}⭐️)`
-                                }
-                            </button>
-                        );
-                    })}
-                    <div style={infoBoxStyle}>
-                        <p style={{fontSize: '0.9rem', color: '#f0f0f0', lineHeight: '1.4'}}>
-                            Бустеры временно увеличивают количество монет, получаемых за каждое нажатие в разделе 🏠 Home. x2 удваивает, x3 утраивает, а x5 увеличивает в пять раз ваш доход. Только один бустер может быть активен одновременно.
-                        </p>
+                    <div className="flex flex-col gap-4">
+                        <h2 className={styles.title}>🚀 Бустеры</h2>
+                        <Boosters>
+                        </Boosters>
                     </div>
                 </div>
 
