@@ -1,5 +1,4 @@
 import { webAppContext } from "@/app/context"
-import Footer from "@/components/footer/Footer"
 import { PAYOUTS, REEL_SIZE, SYMBOLS } from '@/constants/game.js'
 import { ArrowLeft } from 'lucide-react'
 import { useCallback, useContext, useEffect, useState } from 'react'
@@ -335,9 +334,6 @@ const BonusPage = () => {
                 }}>{emoji.emoji}</div>
             ))}
 
-            <div className={'z-50 w-full fixed bottom-0'}>
-                <Footer activeTab='Game' />
-            </div>
         </div>
     );
 };

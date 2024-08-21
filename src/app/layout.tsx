@@ -1,9 +1,11 @@
+import Footer from '@/components/footer/Footer'
 import MobileDetector from '@/components/MobileDetector'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import Script from 'next/script'
 import React from 'react'
 import './globals.scss'
+import styles from './Layout.module.css'
 import Providers from './providers/providers'
 
 export const dynamic = "force-static";
@@ -38,9 +40,13 @@ export default function RootLayout({
           strategy='beforeInteractive'
         />
       </head>
-      <body className={inter.className}>
+      <body className={inter.className + ' ' + styles.body}>
         <MobileDetector>
-          <Providers>{children}</Providers>
+          <Providers>
+            {children}
+            
+            <Footer />
+          </Providers>
         </MobileDetector>
       </body>
     </html>

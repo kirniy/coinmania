@@ -2,14 +2,14 @@
 
 import { webAppContext } from "@/app/context"
 import { LoadingContext } from '@/app/context/LoaderContext'
-import Footer from "@/components/footer/Footer"
 import Loader from '@/components/loader/loader'
 import supabase from "@/db/supabase"
 import { AppDispatch } from '@/store/store'
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { updateUserEnergy, updateUserScores } from '../../../store/userSlice'
-
+import Emoji from './Emoji'
+import styles from './Main.module.css'
 interface RootState {
     user: {
         data: any;
@@ -43,7 +43,6 @@ const CoinMania: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
 
     const [isPressed, setIsPressed] = useState(false);
-    const [headerEmojis, setHeaderEmojis] = useState<EmojiType[]>([]);
     const [coinEmojis, setCoinEmojis] = useState<EmojiType[]>([]);
     const [clicks, setClicks] = useState<ClickType[]>([]);
     const [lastTapTime, setLastTapTime] = useState(Date.now());
@@ -52,31 +51,14 @@ const CoinMania: React.FC = () => {
     const lastUpdateTimeRef = useRef(Date.now());
     const coinRef = useRef<HTMLDivElement>(null);
     const consecutiveTapsRef = useRef(0);
+    
+    const [emogis, setEmogis] = useState<string[]>([])
+    const [speed, setSpeed] = useState(1);
+    const handleButtonClickSpeed = () => {
+        setSpeed((prevSpeed) => (prevSpeed >= 5 ? 1 : prevSpeed + 1)); // Ограничиваем скорость до 5
+      };
 
     const [coinSize, setCoinSize] = useState(360); // Добавляем состояние для размера монеты
-
-
-    // useEffect(() => {
-    //     const saveEnergyAndTime = async () => {
-    //         try {
-    //             const { error } = await supabase
-    //                 .from('users')
-    //                 .update({ energy: userData.energy, last_login_time: new Date().toISOString() })
-    //                 .eq('id', app.initDataUnsafe.user?.id);
-
-    //             if (error) {
-    //                 throw error;
-    //             }
-    //         } catch (error: unknown) {
-    //             if (error instanceof Error) {
-    //                 setError(error.message);
-    //             }
-    //         }
-    //     };
-
-    //     const interval = setInterval(saveEnergyAndTime, 2000);
-    //     return () => clearInterval(interval);
-    // }, [userData.energy]);
 
     useEffect(() => {
         const updateCoinSize = () => {
@@ -105,13 +87,10 @@ const CoinMania: React.FC = () => {
         let boosterMultiplier = 1;
 
         if (userData) {
-            const boosterTypes = ['booster_x2', 'booster_x3', 'booster_x5'] as const;
-            for (const boosterType of boosterTypes) {
-                const boosterEndTime = userData[boosterType];
-                if (boosterEndTime && new Date(boosterEndTime) > now) {
-                    boosterMultiplier = parseInt(boosterType.split('_x')[1]);
-                    break;
-                }
+            const boosterEndTime = new Date(userData.last_tap_boost_time);
+            
+            if (now < boosterEndTime) {
+                boosterMultiplier = 5;
             }
         }
 
@@ -185,27 +164,21 @@ const CoinMania: React.FC = () => {
         }
     };
 
+    const getRandomBgEmoji = () => {
+        const emojis = ['🎉', '⭐', '💥', '🚀', '🎤', '🔥'];
+
+        const filledArray = [];
+
+        for (let i = 0; i < 12; i++) {
+            filledArray.push(emojis[Math.floor(Math.random() * emojis.length)]);
+        }
+        setEmogis(filledArray)
+    };
+
     const getRandomEmoji = () => {
         const emojis = ['🎉', '⭐', '💥', '🚀', '🎤', '🔥'];
         return emojis[Math.floor(Math.random() * emojis.length)];
     };
-
-    const createInitialHeaderEmojis = useCallback((count: number) => {
-        return Array(count).fill(null).map(() => ({
-            id: Date.now() + Math.random(),
-            emoji: getRandomEmoji(),
-            x: Math.random() * 100,
-            y: Math.random() * 100,
-            size: Math.random() * 24 + 16,
-            speedX: (Math.random() - 0.5) * 0.1,
-            speedY: (Math.random() - 0.5) * 0.1,
-            createdAt: Date.now()
-        }));
-    }, []);
-
-    useEffect(() => {
-        setHeaderEmojis(createInitialHeaderEmojis(20));
-    }, [createInitialHeaderEmojis]);
 
     const addCoinEmojis = useCallback((x: number, y: number) => {
         const currentTime = Date.now();
@@ -239,14 +212,6 @@ const CoinMania: React.FC = () => {
             const timeSinceLastTap = currentTime - lastTapTime;
             headerAnimationSpeedRef.current = timeSinceLastTap > 2000 ? 0.2 : 1;
 
-            setHeaderEmojis(prevEmojis =>
-                prevEmojis.map(emoji => ({
-                    ...emoji,
-                    x: (emoji.x + emoji.speedX * headerAnimationSpeedRef.current + 100) % 100,
-                    y: (emoji.y + emoji.speedY * headerAnimationSpeedRef.current + 100) % 100,
-                }))
-            );
-
             setCoinEmojis(prevEmojis =>
                 prevEmojis
                     .map(emoji => ({
@@ -269,6 +234,7 @@ const CoinMania: React.FC = () => {
         const preventDefault = (e: Event) => e.preventDefault();
         document.body.style.overflow = 'hidden';
         document.addEventListener('touchmove', preventDefault, { passive: false });
+        getRandomBgEmoji()
         return () => {
             document.body.style.overflow = 'auto';
             document.removeEventListener('touchmove', preventDefault);
@@ -277,83 +243,53 @@ const CoinMania: React.FC = () => {
 
     const id = app.initDataUnsafe.user?.id
 
-    const resetEnergy = async () => {
-        try {
-            const response = await fetch(`/api/util/reset_energy?userid=${id}`);
-            const data = await response.json();
-            if (data.success) {
-                alert(`Энергия сброшена до ${data.energy}`);
-                console.log(`Setting energy to ${data.energy}`); // Add logging to confirm value
-                dispatch(updateUserEnergy(data.energy));
-            } else {
-                alert(data.error || "Не удалось сбросить энергию");
-            }
-        } catch (error) {
-            alert("Произошла ошибка при сбросе энергии");
-            console.error("Error resetting energy:", error);
-        }
-    };
-
     if (isLoading) {
         return <Loader loading={isLoading} />;
     }
 
     return (
-        <div className="bg-gradient-main min-h-screen flex flex-col items-center text-white font-medium"
-             style={{ userSelect: 'none' }}>
+        <div className={styles.background}>
             {/* Gradient background */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black via-zinc-950 to-red-950 z-0"
-                 style={{ height: '100vh' }}></div>
-            <div className="absolute inset-0 flex items-center justify-center z-0">
+            <div className={styles.gradientBackground}></div>
+            <div className={styles.radialGradientOverlay}>
                 <div className="radial-gradient-overlay"></div>
             </div>
-
+    
             {/* Emoji animation layer */}
-            <div className="fixed inset-0 z-10 overflow-hidden pointer-events-none">
-                <div className="relative w-full h-full">
-                    {headerEmojis.map(emoji => (
-                        <div
-                            key={emoji.id}
-                            className="absolute text-2xl transition-opacity duration-1000"
-                            style={{
-                                left: `${emoji.x}%`,
-                                top: `${emoji.y}%`,
-                                fontSize: `${emoji.size}px`,
-                                opacity: `${emoji.opacity}`, // Применяем opacity к каждому эмодзи
-                            }}
-                        >
-                            {emoji.emoji}
-                        </div>
+            <div className={styles.emojiLayer}>
+                <div className={styles.emojiContainer}>
+                {emogis.map((emoji, index) => (
+                        <Emoji key={index} emoji={emoji} speed={speed} />
                     ))}
+
                 </div>
             </div>
-
-            <div className="w-full z-30 min-h-screen flex flex-col items-center text-white">
+    
+            <div className={styles.content}>
                 {/* Header */}
-                <div className="fixed bg-gradient-to-b from-zinc-950 to-transparent w-full z-40">
-                    <div className="text-center py-8 relative">
+                <div className={styles.header}>
+                    <div className="text-center relative">
                         <img
                             src='/images/coinmania.webp'
                             alt="COINMANIA"
-                            className="mx-auto"
+                            className={styles.headerImage}
                             width={300}
                         />
                     </div>
                 </div>
-
+    
                 {/* Score and associated components */}
-                <div className="fixed top-24 mx-auto w-full z-100 px-4">
+                <div className={styles.scoreSection}>
                     <div className="text-center">
-
-                        <div className="flex justify-center items-center">
-                            <img src='/images/coin.png' width={30} alt="Coin" className="mr-2" />
+                        <div className={styles.score}>
+                            <img src='/images/coin.png' width={30} alt="Coin" className={styles.scoreImage} />
                             <span className="text-3xl font-bold">{userData.scores.toLocaleString()}</span>
                         </div>
                     </div>
                 </div>
-
+    
                 {/* Main coin */}
-                <div className="absolute center inset-0 flex items-center justify-center select-none z-40">
+                <div className={styles.mainCoin}>
                     <div
                         ref={coinRef}
                         className="relative select-none touch-none"
@@ -380,13 +316,13 @@ const CoinMania: React.FC = () => {
                                 transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) ${isPressed ? 'scale(0.95)' : 'scale(1)'}`,
                                 transition: 'transform 0.1s',
                             }}
-                            className='select-none'
+                            className={`${styles.coinImage} select-none`}
                         />
-
+    
                         {coinEmojis.map(emoji => (
                             <div
                                 key={emoji.id}
-                                className="absolute text-2xl pointer-events-none transition-opacity duration-1000"
+                                className={styles.emoji}
                                 style={{
                                     left: `${emoji.x}px`,
                                     top: `${emoji.y}px`,
@@ -400,7 +336,7 @@ const CoinMania: React.FC = () => {
                         {clicks.map((click) => (
                             <div
                                 key={click.id}
-                                className="absolute text-2xl font-bold float-animation"
+                                className={`${styles.clickValue} float-animation`}
                                 style={{
                                     top: `${click.y - 42}px`,
                                     left: `${click.x - 28}px`,
@@ -411,36 +347,29 @@ const CoinMania: React.FC = () => {
                                 +{click.value}⭐️
                             </div>
                         ))}
-
+    
                     </div>
                 </div>
-
-                {/* Блок с энергией */}
-                <div className="fixed bottom-36 w-full z-50 ">
-
-                    <div className="justify-between flex mt-4 mx-2">
-                        <span className="text-center text-white text-xl font-bold">
+    
+                {/* Energy section */}
+                <div className={styles.energySection}>
+    
+                    <div className={styles.energyInfo}>
+                        <span className={styles.energyText}>
                             ⚡️{userData.energy} / {userData?.maxenergy ?? 1000}
                         </span>
-                        <button onClick={resetEnergy}
-                                className="bg-gradient-to-bl z-9999 from-yellow-400 to-yellow-600 text-sm text-white font-black p-1 rounded-md">
-                            Сбросить энергию
-                        </button>
                     </div>
-
-                    <div className="w-full rounded-md items-center px-2 my-2">
-                        <div
-                            className="bg-gradient-to-r from-[#f3c45a] to-[#fffad0] h-2 rounded-md"
-                            style={{width: `${(userData.energy / (userData?.maxenergy ?? 1000)) * 100}%`}}
-                        >
+                        <div className={styles.energyWrap}>
+                            <div className={styles.energyBar}>
+                                <div
+                                    className={styles.energyFill}
+                                    style={{width: `${(userData.energy / (userData?.maxenergy ?? 1000)) * 100}%`}}
+                                />
+                            </div>
                         </div>
-                    </div>
+                    
                 </div>
-
-                {/* Нижний блок меню */}
-                <div className={'z-50 w-full fixed bottom-0'}>
-                    <Footer activeTab={'Home'}/>
-                </div>
+    
             </div>
         </div>
     );
