@@ -1,6 +1,7 @@
 import { configureStore, Action, ThunkAction } from '@reduxjs/toolkit'
 import rootReducer from './rootReducer'
 import type { RootState } from './rootReducer';
+import { startCountdown } from './userSlice';
 
 const store = configureStore({
   reducer: rootReducer,
