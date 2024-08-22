@@ -182,7 +182,7 @@ const CoinMania: React.FC = () => {
 
         if (consecutiveTapsRef.current >= 8 && consecutiveTapsRef.current % 8 === 0) {
             const newEmojis = Array(12).fill(null).map(() => ({
-                id: Date.now() + Math.random(),
+                id: String(Date.now()) + String(Math.random()),
                 emoji: getRandomEmoji(),
                 x: x + (Math.random() - 0.5) * 60,
                 y: y + (Math.random() - 0.5) * 60,
