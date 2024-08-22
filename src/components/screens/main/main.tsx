@@ -13,6 +13,9 @@ import { updateUserEnergy, updateUserScores } from '../../../store/userSlice'
 import Emoji from './Emoji'
 import styles from './Main.module.css'
 import CoinEmojis from "./CoinEmojis";
+
+import { throttle } from "@/utils/throttle";
+
 interface RootState {
     user: {
         data: any;
@@ -32,6 +35,8 @@ const CoinMania: React.FC = () => {
     const userData = useSelector((state: RootState) => state.user.data);
     const { isLoading, setLoading } = useContext(LoadingContext);
     const [error, setError] = useState<string | null>(null);
+
+    const [isTouchDevice, setIsTouchDevice] = useState<boolean>(false);
 
     const [isPressed, setIsPressed] = useState(false);
     const [coinEmojis, setCoinEmojis] = useState<EmojiType[]>([]);
@@ -70,14 +75,32 @@ const CoinMania: React.FC = () => {
         };
     }, []);
 
-    const handleButtonClick = async (e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>) => {
-        if (userData.energy <= 0) return;
+    const throttledSyncWithDB = useCallback(throttle(async (scores: number, energy: number) => {
+        try {
+            const { error } = await supabase
+                .from('users')
+                .update({ scores: scores, energy: energy })
+                .eq('id', userData.id);
 
+            if (error) {
+                throw error;
+            }
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                setError(error.message);
+            }
+        }
+    }, 2000), []);
+
+    useEffect(() => {
+        const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        setIsTouchDevice(isTouch);
+    }, [])
+
+    const handleCoinTap = async (e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>) => {
         // Проверяем время действия бустера
-        const now = new Date();
         let boosterMultiplier = 1;
         let energyToDecrease = 1
-
 
         if (userData) {
             const tapBoostRemainingTime = userData.tap_boost_remaining_time;
@@ -89,6 +112,8 @@ const CoinMania: React.FC = () => {
             }
         }
 
+        if (userData.energy <= 0 && energyToDecrease > 0) return;
+
         const pointsToAdd = 1 * boosterMultiplier; // Значение с учетом бустера
 
         dispatch(updateUserScores(userData.scores + pointsToAdd));
@@ -97,9 +122,9 @@ const CoinMania: React.FC = () => {
         const rect = coinRef.current?.getBoundingClientRect();
         if (rect) {
             let clientX, clientY;
-            if ('touches' in e) {
-                clientX = e.touches[0].clientX;
-                clientY = e.touches[0].clientY;
+            if ('changedTouches' in e) {      
+                clientX = e.changedTouches[0].clientX;
+                clientY = e.changedTouches[0].clientY;
             } else {
                 clientX = e.clientX;
                 clientY = e.clientY;
@@ -112,19 +137,12 @@ const CoinMania: React.FC = () => {
             handleButtonClickSpeed();
         }
 
-        try {
-            const { error } = await supabase
-                .from('users')
-                .update({ scores: userData.scores + pointsToAdd, energy: userData.energy - energyToDecrease })
-                .eq('id', app.initDataUnsafe.user?.id);
+        throttledSyncWithDB(userData.scores + pointsToAdd, userData.energy - 1);
+    }
 
-            if (error) {
-                throw error;
-            }
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                setError(error.message);
-            }
+    const handleButtonClick = async (e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>) => {
+        if (!isTouchDevice) {
+            handleCoinTap(e);
         }
     };
 
@@ -139,8 +157,16 @@ const CoinMania: React.FC = () => {
 
     const handleMouseUp = () => {
         setIsPressed(false);
-        setTilt({ x: 0, y: 0 });
+        setTilt({ x: 0, y: 0 });     
     };
+
+    const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+        setIsPressed(false);
+        setTilt({ x: 0, y: 0 });
+        if (isTouchDevice) {
+            handleCoinTap(e);
+        }
+    }
 
     const handleTilt = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
         if (coinRef.current) {
@@ -287,7 +313,7 @@ const CoinMania: React.FC = () => {
                         onMouseUp={handleMouseUp}
                         onMouseLeave={handleMouseUp}
                         onTouchStart={handleMouseDown}
-                        onTouchEnd={handleMouseUp}
+                        onTouchEnd={handleTouchEnd}
                         onTouchCancel={handleMouseUp}
                         style={{
                             userSelect: 'none',
