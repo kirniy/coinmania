@@ -1,5 +1,7 @@
 "use client";
 
+import { CoinEmoji as EmojiType } from "@/types/coinEmoji";
+
 import { webAppContext } from "@/app/context"
 import { LoadingContext } from '@/app/context/LoaderContext'
 import Loader from '@/components/loader/loader'
@@ -15,18 +17,6 @@ interface RootState {
         data: any;
     }
 }
-
-type EmojiType = {
-    id: number;
-    emoji: string;
-    x: number;
-    y: number;
-    size: number;
-    speedX: number;
-    speedY: number;
-    createdAt: number;
-    opacity?: number; // Добавляем opacity
-};
 
 type ClickType = {
     id: number;
