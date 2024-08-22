@@ -36,17 +36,17 @@ const CoinMania: React.FC = () => {
     const [isPressed, setIsPressed] = useState(false);
     const [coinEmojis, setCoinEmojis] = useState<EmojiType[]>([]);
     const [clicks, setClicks] = useState<ClickType[]>([]);
-    const [lastTapTime, setLastTapTime] = useState(Date.now());
+    const lastTapTimeRef = useRef<number>(Date.now());
     const [tilt, setTilt] = useState({ x: 0, y: 0 });
     const headerAnimationSpeedRef = useRef(0.4);
-    const lastUpdateTimeRef = useRef(Date.now());
     const coinRef = useRef<HTMLDivElement>(null);
     const consecutiveTapsRef = useRef(0);
     
     const [emogis, setEmogis] = useState<string[]>([])
     const [speed, setSpeed] = useState(1);
+
     const handleButtonClickSpeed = () => {
-        setSpeed((prevSpeed) => (prevSpeed >= 5 ? 1 : prevSpeed + 1)); // Ограничиваем скорость до 5
+        setSpeed((prevSpeed) => (prevSpeed >= 5 ? 5 : prevSpeed + 1)); // Ограничиваем скорость до 5
       };
 
     const [coinSize, setCoinSize] = useState(360); // Добавляем состояние для размера монеты
@@ -104,6 +104,8 @@ const CoinMania: React.FC = () => {
             const y = clientY - rect.top;
             addCoinEmojis(x, y);
             setClicks(prev => [...prev, { id: Date.now(), x, y, value: pointsToAdd }]); // Добавляем значение
+
+            handleButtonClickSpeed();
         }
 
         try {
@@ -173,7 +175,7 @@ const CoinMania: React.FC = () => {
 
     const addCoinEmojis = useCallback((x: number, y: number) => {
         const currentTime = Date.now();
-        if (currentTime - lastTapTime > 1000) {
+        if (currentTime - lastTapTimeRef.current > 1000) {
             consecutiveTapsRef.current = 0;
         }
         consecutiveTapsRef.current++;
@@ -191,35 +193,27 @@ const CoinMania: React.FC = () => {
             }));
             setCoinEmojis(prev => [...prev, ...newEmojis]);
         }
-        setLastTapTime(currentTime);
-    }, [lastTapTime]);
+        lastTapTimeRef.current = currentTime;
+    }, []);
 
     useEffect(() => {
-        const animationFrame = requestAnimationFrame(function animate() {
+        const intervalId = setInterval(() => {
             const currentTime = Date.now();
-            const deltaTime = (currentTime - lastUpdateTimeRef.current) / 1000; // time in seconds
-            lastUpdateTimeRef.current = currentTime;
+            const timeSinceLastTap = currentTime - lastTapTimeRef.current;
 
-            const timeSinceLastTap = currentTime - lastTapTime;
-            headerAnimationSpeedRef.current = timeSinceLastTap > 2000 ? 0.2 : 1;
+            if (timeSinceLastTap > 2000) {
+                setSpeed((currentSpeed) => {
+                    return currentSpeed > 1
+                        ? currentSpeed - 1
+                        : 1;
+                })
+            }
+        }, 2000)
 
-            setCoinEmojis(prevEmojis =>
-                prevEmojis
-                    .map(emoji => ({
-                        ...emoji,
-                        x: emoji.x + emoji.speedX * deltaTime,
-                        y: emoji.y + emoji.speedY * deltaTime + (0.5 * 500 * deltaTime * deltaTime),
-                        speedY: emoji.speedY + 500 * deltaTime,
-                        opacity: 1 - (currentTime - emoji.createdAt) / 2000 // Добавляем свойство opacity
-                    }))
-                    .filter(emoji => (currentTime - emoji.createdAt) < 2000 && emoji.y < window.innerHeight && emoji.y > -50) // Удаляем устаревшие эмодзи
-            );
-
-            requestAnimationFrame(animate);
-        });
-
-        return () => cancelAnimationFrame(animationFrame);
-    }, [lastTapTime]);
+        return () => {
+            clearInterval(intervalId)
+        }
+    }, [])
 
     useEffect(() => {
         const preventDefault = (e: Event) => e.preventDefault();
