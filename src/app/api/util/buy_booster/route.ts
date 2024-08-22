@@ -92,6 +92,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             isLimitReached: isBoostLimitReached,
             newAvailableBoostCount: isBoostLimitReached ? 0 : (boostsToday - 1),
             endTime: endTime,
+            remainingTime: boosterDuration,
             data: null,
         };
 

@@ -29,6 +29,16 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
 
+        const currentTime = new Date();
+        const tapBoostEndTime = new Date(user.last_tap_boost_time) ?? 0;
+        const isBoostActive = currentTime < tapBoostEndTime;
+
+        if (isBoostActive) {
+            const remainingTime = tapBoostEndTime.getTime() - currentTime.getTime();
+
+            user.tap_boost_remaining_time = remainingTime;
+        }
+
         return NextResponse.json({ user }, { status: 200 });
     } catch (error) {
         console.error("Error processing request:", error);
