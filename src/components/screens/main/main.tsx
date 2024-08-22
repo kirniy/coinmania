@@ -77,13 +77,12 @@ const CoinMania: React.FC = () => {
         setIsTouchDevice(isTouch);
     }, [])
 
+    const handleCoinTap = async (e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>) => {
         if (userData.energy <= 0) return;
 
         // Проверяем время действия бустера
-        const now = new Date();
         let boosterMultiplier = 1;
         let energyToDecrease = 1
-
 
         if (userData) {
             const tapBoostRemainingTime = userData.tap_boost_remaining_time;
@@ -132,6 +131,12 @@ const CoinMania: React.FC = () => {
                 setError(error.message);
             }
         }
+    }
+
+    const handleButtonClick = async (e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>) => {
+        if (!isTouchDevice) {
+            handleCoinTap(e);
+        }
     };
 
     const handleAnimationEnd = (id: number) => {
@@ -145,8 +150,16 @@ const CoinMania: React.FC = () => {
 
     const handleMouseUp = () => {
         setIsPressed(false);
-        setTilt({ x: 0, y: 0 });
+        setTilt({ x: 0, y: 0 });     
     };
+
+    const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+        setIsPressed(false);
+        setTilt({ x: 0, y: 0 });
+        if (isTouchDevice) {
+            handleCoinTap(e);
+        }
+    }
 
     const handleTilt = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
         if (coinRef.current) {
@@ -293,7 +306,7 @@ const CoinMania: React.FC = () => {
                         onMouseUp={handleMouseUp}
                         onMouseLeave={handleMouseUp}
                         onTouchStart={handleMouseDown}
-                        onTouchEnd={handleMouseUp}
+                        onTouchEnd={handleTouchEnd}
                         onTouchCancel={handleMouseUp}
                         style={{
                             userSelect: 'none',
