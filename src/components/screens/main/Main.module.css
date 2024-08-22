@@ -88,6 +88,7 @@
   z-index: 40;
   user-select: none;
   pointer-events: none;
+  overflow: hidden;
 }
 .coinImage {
   pointer-events: auto;
