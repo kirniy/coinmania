@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { updateUserEnergy, updateUserScores } from '../../../store/userSlice'
 import Emoji from './Emoji'
 import styles from './Main.module.css'
+import CoinEmojis from "./CoinEmojis";
 interface RootState {
     user: {
         data: any;
@@ -309,20 +310,13 @@ const CoinMania: React.FC = () => {
                             className={`${styles.coinImage} select-none`}
                         />
     
-                        {coinEmojis.map(emoji => (
-                            <div
-                                key={emoji.id}
-                                className={styles.emoji}
-                                style={{
-                                    left: `${emoji.x}px`,
-                                    top: `${emoji.y}px`,
-                                    fontSize: `${emoji.size}px`,
-                                    opacity: emoji.opacity ?? 1, // Применяем opacity к каждому эмодзи
-                                }}
+                        {coinEmojis.length > 0 &&
+                            <CoinEmojis
+                                emojis={coinEmojis}
+                                setCoinEmojis={setCoinEmojis}
                             >
-                                {emoji.emoji}
-                            </div>
-                        ))}
+                            </CoinEmojis>
+                        }
                         {clicks.map((click) => (
                             <div
                                 key={click.id}
