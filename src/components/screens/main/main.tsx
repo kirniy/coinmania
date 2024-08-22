@@ -76,19 +76,23 @@ const CoinMania: React.FC = () => {
         // Проверяем время действия бустера
         const now = new Date();
         let boosterMultiplier = 1;
+        let energyToDecrease = 1
+
 
         if (userData) {
-            const boosterEndTime = new Date(userData.last_tap_boost_time);
+            const tapBoostRemainingTime = userData.tap_boost_remaining_time;
+            const isBoosterActive = tapBoostRemainingTime > 0;
             
-            if (now < boosterEndTime) {
+            if (isBoosterActive) {
                 boosterMultiplier = 5;
+                energyToDecrease = 0;
             }
         }
 
         const pointsToAdd = 1 * boosterMultiplier; // Значение с учетом бустера
 
         dispatch(updateUserScores(userData.scores + pointsToAdd));
-        dispatch(updateUserEnergy(Math.min(userData.energy - 1, userData?.maxenergy ?? 0)));// Уменьшаем энергию, не превышая maxenergy
+        dispatch(updateUserEnergy(Math.min(userData.energy - energyToDecrease, userData?.maxenergy ?? 0)));// Уменьшаем энергию, не превышая maxenergy
 
         const rect = coinRef.current?.getBoundingClientRect();
         if (rect) {
@@ -111,7 +115,7 @@ const CoinMania: React.FC = () => {
         try {
             const { error } = await supabase
                 .from('users')
-                .update({ scores: userData.scores + pointsToAdd, energy: userData.energy - 1 })
+                .update({ scores: userData.scores + pointsToAdd, energy: userData.energy - energyToDecrease })
                 .eq('id', app.initDataUnsafe.user?.id);
 
             if (error) {
