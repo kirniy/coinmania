@@ -2,6 +2,7 @@ import { MAX_SPINS_PER_DAY } from '@/constants/game.js'
 import { BOOSTERS } from '@/constants/earn';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { UserData } from '@/types/user';
+import { AppThunk } from './store';
 
 interface UserState {
   data: UserData | null;
@@ -65,6 +66,11 @@ const userSlice = createSlice({
       if (state.data) {
         state.data.last_full_tank_time = action.payload;
       }
+    },
+    updateUserTapBoostRemainingTime: (state, action: PayloadAction<number>) => {
+      if (state.data) {
+        state.data.tap_boost_remaining_time = action.payload;
+      }
     }
   },
   extraReducers: (builder) => {
@@ -125,6 +131,29 @@ export const {
   updateUserTapBoosterCount,
   updateUserTapBoosterLastTime,
   updateUserFullTankCount,
-  updateUserFullTankLastTime
+  updateUserFullTankLastTime,
+  updateUserTapBoostRemainingTime
 } = userSlice.actions;
+
+export const startCountdown = (): AppThunk => (dispatch, getState) => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  const timer = setInterval(() => {
+    const state = getState().user;    
+    if (state.data) {
+      if (
+        state.data.tap_boost_remaining_time
+        && state.data.tap_boost_remaining_time > 0
+      ) {
+        dispatch(updateUserTapBoostRemainingTime(Math.max(0, state.data.tap_boost_remaining_time - 1000)));
+      } else {
+        clearInterval(timer);
+      }
+    }
+
+  }, 1000);
+};
+
 export default userSlice.reducer;
