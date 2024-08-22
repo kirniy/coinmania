@@ -78,8 +78,6 @@ const CoinMania: React.FC = () => {
     }, [])
 
     const handleCoinTap = async (e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>) => {
-        if (userData.energy <= 0) return;
-
         // Проверяем время действия бустера
         let boosterMultiplier = 1;
         let energyToDecrease = 1
@@ -93,6 +91,8 @@ const CoinMania: React.FC = () => {
                 energyToDecrease = 0;
             }
         }
+
+        if (userData.energy <= 0 && energyToDecrease > 0) return;
 
         const pointsToAdd = 1 * boosterMultiplier; // Значение с учетом бустера
 
