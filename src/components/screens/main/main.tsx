@@ -80,9 +80,10 @@ const CoinMania: React.FC = () => {
 
 
         if (userData) {
-            const boosterEndTime = new Date(userData.last_tap_boost_time);
+            const tapBoostRemainingTime = userData.tap_boost_remaining_time;
+            const isBoosterActive = tapBoostRemainingTime > 0;
             
-            if (now < boosterEndTime) {
+            if (isBoosterActive) {
                 boosterMultiplier = 5;
                 energyToDecrease = 0;
             }
