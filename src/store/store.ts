@@ -7,6 +7,8 @@ const store = configureStore({
   reducer: rootReducer,
 });
 
+store.dispatch(startCountdown());
+
 export type AppDispatch = typeof store.dispatch;
 
 export type AppThunk<ReturnType = void> = ThunkAction<
