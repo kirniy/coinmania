@@ -102,9 +102,9 @@ const CoinMania: React.FC = () => {
         const rect = coinRef.current?.getBoundingClientRect();
         if (rect) {
             let clientX, clientY;
-            if ('touches' in e) {
-                clientX = e.touches[0].clientX;
-                clientY = e.touches[0].clientY;
+            if ('changedTouches' in e) {      
+                clientX = e.changedTouches[0].clientX;
+                clientY = e.changedTouches[0].clientY;
             } else {
                 clientX = e.clientX;
                 clientY = e.clientY;
