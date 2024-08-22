@@ -33,6 +33,8 @@ const CoinMania: React.FC = () => {
     const { isLoading, setLoading } = useContext(LoadingContext);
     const [error, setError] = useState<string | null>(null);
 
+    const [isTouchDevice, setIsTouchDevice] = useState<boolean>(false);
+
     const [isPressed, setIsPressed] = useState(false);
     const [coinEmojis, setCoinEmojis] = useState<EmojiType[]>([]);
     const [clicks, setClicks] = useState<ClickType[]>([]);
@@ -70,7 +72,11 @@ const CoinMania: React.FC = () => {
         };
     }, []);
 
-    const handleButtonClick = async (e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>) => {
+    useEffect(() => {
+        const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        setIsTouchDevice(isTouch);
+    }, [])
+
         if (userData.energy <= 0) return;
 
         // Проверяем время действия бустера
