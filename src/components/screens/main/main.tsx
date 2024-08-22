@@ -13,6 +13,9 @@ import { updateUserEnergy, updateUserScores } from '../../../store/userSlice'
 import Emoji from './Emoji'
 import styles from './Main.module.css'
 import CoinEmojis from "./CoinEmojis";
+
+import { throttle } from "@/utils/throttle";
+
 interface RootState {
     user: {
         data: any;
@@ -72,6 +75,23 @@ const CoinMania: React.FC = () => {
         };
     }, []);
 
+    const throttledSyncWithDB = useCallback(throttle(async (scores: number, energy: number) => {
+        try {
+            const { error } = await supabase
+                .from('users')
+                .update({ scores: scores, energy: energy })
+                .eq('id', userData.id);
+
+            if (error) {
+                throw error;
+            }
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                setError(error.message);
+            }
+        }
+    }, 2000), []);
+
     useEffect(() => {
         const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
         setIsTouchDevice(isTouch);
@@ -117,20 +137,7 @@ const CoinMania: React.FC = () => {
             handleButtonClickSpeed();
         }
 
-        try {
-            const { error } = await supabase
-                .from('users')
-                .update({ scores: userData.scores + pointsToAdd, energy: userData.energy - energyToDecrease })
-                .eq('id', app.initDataUnsafe.user?.id);
-
-            if (error) {
-                throw error;
-            }
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                setError(error.message);
-            }
-        }
+        throttledSyncWithDB(userData.scores + pointsToAdd, userData.energy - 1);
     }
 
     const handleButtonClick = async (e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>) => {
