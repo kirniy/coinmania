@@ -5,6 +5,9 @@ import { Users, XCircle } from 'lucide-react'
 import { useContext, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import styles from './FriendsPage.module.css'; // Импортируем стили
+import { useDispatch } from "react-redux"
+import { updateUserReferred, updateUserScores } from "@/store/userSlice"
+import axios from "axios"
 
 const FriendsPage = () => {
     const {app} = useContext(webAppContext);
@@ -13,23 +16,11 @@ const FriendsPage = () => {
     const [showLeaderboard, setShowLeaderboard] = useState(false);
     const [isInvitePressed, setIsInvitePressed] = useState(false);
     const [error, setError] = useState(null);
-    const [referralsCount, setReferralsCount] = useState(0);
     const [users, setUsers] = useState([]);
 
-    useEffect(() => {
-        const fetchReferralsCount = async () => {
-            try {
-                const response = await fetch(`/api/user/referrals?id=${app.initDataUnsafe.user?.id}`);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                setReferralsCount(data.referralsCount);
-            } catch (error) {
-                console.error("Error fetching referrals count:", error);
-            }
-        };
+    const dispatch = useDispatch();
 
+    useEffect(() => {
         const fetchUsers = async () => {
             const testUsers = [
                 { first_name: "TestUser1", scores: 250 },
@@ -58,13 +49,12 @@ const FriendsPage = () => {
         };
 
         if (app.initDataUnsafe.user?.id) {
-            fetchReferralsCount();
             fetchUsers();
         }
     }, [app.initDataUnsafe.user?.id]);
 
     const copyToClipboard = () => {        
-        const referralLink = `${process.env.NEXT_PUBLIC_TG_APP_URL ?? 'https://t.me/vinovnicabot/demojuly30'}?startapp=${app.initDataUnsafe.user?.id}`;
+        const referralLink = `${process.env.NEXT_PUBLIC_TG_APP_URL ?? 'https://t.me/vinovnicabot/start'}?startapp=${app.initDataUnsafe.user?.id}`;
         navigator.clipboard.writeText(referralLink)
             .then(() => {
                 alert("Скопировано!");
@@ -105,6 +95,29 @@ const FriendsPage = () => {
         </div>
     );
 
+    const handleGetRewardClick = async (referral) => {
+        console.log(referral);
+        
+        try {
+            const response = await axios.get(`/api/user/referrals/get_reward?userId=${userData?.id}&referralId=${referral.id}`);
+
+            const data = response.data;
+    
+            dispatch(updateUserReferred({
+                ...referral,
+                reward_claimed: true,
+            }))
+    
+            dispatch(updateUserScores(data.scores));
+
+            alert('Награда получена!');
+        } catch (error) {
+            console.error('Error claiming reward:', error);
+            alert('Не удалось получить награду');
+        }
+
+    }
+
     if (isLoading) {
         return <Loader loading={isLoading} />;
     }
@@ -124,7 +137,7 @@ const FriendsPage = () => {
                     <div className={styles.stats}>
                         <div>🪙 Всего нажатий: <span style={{ color: '#f8cc46' }}>{userData?.scores || 0}</span></div>
                         <div>🎰 Прокруток слота: <span style={{ color: '#f8cc46' }}>1000</span></div>
-                        <div>👥 Приглашено друзей: <span style={{ color: '#f8cc46' }}>{referralsCount}</span></div>
+                        <div>👥 Приглашено друзей: <span style={{ color: '#f8cc46' }}>{userData.referrals.length}</span></div>
                     </div>
                     <button
                         onMouseDown={() => setIsInvitePressed(true)}
@@ -157,6 +170,48 @@ const FriendsPage = () => {
                         Больше энергии – больше монет и ⭐ каждый день!
                     </p>
                 </div>
+
+                {userData.referrals.length > 0 &&
+                    <div className={styles.profileSection}>
+                        <h2 className={styles.title}>
+                            Приглашённые друзья
+                        </h2>
+
+                        <div className="flex flex-col gap-4">
+                            {userData.referrals.map(referral => {
+                                return (
+                                    <div
+                                        key={referral.users.id}
+                                        className="text-white flex items-center gap-2 p-2 border-white border-opacity-80 border rounded-xl"
+                                    >
+                                        <span className="text-sm text-ellipsis overflow-hidden max-w-[55%] whitespace-nowrap">
+                                            {referral.users.first_name}
+                                        </span>
+
+                                        {referral.reward_claimed &&
+                                            <span
+                                                className="py-2 px-4 bg-[#00b600] text-white rounded-[25px] text-[0.8rem] ml-auto"
+                                            >
+                                                Получено!
+                                            </span>
+                                        }
+
+                                        {!referral.reward_claimed &&
+                                            <button
+                                                type="button"
+                                                className={styles.getRewardButton}
+                                                onClick={() => {handleGetRewardClick(referral)}}
+                                            >
+                                                25, 000
+                                                <img src='/images/coin.png' width={15} alt="Coin" className='ml-1' />
+                                            </button>
+                                        }
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    </div>
+                }
 
                 <button onClick={() => setShowLeaderboard(true)} className={styles.leaderboardButton}>
                     🏆 Лидеры VNVNC
