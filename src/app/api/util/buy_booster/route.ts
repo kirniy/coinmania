@@ -2,6 +2,7 @@ import supabase from "@/db/supabase"
 import { NextRequest, NextResponse } from 'next/server'
 import { BOOSTERS } from "@/constants/earn";
 import type { Booster } from "@/types/boosters";
+import { checkIsSameDay } from "@/utils/dates";
 
 export const dynamic = "force-dynamic"
 
@@ -79,7 +80,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         }
 
         const lastBoostTime = user[`last_${booster.slug}_time`] ? new Date(user[`last_${booster.slug}_time`]) : new Date(0);
-        const isSameDay = lastBoostTime.toDateString() === currentTime.toDateString();
+        const isSameDay = checkIsSameDay(lastBoostTime, currentTime);
         const boostsToday = isSameDay
             ? user[`daily_${booster.slug}_count`] ?? booster.maxUsePerDay
             : booster.maxUsePerDay;
