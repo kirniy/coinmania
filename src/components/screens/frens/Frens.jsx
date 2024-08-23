@@ -53,16 +53,20 @@ const FriendsPage = () => {
         }
     }, [app.initDataUnsafe.user?.id]);
 
-    const copyToClipboard = () => {        
+    const referralLink = () => {      
         const referralLink = `${process.env.NEXT_PUBLIC_TG_APP_URL ?? 'https://t.me/vinovnicabot/start'}?startapp=${app.initDataUnsafe.user?.id}`;
-        navigator.clipboard.writeText(referralLink)
-            .then(() => {
-                alert("Скопировано!");
-            })
-            .catch((err) => {
-                alert("Error copying to clipboard: ", err);
-                console.error("Error copying to clipboard: ", err);
-            });
+        // navigator.clipboard.writeText(referralLink)
+        //     .then(() => {
+        //         alert("Скопировано!");
+        //     })
+        //     .catch((err) => {
+        //         alert("Error copying to clipboard: ", err);
+        //         console.error("Error copying to clipboard: ", err);
+        //     });
+
+        const tgLink = `https://t.me/share/url?url=${encodeURI(referralLink)}`;
+
+        return tgLink;
     };
 
 
@@ -139,11 +143,11 @@ const FriendsPage = () => {
                         <div>🎰 Прокруток слота: <span style={{ color: '#f8cc46' }}>1000</span></div>
                         <div>👥 Приглашено друзей: <span style={{ color: '#f8cc46' }}>{userData.referrals.length}</span></div>
                     </div>
-                    <button
+                    <a
+                        href={referralLink()}
                         onMouseDown={() => setIsInvitePressed(true)}
                         onMouseUp={() => setIsInvitePressed(false)}
                         onMouseLeave={() => setIsInvitePressed(false)}
-                        onClick={copyToClipboard}
                         style={{
                             ...buttonStyle,
                             width: '100%',
@@ -164,7 +168,7 @@ const FriendsPage = () => {
                         }}
                     >
                         <Users size={20} style={{ marginRight: '10px' }} /> Пригласить друзей
-                    </button>
+                    </a>
                     <p className={styles.inviteText}>
                         Пригласи друзей и получи +500⚡ к лимиту Party Energy навсегда.
                         Больше энергии – больше монет и ⭐ каждый день!
