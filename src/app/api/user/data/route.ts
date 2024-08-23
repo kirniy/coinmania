@@ -19,6 +19,8 @@ export async function GET(req: NextRequest) {
             .select(`
                 *,
                 referrals!referrals_referrer_id_fkey (
+                    id,
+                    reward_claimed,
                     users!referrals_referred_id_fkey (
                         id,
                         first_name,
