@@ -2,6 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import supabase from "@/db/supabase";
+import { checkIsSameDay } from '@/utils/dates';
 
 export async function POST(req: NextRequest) {
     try {
@@ -30,7 +31,7 @@ export async function POST(req: NextRequest) {
         // Check spin restrictions
         const now = new Date();
         const lastSpinTime = user.last_spin_time ? new Date(user.last_spin_time) : new Date(0);
-        const isSameDay = lastSpinTime.toDateString() === now.toDateString();
+        const isSameDay = checkIsSameDay(lastSpinTime, now);
         const spinsToday = isSameDay
             ? user.daily_spin_count ?? 0
             : 0;

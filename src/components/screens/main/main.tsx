@@ -1,5 +1,7 @@
 "use client";
 
+import { CoinEmoji as EmojiType } from "@/types/coinEmoji";
+
 import { webAppContext } from "@/app/context"
 import { LoadingContext } from '@/app/context/LoaderContext'
 import Loader from '@/components/loader/loader'
@@ -10,23 +12,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import { updateUserEnergy, updateUserScores } from '../../../store/userSlice'
 import Emoji from './Emoji'
 import styles from './Main.module.css'
+import CoinEmojis from "./CoinEmojis";
+
+import { throttle } from "@/utils/throttle";
+
 interface RootState {
     user: {
         data: any;
     }
 }
-
-type EmojiType = {
-    id: number;
-    emoji: string;
-    x: number;
-    y: number;
-    size: number;
-    speedX: number;
-    speedY: number;
-    createdAt: number;
-    opacity?: number; // Добавляем opacity
-};
 
 type ClickType = {
     id: number;
@@ -42,20 +36,22 @@ const CoinMania: React.FC = () => {
     const { isLoading, setLoading } = useContext(LoadingContext);
     const [error, setError] = useState<string | null>(null);
 
+    const [isTouchDevice, setIsTouchDevice] = useState<boolean>(false);
+
     const [isPressed, setIsPressed] = useState(false);
     const [coinEmojis, setCoinEmojis] = useState<EmojiType[]>([]);
     const [clicks, setClicks] = useState<ClickType[]>([]);
-    const [lastTapTime, setLastTapTime] = useState(Date.now());
+    const lastTapTimeRef = useRef<number>(Date.now());
     const [tilt, setTilt] = useState({ x: 0, y: 0 });
     const headerAnimationSpeedRef = useRef(0.4);
-    const lastUpdateTimeRef = useRef(Date.now());
     const coinRef = useRef<HTMLDivElement>(null);
     const consecutiveTapsRef = useRef(0);
     
     const [emogis, setEmogis] = useState<string[]>([])
     const [speed, setSpeed] = useState(1);
+
     const handleButtonClickSpeed = () => {
-        setSpeed((prevSpeed) => (prevSpeed >= 5 ? 1 : prevSpeed + 1)); // Ограничиваем скорость до 5
+        setSpeed((prevSpeed) => (prevSpeed >= 5 ? 5 : prevSpeed + 1)); // Ограничиваем скорость до 5
       };
 
     const [coinSize, setCoinSize] = useState(360); // Добавляем состояние для размера монеты
@@ -79,47 +75,12 @@ const CoinMania: React.FC = () => {
         };
     }, []);
 
-    const handleButtonClick = async (e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>) => {
-        if (userData.energy <= 0) return;
-
-        // Проверяем время действия бустера
-        const now = new Date();
-        let boosterMultiplier = 1;
-
-        if (userData) {
-            const boosterEndTime = new Date(userData.last_tap_boost_time);
-            
-            if (now < boosterEndTime) {
-                boosterMultiplier = 5;
-            }
-        }
-
-        const pointsToAdd = 1 * boosterMultiplier; // Значение с учетом бустера
-
-        dispatch(updateUserScores(userData.scores + pointsToAdd));
-        dispatch(updateUserEnergy(Math.min(userData.energy - 1, userData?.maxenergy ?? 0)));// Уменьшаем энергию, не превышая maxenergy
-
-        const rect = coinRef.current?.getBoundingClientRect();
-        if (rect) {
-            let clientX, clientY;
-            if ('touches' in e) {
-                clientX = e.touches[0].clientX;
-                clientY = e.touches[0].clientY;
-            } else {
-                clientX = e.clientX;
-                clientY = e.clientY;
-            }
-            const x = clientX - rect.left;
-            const y = clientY - rect.top;
-            addCoinEmojis(x, y);
-            setClicks(prev => [...prev, { id: Date.now(), x, y, value: pointsToAdd }]); // Добавляем значение
-        }
-
+    const throttledSyncWithDB = useCallback(throttle(async (scores: number, energy: number) => {
         try {
             const { error } = await supabase
                 .from('users')
-                .update({ scores: userData.scores + pointsToAdd, energy: userData.energy - 1 })
-                .eq('id', app.initDataUnsafe.user?.id);
+                .update({ scores: scores, energy: energy })
+                .eq('id', userData.id);
 
             if (error) {
                 throw error;
@@ -128,6 +89,60 @@ const CoinMania: React.FC = () => {
             if (error instanceof Error) {
                 setError(error.message);
             }
+        }
+    }, 2000), []);
+
+    useEffect(() => {
+        const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        setIsTouchDevice(isTouch);
+    }, [])
+
+    const handleCoinTap = async (e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>) => {
+        // Проверяем время действия бустера
+        let boosterMultiplier = 1;
+        let energyToDecrease = 1
+
+        if (userData) {
+            const tapBoostRemainingTime = userData.tap_boost_remaining_time;
+            const isBoosterActive = tapBoostRemainingTime > 0;
+            
+            if (isBoosterActive) {
+                boosterMultiplier = 5;
+                energyToDecrease = 0;
+            }
+        }
+
+        if (userData.energy <= 0 && energyToDecrease > 0) return;
+
+        const pointsToAdd = 1 * boosterMultiplier; // Значение с учетом бустера
+
+        dispatch(updateUserScores(userData.scores + pointsToAdd));
+        dispatch(updateUserEnergy(Math.min(userData.energy - energyToDecrease, userData?.maxenergy ?? 0)));// Уменьшаем энергию, не превышая maxenergy
+
+        const rect = coinRef.current?.getBoundingClientRect();
+        if (rect) {
+            let clientX, clientY;
+            if ('changedTouches' in e) {      
+                clientX = e.changedTouches[0].clientX;
+                clientY = e.changedTouches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+            addCoinEmojis(x, y);
+            setClicks(prev => [...prev, { id: Date.now(), x, y, value: pointsToAdd }]); // Добавляем значение
+
+            handleButtonClickSpeed();
+        }
+
+        throttledSyncWithDB(userData.scores + pointsToAdd, userData.energy - 1);
+    }
+
+    const handleButtonClick = async (e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>) => {
+        if (!isTouchDevice) {
+            handleCoinTap(e);
         }
     };
 
@@ -142,8 +157,16 @@ const CoinMania: React.FC = () => {
 
     const handleMouseUp = () => {
         setIsPressed(false);
-        setTilt({ x: 0, y: 0 });
+        setTilt({ x: 0, y: 0 });     
     };
+
+    const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+        setIsPressed(false);
+        setTilt({ x: 0, y: 0 });
+        if (isTouchDevice) {
+            handleCoinTap(e);
+        }
+    }
 
     const handleTilt = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
         if (coinRef.current) {
@@ -182,14 +205,14 @@ const CoinMania: React.FC = () => {
 
     const addCoinEmojis = useCallback((x: number, y: number) => {
         const currentTime = Date.now();
-        if (currentTime - lastTapTime > 1000) {
+        if (currentTime - lastTapTimeRef.current > 1000) {
             consecutiveTapsRef.current = 0;
         }
         consecutiveTapsRef.current++;
 
-        if (consecutiveTapsRef.current >= 8 && consecutiveTapsRef.current % 8 === 0) {
-            const newEmojis = Array(12).fill(null).map(() => ({
-                id: Date.now() + Math.random(),
+        if (consecutiveTapsRef.current >= 16 && consecutiveTapsRef.current % 16 === 0) {
+            const newEmojis = Array(8).fill(null).map(() => ({
+                id: String(Date.now()) + String(Math.random()),
                 emoji: getRandomEmoji(),
                 x: x + (Math.random() - 0.5) * 60,
                 y: y + (Math.random() - 0.5) * 60,
@@ -200,35 +223,27 @@ const CoinMania: React.FC = () => {
             }));
             setCoinEmojis(prev => [...prev, ...newEmojis]);
         }
-        setLastTapTime(currentTime);
-    }, [lastTapTime]);
+        lastTapTimeRef.current = currentTime;
+    }, []);
 
     useEffect(() => {
-        const animationFrame = requestAnimationFrame(function animate() {
+        const intervalId = setInterval(() => {
             const currentTime = Date.now();
-            const deltaTime = (currentTime - lastUpdateTimeRef.current) / 1000; // time in seconds
-            lastUpdateTimeRef.current = currentTime;
+            const timeSinceLastTap = currentTime - lastTapTimeRef.current;
 
-            const timeSinceLastTap = currentTime - lastTapTime;
-            headerAnimationSpeedRef.current = timeSinceLastTap > 2000 ? 0.2 : 1;
+            if (timeSinceLastTap > 2000) {
+                setSpeed((currentSpeed) => {
+                    return currentSpeed > 1
+                        ? currentSpeed - 1
+                        : 1;
+                })
+            }
+        }, 2000)
 
-            setCoinEmojis(prevEmojis =>
-                prevEmojis
-                    .map(emoji => ({
-                        ...emoji,
-                        x: emoji.x + emoji.speedX * deltaTime,
-                        y: emoji.y + emoji.speedY * deltaTime + (0.5 * 500 * deltaTime * deltaTime),
-                        speedY: emoji.speedY + 500 * deltaTime,
-                        opacity: 1 - (currentTime - emoji.createdAt) / 2000 // Добавляем свойство opacity
-                    }))
-                    .filter(emoji => (currentTime - emoji.createdAt) < 2000 && emoji.y < window.innerHeight && emoji.y > -50) // Удаляем устаревшие эмодзи
-            );
-
-            requestAnimationFrame(animate);
-        });
-
-        return () => cancelAnimationFrame(animationFrame);
-    }, [lastTapTime]);
+        return () => {
+            clearInterval(intervalId)
+        }
+    }, [])
 
     useEffect(() => {
         const preventDefault = (e: Event) => e.preventDefault();
@@ -298,7 +313,7 @@ const CoinMania: React.FC = () => {
                         onMouseUp={handleMouseUp}
                         onMouseLeave={handleMouseUp}
                         onTouchStart={handleMouseDown}
-                        onTouchEnd={handleMouseUp}
+                        onTouchEnd={handleTouchEnd}
                         onTouchCancel={handleMouseUp}
                         style={{
                             userSelect: 'none',
@@ -319,20 +334,13 @@ const CoinMania: React.FC = () => {
                             className={`${styles.coinImage} select-none`}
                         />
     
-                        {coinEmojis.map(emoji => (
-                            <div
-                                key={emoji.id}
-                                className={styles.emoji}
-                                style={{
-                                    left: `${emoji.x}px`,
-                                    top: `${emoji.y}px`,
-                                    fontSize: `${emoji.size}px`,
-                                    opacity: emoji.opacity ?? 1, // Применяем opacity к каждому эмодзи
-                                }}
+                        {coinEmojis.length > 0 &&
+                            <CoinEmojis
+                                emojis={coinEmojis}
+                                setCoinEmojis={setCoinEmojis}
                             >
-                                {emoji.emoji}
-                            </div>
-                        ))}
+                            </CoinEmojis>
+                        }
                         {clicks.map((click) => (
                             <div
                                 key={click.id}

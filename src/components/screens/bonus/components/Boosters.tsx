@@ -2,20 +2,23 @@ import { BOOSTERS } from '@/constants/earn';
 import React from 'react';
 import axios from 'axios';
 import { useSelector, useDispatch } from 'react-redux';
+import { AppDispatch } from '@/store/store';
 import { updateUserEnergy } from '@/store/userSlice';
 import { RootState } from '@/store/rootReducer'
 import styles from './Boosters.module.css';
+import { startCountdown } from '@/store/userSlice';
 
 import {
     updateUserTapBoosterCount,
     updateUserTapBoosterLastTime,
     updateUserFullTankCount,
-    updateUserFullTankLastTime
+    updateUserFullTankLastTime,
+    updateUserTapBoostRemainingTime,
 } from "@/store/userSlice";
 import { Booster } from '@/types/boosters';
 
 const Boosters: React.FC = ({}) => {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const userData = useSelector((state: RootState) => state.user.data);
 
     const dynamicStyles = (booster: Booster, isAvailable: Boolean = true) => ({
@@ -62,6 +65,9 @@ const Boosters: React.FC = ({}) => {
 
             dispatch(updateUserTapBoosterCount(data.newAvailableBoostCount));
             dispatch(updateUserTapBoosterLastTime(data.endTime));
+            dispatch(updateUserTapBoostRemainingTime(data.remainingTime));
+            dispatch(startCountdown());
+
         } catch (error) {
             console.error('Failed to buy booster:', error)
         }
