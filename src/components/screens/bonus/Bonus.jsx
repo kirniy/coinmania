@@ -10,35 +10,58 @@ import InfoBox from "@/components/common/InfoBox";
 const CoinManiaBonusPage = () => {
     const [activeBooster, setActiveBooster] = useState(null);
     const [showTasks, setShowTasks] = useState(false);
+    const [showTasksModal, setShowTasksModal] = useState(false);
     const [taskStatus, setTaskStatus] = useState({});
     const [loadingTasks, setLoadingTasks] = useState({});
     const {app} = useContext(webAppContext);
+    const userId = 411228208;
+    // const userId = 999125484;
 
     const tasks = [
-        { platform: 'Telegram', channels: ['Маленькая Виновница', 'VNVNC', 'ANGAR'], reward: 5000, duration: 15, color: '#0088cc' },
-        { platform: 'Instagram', channels: ['Маленькая Виновница', 'VNVNC', 'ANGAR'], reward: 10000, duration: 240, color: '#c13584' },
+        { 
+            platform: 'Telegram', 
+            channels: [
+                {
+                    name: "Маленькая Виновница", 
+                    id: "@qdayvckwds", 
+                    link: "https://t.me/qdayvckwds"
+                }
+            ], 
+            reward: 5000, 
+            duration: 15, 
+            color: '#0088cc' 
+        },
+        // { platform: 'Instagram', channels: ['Маленькая Виновница', 'VNVNC', 'ANGAR'], reward: 10000, duration: 240, color: '#c13584' },
     ];
 
-    const subscribeToChannel = async (platform, channel) => {
-        try {
-            setLoadingTasks(prev => ({ ...prev, [`${platform}-${channel}`]: true }));
-            await axios.post('/api/tasks/update', {
-                taskId: `${platform}-${channel}`,
-                userId: app.initDataUnsafe.user?.id,
-                name: channel,
-                platform,
-                reward: tasks.find(t => t.platform === platform).reward,
-                link: ''
-            });
-            setTaskStatus(prev => ({
-                ...prev,
-                [`${platform}-${channel}`]: { status: 'checking', timeLeft: tasks.find(t => t.platform === platform).duration * 60 }
-            }));
-        } catch (error) {
-            console.error("Failed to update task:", error);
-            setLoadingTasks(prev => ({ ...prev, [`${platform}-${channel}`]: false }));
-        }
+    const handleButtonClick = async (platform, channel) => {
+        setShowTasksModal(true);
+
+        // try {
+        //     setLoadingTasks(prev => ({ ...prev, [`${platform}-${channel}`]: true }));
+        //     await axios.post('/api/tasks/update', {
+        //         taskId: `${platform}-${channel}`,
+        //         userId: app.initDataUnsafe.user?.id,
+        //         name: channel,
+        //         platform,
+        //         reward: tasks.find(t => t.platform === platform).reward,
+        //         link: ''
+        //     });
+        //     setTaskStatus(prev => ({
+        //         ...prev,
+        //         [`${platform}-${channel}`]: { status: 'checking', timeLeft: tasks.find(t => t.platform === platform).duration * 60 }
+        //     }));
+        // } catch (error) {
+        //     console.error("Failed to update task:", error);
+        //     setLoadingTasks(prev => ({ ...prev, [`${platform}-${channel}`]: false }));
+        // }
     };
+
+    async function handleVerifyButtonClick(channel, userId) {
+        const req = await fetch(`http://localhost:3000/api/get_chat_member?id=${userId}`);
+        const res = await req.json();
+        console.log(res);
+    }
 
     useEffect(() => {
         const fetchTaskStatuses = async () => {
@@ -167,21 +190,34 @@ const CoinManiaBonusPage = () => {
                                 <h3 className={styles.tasksPopupPlatform}>{task.platform}</h3>
                                 <div className={styles.taskButtonGrid}>
                                     {task.channels.map((channel, index) => {
-                                        const status = taskStatus[`${task.platform}-${channel}`]?.status || 'pending';
-                                        const timeLeft = taskStatus[`${task.platform}-${channel}`]?.timeLeft || 0;
+                                        const status = taskStatus[`${task.platform}-${channel.name}`]?.status || 'pending';
+                                        const timeLeft = taskStatus[`${task.platform}-${channel.name}`]?.timeLeft || 0;
                                         const minutes = Math.floor(timeLeft / 60);
                                         const seconds = timeLeft % 60;
                                         const isMain = index === 0;
                                         return (
-                                            <button key={channel} onClick={() => subscribeToChannel(task.platform, channel)} style={taskButtonStyle(task, status, isMain)} disabled={status === 'completed' || status === 'checking'}>
-                                                {status === 'completed' ? `✅ ${task.reward / 1000}K⭐️` : status === 'checking' ? `${minutes}:${seconds.toString().padStart(2, '0')}` : (
-                                                    <>
-                                                        {channel}
-                                                        <br />
-                                                        <span style={{fontSize: '0.8em'}}>{task.reward / 1000}K⭐️</span>
-                                                    </>
+                                            <> 
+                                                <button key={channel.name} onClick={() => handleButtonClick(task.platform, channel)} style={taskButtonStyle(task, status, isMain)} disabled={status === 'completed' || status === 'checking'}>
+                                                    {status === 'completed' ? `✅ ${task.reward / 1000}K⭐️` : status === 'checking' ? `${minutes}:${seconds.toString().padStart(2, '0')}` : (
+                                                        <>
+                                                            {channel.name}
+                                                            <br />
+                                                            <span style={{fontSize: '0.8em'}}>{task.reward / 1000}K⭐️</span>
+                                                        </>
+                                                    )}
+                                                </button>
+                                                {showTasksModal && (
+                                                    <div className={styles.taskModal}>
+                                                        <div className={styles.taskModalContent}>
+                                                            <div className={styles.taskModalCloseContainer}>
+                                                                <button onClick={() => setShowTasksModal(false)} className={styles.closeButton}><XCircle size={30} /></button>
+                                                            </div>
+                                                            <a href={channel.link} className={styles.taskModalButton}>Подписаться</a>
+                                                            <button onClick={() => handleVerifyButtonClick(channel, userId)} className={styles.taskModalButton}>Проверить</button>
+                                                        </div>
+                                                    </div>
                                                 )}
-                                            </button>
+                                            </>
                                         );
                                     })}
                                 </div>
