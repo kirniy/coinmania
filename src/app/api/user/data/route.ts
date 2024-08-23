@@ -16,7 +16,18 @@ export async function GET(req: NextRequest) {
         // Получение данных пользователя из базы данных
         const { data: user, error: fetchError } = await supabase
             .from('users')
-            .select('*')
+            .select(`
+                *,
+                referrals!referrals_referrer_id_fkey (
+                    id,
+                    reward_claimed,
+                    users!referrals_referred_id_fkey (
+                        id,
+                        first_name,
+                        last_name
+                    )
+                )
+            `)
             .eq('id', id)
             .single();
 
