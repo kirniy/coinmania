@@ -3,6 +3,7 @@ import { BOOSTERS } from '@/constants/earn';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { UserData } from '@/types/user';
 import { AppThunk } from './store';
+import { checkIsSameDay } from '@/utils/dates';
 
 interface UserState {
   data: UserData | null;
@@ -16,7 +17,7 @@ const initialState: UserState = {
   error: null,
 };
 
-export const fetchUserData = createAsyncThunk<UserData, number>(
+export const fetchUserData = createAsyncThunk<{user: UserData, serverTime: Date}, number>(
   'user/fetchUserData',
   async (userId: number) => {
     const response = await fetch(`/api/user/data?id=${userId}`);
@@ -24,7 +25,7 @@ export const fetchUserData = createAsyncThunk<UserData, number>(
       throw new Error('Network response was not ok');
     }
     const data = await response.json();
-    return data?.user;
+    return data;
   }
 );
 
@@ -86,15 +87,17 @@ const userSlice = createSlice({
           return;
         }
         console.log('action.payload', action.payload)
-        state.status = 'succeeded';
-        state.data = action.payload;
-        state.data.energy = Math.min(action.payload.energy ?? 0, action.payload.maxenergy);
 
-        const lastSpinTime = action.payload.last_spin_time ? new Date(action.payload.last_spin_time) : new Date(0);
-        const isSameDay = lastSpinTime.toDateString() === new Date().toDateString();
+        const userData = action.payload.user;
+        state.status = 'succeeded';
+        state.data = userData;
+        state.data.energy = Math.min(userData.energy ?? 0, userData.maxenergy);
+
+        const lastSpinTime = userData.last_spin_time ? new Date(userData.last_spin_time) : new Date(0);
+        const isSameDay = checkIsSameDay(lastSpinTime, action.payload.serverTime);
 
         let availableSpinCount = isSameDay
-            ? MAX_SPINS_PER_DAY - action.payload.daily_spin_count ?? 0
+            ? MAX_SPINS_PER_DAY - userData.daily_spin_count ?? 0
             : MAX_SPINS_PER_DAY;
 
         state.data.daily_spin_count = availableSpinCount;
@@ -102,13 +105,13 @@ const userSlice = createSlice({
         // Boosters
 
         BOOSTERS.forEach(booster => {
-          const lastBoostTime = action.payload[`last_${booster.slug}_time`]
-            ? new Date(action.payload[`last_${booster.slug}_time`] ?? 0)
+          const lastBoostTime = userData[`last_${booster.slug}_time`]
+            ? new Date(userData[`last_${booster.slug}_time`] ?? 0)
             : new Date(0);
-          const isSameDay = lastBoostTime.toDateString() === new Date().toDateString();
+          const isSameDay = checkIsSameDay(lastBoostTime, action.payload.serverTime);
   
           let availableBoostCount = isSameDay
-              ? action.payload[`daily_${booster.slug}_count`] ?? booster.maxUsePerDay
+              ? userData[`daily_${booster.slug}_count`] ?? booster.maxUsePerDay
               : booster.maxUsePerDay;
 
           if (state.data) {
