@@ -39,7 +39,9 @@ export async function GET(req: NextRequest) {
             user.tap_boost_remaining_time = remainingTime;
         }
 
-        return NextResponse.json({ user }, { status: 200 });
+        const serverTime = new Date();
+
+        return NextResponse.json({ user, serverTime }, { status: 200 });
     } catch (error) {
         console.error("Error processing request:", error);
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });
