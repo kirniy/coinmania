@@ -56,7 +56,17 @@ export async function POST(req: NextRequest) {
             }
 
             if (referal_id) {
-                await increase_max_energy(referal_id, 500);
+                const { error: insertError } = await supabase
+                    .from('referrals')
+                    .insert({
+                        referrer_id: referal_id,
+                        referred_id: id
+                    });
+
+                if (insertError) {
+                    console.error("Failed to insert referral info:", insertError);
+                    return NextResponse.json({ error: "Failed to insert referral info!" }, { status: 500 });
+                }
             }
 
             return NextResponse.json({ message: "User added successfully" }, { status: 200 });
