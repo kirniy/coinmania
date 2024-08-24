@@ -13,6 +13,23 @@ export const GET = async (req: Request) => {
             return NextResponse.json({ error: "Invalid request" }, { status: 400 });
         }
 
+        // Проверка, была ли уже получена награда для конкретного пользователя и реферала
+        const { data: rewardCheck, error: rewardCheckError } = await supabase
+            .from('referrals')
+            .select('reward_claimed')
+            .eq('id', referralId)
+            .eq('referrer_id', userId)
+            .single();
+
+        if (rewardCheckError) {
+            console.error("Failed to check reward status:", rewardCheckError);
+            return NextResponse.json({ error: "Failed to check reward status" }, { status: 500 });
+        }
+
+        if (rewardCheck?.reward_claimed) {
+            return NextResponse.json({ error: "Reward already claimed" }, { status: 400 });
+        }
+
         // Обновляем статус награды для реферала
         const { error: referralUpdateError } = await supabase
             .from('referrals')
