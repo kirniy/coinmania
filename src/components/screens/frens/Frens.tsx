@@ -22,41 +22,28 @@ const FriendsPage = () => {
 
     const dispatch = useDispatch();
 
-    useEffect(() => {
-        const fetchUsers = async () => {
-            const testUsers = [
-                { id: String(Date.now()) + String(Math.random()), first_name: "TestUser1", scores: 250 },
-                { id: String(Date.now()) + String(Math.random()), first_name: "TestUser2", scores: 200 },
-                { id: String(Date.now()) + String(Math.random()), first_name: "TestUser3", scores: 150 },
-                { id: String(Date.now()) + String(Math.random()), first_name: "TestUser4", scores: 100 },
-                { id: String(Date.now()) + String(Math.random()), first_name: "TestUser5", scores: 50 },
-            ];
+    const fetchUsers = async () => {
+        try {
+            const response = await fetch('/api/users');
+            const data: {users: UserData[]} = await response.json();
 
-            try {
-                const response = await fetch('/api/users');
-                const data = await response.json();
-
-                if (data.users) {
-                    const sortedUsers = [...data.users, ...testUsers].sort((a, b) => b.scores - a.scores);
-                    setUsers(sortedUsers);
-                } else {
-                    setUsers(testUsers);
-                }
-            } catch (error) {
-                setUsers(testUsers);
-                console.error("Failed to fetch users:", error);
-            } finally {
-
+            if (data.users) {
+                const sortedUsers = data.users.sort((a: UserData, b: UserData) => (b?.scores ?? 0) - (a?.scores ?? 0));
+                setUsers(sortedUsers);
             }
-        };
+        } catch (error) {
+            console.error("Failed to fetch users:", error);
+        } finally {
 
-        if (app.initDataUnsafe.user?.id) {
-            fetchUsers();
         }
-    }, [app.initDataUnsafe.user?.id]);
+    };
+
+    useEffect(() => {
+        fetchUsers();
+    }, []);
 
     const referralLink = () => {      
-        const referralLink = `${process.env.NEXT_PUBLIC_TG_APP_URL ?? 'https://t.me/vinovnicabot/start'}?startapp=${app.initDataUnsafe.user?.id}`;
+        const referralLink = `${process.env.NEXT_PUBLIC_TG_APP_URL ?? 'https://t.me/vinovnicabot/start'}?startapp=${userData?.id}`;
         const tgLink = `https://t.me/share/url?url=${encodeURI(referralLink)}`;
 
         return tgLink;
@@ -114,6 +101,7 @@ const FriendsPage = () => {
             }))
     
             dispatch(updateUserScores(data.scores));
+            fetchUsers();
 
             alert('Награда получена!');
         } catch (error) {
