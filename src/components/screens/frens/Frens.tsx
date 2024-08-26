@@ -9,7 +9,7 @@ import { useDispatch } from "react-redux"
 import { updateUserReferred, updateUserScores } from "@/store/userSlice"
 import axios from "axios"
 import { RootState } from "@/store/rootReducer"
-import { referredUser, UserData } from "@/types/user"
+import { referredUserRecord, UserData } from "@/types/user"
 
 const FriendsPage = () => {
     const {app} = useContext(webAppContext);
@@ -87,7 +87,7 @@ const FriendsPage = () => {
         </div>
     );
 
-    const handleGetRewardClick = async (referral: referredUser) => {
+    const handleGetRewardClick = async (referral: referredUserRecord) => {
         console.log(referral);
         
         try {
