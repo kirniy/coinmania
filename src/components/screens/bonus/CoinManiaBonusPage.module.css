@@ -19,6 +19,7 @@
 .bonusSection {
     background-color: rgba(255, 255, 255, 0.07);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-radius: 25px;
     border: 1px solid rgba(255, 255, 255, 0.18);
     width: 100%;
@@ -37,6 +38,7 @@
 .tasksButton {
     background-color: rgba(255, 255, 255, 0.035);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-radius: 25px;
     border: 1px solid rgba(255, 255, 255, 0.18);
     width: 100%;
@@ -67,6 +69,7 @@
 .tasksPopupContent {
     background-color: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-radius: 25px;
     border: 1px solid rgba(255, 255, 255, 0.18);
     width: 95%;
