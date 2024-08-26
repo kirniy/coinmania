@@ -174,11 +174,11 @@ const FriendsPage = () => {
                             {userData.referrals.map(referral => {
                                 return (
                                     <div
-                                        key={referral.users.id}
+                                        key={referral.id}
                                         className="text-white flex items-center gap-2 p-2 border-white border-opacity-80 border rounded-xl"
                                     >
                                         <span className="text-sm text-ellipsis overflow-hidden max-w-[55%] whitespace-nowrap">
-                                            {referral.users.first_name}
+                                            {referral.user.first_name}
                                         </span>
 
                                         {referral.reward_claimed &&
