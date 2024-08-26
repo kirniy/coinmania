@@ -16,11 +16,11 @@ export interface UserData {
     last_full_tank_time: string | null;
     referal_id: string | null;
     tap_boost_remaining_time: number;
-    referrals: referredUser[]
+    referrals: referredUserRecord[]
 };
 
-export type referredUser = {
+export type referredUserRecord = {
     id: string,
-    first_name: string,
-    last_name: string,
-}
+    reward_claimed: boolean,
+    user: Pick<UserData, 'id' | 'first_name' | 'last_name'>
+};
