@@ -28,7 +28,6 @@ export const WebAppProvider = ({ children }: IProps) => {
     if (!app || !app.ready) return;
 
     app.ready();
-    app.isClosingConfirmationEnabled = true;
     app.disableVerticalSwipes();
     app.expand();
 
