@@ -1,9 +1,9 @@
 export type Task = {
   platform: "Telegram" | "Instagram";
   name: string;
-  tgId: string;
+  tg_id?: string;
   link: string;
   reward: number;
-  duration: number;
+  duration?: number;
   color: string;
 };

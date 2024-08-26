@@ -26,7 +26,7 @@ export const TASKS: Task[] = [
   {
     platform: "Telegram",
     name: "Маленькая Виновница",
-    tgId: "@qdayvckwds",
+    tg_id: "@qdayvckwds",
     link: "https://t.me/qdayvckwds",
     reward: 20000,
     duration: 15,
@@ -35,7 +35,7 @@ export const TASKS: Task[] = [
   {
     platform: "Telegram",
     name: "VNVNC",
-    tgId: "@AlfaBank",
+    tg_id: "@AlfaBank",
     link: "https://t.me/AlfaBank",
     reward: 20000,
     duration: 15,
@@ -44,7 +44,7 @@ export const TASKS: Task[] = [
   {
     platform: "Telegram",
     name: "ANGAR",
-    tgId: "@rabota_Angarsk",
+    tg_id: "@rabota_Angarsk",
     link: "https://t.me/rabota_Angarskk",
     reward: 20000,
     duration: 15,
@@ -53,7 +53,6 @@ export const TASKS: Task[] = [
   {
     platform: "Instagram",
     name: "Маленькая Виновница",
-    tgId: "@qdayvckwds",
     link: "https://t.me/qdayvckwds",
     reward: 20000,
     duration: 15,
@@ -62,7 +61,6 @@ export const TASKS: Task[] = [
   {
     platform: "Instagram",
     name: "VNVNC",
-    tgId: "@AlfaBank",
     link: "https://t.me/AlfaBank",
     reward: 20000,
     duration: 15,
@@ -71,7 +69,6 @@ export const TASKS: Task[] = [
   {
     platform: "Instagram",
     name: "ANGAR",
-    tgId: "@rabota_Angarskk",
     link: "https://t.me/rabota_Angarskk",
     reward: 20000,
     duration: 15,
