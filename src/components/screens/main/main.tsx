@@ -108,7 +108,6 @@ const CoinMania: React.FC = () => {
             
             if (isBoosterActive) {
                 boosterMultiplier = 5;
-                energyToDecrease = 0;
             }
         }
 
