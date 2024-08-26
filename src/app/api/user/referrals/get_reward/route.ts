@@ -64,7 +64,7 @@ export const GET = async (req: Request) => {
             return NextResponse.json({ error: "Failed to fetch user" }, { status: 500 });
         }
         
-        return NextResponse.json({ scores: user.scores + 25000 }, { status: 200 });
+        return NextResponse.json({ scores: user.scores + 20000 }, { status: 200 });
 
     } catch (error) {
         console.error("Error processing request:", error);

@@ -195,7 +195,7 @@ const FriendsPage = () => {
                                                 className={styles.getRewardButton}
                                                 onClick={() => {handleGetRewardClick(referral)}}
                                             >
-                                                25, 000
+                                                20, 000
                                                 <img src='/images/coin.png' width={15} alt="Coin" className='ml-1' />
                                             </button>
                                         }
