@@ -8,62 +8,42 @@ import styles from './FriendsPage.module.css'; // Импортируем сти�
 import { useDispatch } from "react-redux"
 import { updateUserReferred, updateUserScores } from "@/store/userSlice"
 import axios from "axios"
+import { RootState } from "@/store/rootReducer"
+import { referredUser, UserData } from "@/types/user"
 
 const FriendsPage = () => {
     const {app} = useContext(webAppContext);
-    const userData = useSelector((state) => state.user.data);
+    const userData = useSelector((state: RootState) => state.user.data);
     const { isLoading, setLoading } = useContext(LoadingContext);
     const [showLeaderboard, setShowLeaderboard] = useState(false);
     const [isInvitePressed, setIsInvitePressed] = useState(false);
     const [error, setError] = useState(null);
-    const [users, setUsers] = useState([]);
+    const [users, setUsers] = useState<Pick<UserData, 'id' | 'first_name' | 'scores'>[]>([]);
 
     const dispatch = useDispatch();
 
-    useEffect(() => {
-        const fetchUsers = async () => {
-            const testUsers = [
-                { first_name: "TestUser1", scores: 250 },
-                { first_name: "TestUser2", scores: 200 },
-                { first_name: "TestUser3", scores: 150 },
-                { first_name: "TestUser4", scores: 100 },
-                { first_name: "TestUser5", scores: 50 },
-            ];
+    const fetchUsers = async () => {
+        try {
+            const response = await fetch('/api/users');
+            const data: {users: UserData[]} = await response.json();
 
-            try {
-                const response = await fetch('/api/users');
-                const data = await response.json();
-
-                if (data.users) {
-                    const sortedUsers = [...data.users, ...testUsers].sort((a, b) => b.scores - a.scores);
-                    setUsers(sortedUsers);
-                } else {
-                    setUsers(testUsers);
-                }
-            } catch (error) {
-                setUsers(testUsers);
-                console.error("Failed to fetch users:", error);
-            } finally {
-
+            if (data.users) {
+                const sortedUsers = data.users.sort((a: UserData, b: UserData) => (b?.scores ?? 0) - (a?.scores ?? 0));
+                setUsers(sortedUsers);
             }
-        };
+        } catch (error) {
+            console.error("Failed to fetch users:", error);
+        } finally {
 
-        if (app.initDataUnsafe.user?.id) {
-            fetchUsers();
         }
-    }, [app.initDataUnsafe.user?.id]);
+    };
+
+    useEffect(() => {
+        fetchUsers();
+    }, []);
 
     const referralLink = () => {      
-        const referralLink = `${process.env.NEXT_PUBLIC_TG_APP_URL ?? 'https://t.me/vinovnicabot/start'}?startapp=${app.initDataUnsafe.user?.id}`;
-        // navigator.clipboard.writeText(referralLink)
-        //     .then(() => {
-        //         alert("Скопировано!");
-        //     })
-        //     .catch((err) => {
-        //         alert("Error copying to clipboard: ", err);
-        //         console.error("Error copying to clipboard: ", err);
-        //     });
-
+        const referralLink = `${process.env.NEXT_PUBLIC_TG_APP_URL ?? 'https://t.me/vinovnicabot/start'}?startapp=${userData?.id}`;
         const tgLink = `https://t.me/share/url?url=${encodeURI(referralLink)}`;
 
         return tgLink;
@@ -78,7 +58,15 @@ const FriendsPage = () => {
         }
     };
 
-    const ScoreboardDisplay = ({ icon, value, color, fontSize, width }) => (
+    type ScoreboardDisplayProps = {
+        icon: string,
+        value: number | string,
+        color: string,
+        fontSize: string,
+        width: string,
+    }
+
+    const ScoreboardDisplay = ({ icon, value, color, fontSize, width }: ScoreboardDisplayProps) => (
         <div style={{
             fontSize: fontSize,
             fontWeight: 'bold',
@@ -99,7 +87,7 @@ const FriendsPage = () => {
         </div>
     );
 
-    const handleGetRewardClick = async (referral) => {
+    const handleGetRewardClick = async (referral: referredUser) => {
         console.log(referral);
         
         try {
@@ -113,6 +101,7 @@ const FriendsPage = () => {
             }))
     
             dispatch(updateUserScores(data.scores));
+            fetchUsers();
 
             alert('Награда получена!');
         } catch (error) {
@@ -141,7 +130,7 @@ const FriendsPage = () => {
                     <div className={styles.stats}>
                         <div>🪙 Всего нажатий: <span style={{ color: '#f8cc46' }}>{userData?.scores || 0}</span></div>
                         <div>🎰 Прокруток слота: <span style={{ color: '#f8cc46' }}>1000</span></div>
-                        <div>👥 Приглашено друзей: <span style={{ color: '#f8cc46' }}>{userData.referrals.length}</span></div>
+                        <div>👥 Приглашено друзей: <span style={{ color: '#f8cc46' }}>{userData?.referrals?.length ?? 0}</span></div>
                     </div>
                     <a
                         href={referralLink()}
@@ -175,7 +164,7 @@ const FriendsPage = () => {
                     </p>
                 </div>
 
-                {userData.referrals.length > 0 &&
+                {userData?.referrals && userData.referrals.length > 0 &&
                     <div className={styles.profileSection}>
                         <h2 className={styles.title}>
                             Приглашённые друзья

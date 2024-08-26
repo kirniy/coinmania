@@ -19,8 +19,7 @@ export interface UserData {
     referrals: referredUser[]
 };
 
-export type referredUser = {
-    id: string,
-    first_name: string,
-    last_name: string,
-}
+export type referredUser = Pick<UserData, 'id' | 'first_name' | 'last_name'> & {
+    reward_claimed: boolean,
+    users: Pick<UserData, 'id' | 'first_name' | 'last_name'>
+};
