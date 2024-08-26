@@ -158,9 +158,12 @@ const FriendsPage = () => {
                     >
                         <Users size={20} style={{ marginRight: '10px' }} /> Пригласить друзей
                     </a>
-                    <p className={styles.inviteText}>
-                        Пригласи друзей и получи +500⚡ к лимиту Party Energy навсегда.
-                        Больше энергии – больше монет и ⭐ каждый день!
+                    <p className={`${styles.inviteText}`}>
+                        Приглашай друзей и получай по 20, 000
+                        <span className="inline-flex items-center">
+                            <img src='/images/coin.png' width={10} alt="Coin" className="mx-1 inline" />
+                        </span>
+                        за каждого друга, который зайдет в игру по твоей ссылке!
                     </p>
                 </div>
 
