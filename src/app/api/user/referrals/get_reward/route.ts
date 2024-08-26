@@ -55,7 +55,7 @@ export const GET = async (req: Request) => {
         const { data: updatedUser, error: userUpdateError } = await supabase
             .from('users')
             .update({
-                scores: user.scores + 25000,
+                scores: user.scores + 20000,
             })
             .eq('id', userId);
 
