@@ -9,7 +9,7 @@ import { useDispatch } from "react-redux"
 import { updateUserReferred, updateUserScores } from "@/store/userSlice"
 import axios from "axios"
 import { RootState } from "@/store/rootReducer"
-import { referredUser, UserData } from "@/types/user"
+import { referredUserRecord, UserData } from "@/types/user"
 
 const FriendsPage = () => {
     const {app} = useContext(webAppContext);
@@ -87,7 +87,7 @@ const FriendsPage = () => {
         </div>
     );
 
-    const handleGetRewardClick = async (referral: referredUser) => {
+    const handleGetRewardClick = async (referral: referredUserRecord) => {
         console.log(referral);
         
         try {
@@ -158,9 +158,12 @@ const FriendsPage = () => {
                     >
                         <Users size={20} style={{ marginRight: '10px' }} /> Пригласить друзей
                     </a>
-                    <p className={styles.inviteText}>
-                        Пригласи друзей и получи +500⚡ к лимиту Party Energy навсегда.
-                        Больше энергии – больше монет и ⭐ каждый день!
+                    <p className={`${styles.inviteText}`}>
+                        Приглашай друзей и получай по 20, 000
+                        <span className="inline-flex items-center">
+                            <img src='/images/coin.png' width={10} alt="Coin" className="mx-1 inline" />
+                        </span>
+                        за каждого друга, который зайдет в игру по твоей ссылке!
                     </p>
                 </div>
 
@@ -174,11 +177,11 @@ const FriendsPage = () => {
                             {userData.referrals.map(referral => {
                                 return (
                                     <div
-                                        key={referral.users.id}
+                                        key={referral.id}
                                         className="text-white flex items-center gap-2 p-2 border-white border-opacity-80 border rounded-xl"
                                     >
                                         <span className="text-sm text-ellipsis overflow-hidden max-w-[55%] whitespace-nowrap">
-                                            {referral.users.first_name}
+                                            {referral.user.first_name}
                                         </span>
 
                                         {referral.reward_claimed &&
@@ -195,7 +198,7 @@ const FriendsPage = () => {
                                                 className={styles.getRewardButton}
                                                 onClick={() => {handleGetRewardClick(referral)}}
                                             >
-                                                25, 000
+                                                20, 000
                                                 <img src='/images/coin.png' width={15} alt="Coin" className='ml-1' />
                                             </button>
                                         }

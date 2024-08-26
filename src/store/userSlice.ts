@@ -1,7 +1,7 @@
 import { MAX_SPINS_PER_DAY } from '@/constants/game.js'
 import { BOOSTERS } from '@/constants/earn';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { referredUser, UserData } from '@/types/user';
+import { referredUserRecord, UserData } from '@/types/user';
 import { AppThunk } from './store';
 import { checkIsSameDay } from '@/utils/dates';
 
@@ -73,10 +73,10 @@ const userSlice = createSlice({
         state.data.tap_boost_remaining_time = action.payload;
       }
     },
-    updateUserReferred: (state, action: PayloadAction<referredUser>) => {
+    updateUserReferred: (state, action: PayloadAction<referredUserRecord>) => {
       if (state.data) {
-        state.data.referrals = state.data.referrals.map(referredUser =>
-          referredUser.id === action.payload.id ? action.payload : referredUser
+        state.data.referrals = state.data.referrals.map(referredUserRecord =>
+          referredUserRecord.id === action.payload.id ? action.payload : referredUserRecord
         );
       }
     }
