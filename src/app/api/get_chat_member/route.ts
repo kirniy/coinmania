@@ -2,6 +2,7 @@
 
 // 7350492017:AAGdqqLFW3Jn3Kefuv8jQ7wJcQjsmbJVYho
 
+import supabase from "@/db/supabase";
 import { NextResponse } from "next/server";
 
 interface TgApiResponse {
@@ -52,8 +53,29 @@ export async function GET(req: Request) {
     tgApiResponse.result?.status !== "left" &&
     tgApiResponse.result?.status !== "kicked"
   ) {
-    return NextResponse.json({ result: true });
+    const { data: user, error: fetchError } = await supabase
+      .from("users")
+      .select("scores")
+      .eq("id", id)
+      .single();
+
+    if (fetchError) {
+      console.error("Failed to fetch user:", fetchError);
+      return NextResponse.json(
+        { error: "Failed to fetch user" },
+        { status: 500 }
+      );
+    }
+
+    const { data: updatedUser, error: userUpdateError } = await supabase
+      .from("users")
+      .update({
+        scores: user.scores + 20000,
+      })
+      .eq("id", id);
+
+    return NextResponse.json({ ok: true, scores: user.scores + 20000 });
   }
 
-  return Response.json(tgApiResponse);
+  return Response.json({ ok: false });
 }
