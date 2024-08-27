@@ -5,6 +5,7 @@ import styles from './CoinManiaBonusPage.module.css'; // Импортируем 
 import Boosters from './components/Boosters';
 import InfoBox from "@/components/common/InfoBox";
 import { useDispatch, useSelector } from "react-redux";
+import { Upgrades } from "./components/Upgrades";
 
 // import { tasks } from "@/constants/earn";
 import { updateUserScores } from "@/store/userSlice";
@@ -153,6 +154,19 @@ const CoinManiaBonusPage = () => {
 
                         <InfoBox>
                             Каждый бустер можно использовать только 3 раза в день, после истечения 24-х часов их можно будет использовать снова.
+                        </InfoBox>
+                    </div>
+                </div>
+
+                <div className={styles.bonusSection}>
+
+                    <div className="flex flex-col gap-4">
+                        <h2 className={styles.title}>🚀 Улучшения</h2>
+                        <Upgrades>
+                        </Upgrades>
+
+                        <InfoBox>
+                            Улучшения можно купить за коины и они будут действовать постоянно.
                         </InfoBox>
                     </div>
                 </div>
