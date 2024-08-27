@@ -16,7 +16,8 @@ export interface UserData {
     last_full_tank_time: string | null;
     referal_id: string | null;
     tap_boost_remaining_time: number;
-    referrals: referredUserRecord[]
+    referrals: referredUserRecord[];
+    upgrades: userUpgrades,
 };
 
 export type referredUserRecord = {
@@ -24,3 +25,9 @@ export type referredUserRecord = {
     reward_claimed: boolean,
     user: Pick<UserData, 'id' | 'first_name' | 'last_name'>
 };
+
+export type userUpgrades = {
+    tap_value: number,
+    energy_limit: number,
+    recharging_speed: number,
+}
