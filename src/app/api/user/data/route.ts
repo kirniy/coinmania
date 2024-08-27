@@ -26,6 +26,11 @@ export async function GET(req: NextRequest) {
                         first_name,
                         last_name
                     )
+                ),
+                upgrades (
+                    tap_value,
+                    energy_limit,
+                    recharging_speed
                 )
             `)
             .eq('id', id)
