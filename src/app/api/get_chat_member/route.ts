@@ -54,6 +54,7 @@ export async function GET(req: Request) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(body),
+      cache: "no-store",
     }
   );
   const tgApiResponse: TgApiResponse = await response.json();
