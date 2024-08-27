@@ -1,7 +1,3 @@
-// POST https://api.telegram.org/bot5000573019:AAEpWwB5xxsu7I_tzh4clAa3hlwlTaB4VAY/getChatMember
-
-// 7350492017:AAGdqqLFW3Jn3Kefuv8jQ7wJcQjsmbJVYho
-
 import supabase from "@/db/supabase";
 import { NextResponse } from "next/server";
 
@@ -27,17 +23,31 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
 
   const id = searchParams.get("id");
+  const taskId = searchParams.get("task_id");
 
-  if (!id) {
-    return NextResponse.json({ error: "Missing user ID" }, { status: 400 });
+  if (!id || !taskId) {
+    return NextResponse.json({ error: "Missing user ID or task ID" }, { status: 400 });
   }
+
+  const {data: task, error: taskFetchinError} = await supabase
+    .from("tasks")
+    .select("tg_id, reward")
+    .eq("id", taskId)
+    .single();
+
+    if (taskFetchinError) {
+        console.error("Failed to fetch user task:", taskFetchinError);
+        return NextResponse.json({ error: "Failed to fetch user task" }, { status: 500 });
+    }
+
   const body = {
-    chat_id: "@asjfiuwqhdiuqnjdbqks",
+    chat_id: task.tg_id,
     user_id: id,
   };
-
+  
+  const BOT_TOKEN = process.env.BOT_TOKEN;
   const response = await fetch(
-    "https://api.telegram.org/bot7350492017:AAGdqqLFW3Jn3Kefuv8jQ7wJcQjsmbJVYho/getChatMember",
+    `https://api.telegram.org/bot${BOT_TOKEN}/getChatMember`,
     {
       method: "POST",
       headers: {
@@ -67,14 +77,52 @@ export async function GET(req: Request) {
       );
     }
 
+    const { data: existingCompletedTask, error: existingTaskError } = await supabase
+        .from("user_tasks")
+        .select('*')
+        .eq("user_id", id)
+        .eq("task_id", taskId);
+        
+    if (existingTaskError) {
+        console.error("Failed to fetch user task:", existingTaskError);
+        return NextResponse.json({ error: "Failed to fetch user task" }, { status: 500 });
+    }
+
+    if (existingCompletedTask.length > 0) {
+        return NextResponse.json({ error: "Task already completed" }, { status: 400 });
+    }
+
+    interface Task {
+        id: string;
+        name: string;
+        reward: number;
+      }
+    interface CompletedTask {
+    tasks: Task;
+    }
+
+    const { data: completedTask, error: completedTaskError}: { data: CompletedTask | null, error: any } = await supabase
+        .from("user_tasks")
+        .insert([{
+            user_id: id,
+            task_id: taskId,
+        }])
+        
+    if (completedTaskError) {
+        console.error("Failed to create user task:", completedTaskError);
+        return NextResponse.json({ error: "Failed to create user task" }, { status: 500 });
+    }
+
+    const reward = task.reward;
+
     const { data: updatedUser, error: userUpdateError } = await supabase
       .from("users")
       .update({
-        scores: user.scores + 20000,
+        scores: user.scores + reward,
       })
       .eq("id", id);
 
-    return NextResponse.json({ ok: true, scores: user.scores + 20000 });
+    return NextResponse.json({ ok: true, scores: user.scores + reward });
   }
 
   return Response.json({ ok: false });

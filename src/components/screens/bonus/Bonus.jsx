@@ -1,13 +1,14 @@
 import { XCircle } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styles from './CoinManiaBonusPage.module.css'; // Импортируем стили
 
 import Boosters from './components/Boosters';
 import InfoBox from "@/components/common/InfoBox";
 import { useDispatch, useSelector } from "react-redux";
 
-import { TASKS } from "@/constants/earn";
+// import { tasks } from "@/constants/earn";
 import { updateUserScores } from "@/store/userSlice";
+// import { Task } from '@/types/tasks';
 
 // STYLES
 
@@ -66,8 +67,9 @@ const handleButtonClick = async (setShowTasksModal) => {
     // }
 };
 
-async function handleVerifyButtonClick(setShowTasksModal, userId, dispatch) {
-    const req = await fetch(`/api/get_chat_member?id=${userId}`);
+async function handleVerifyButtonClick(setShowTasksModal, userId, dispatch, task_id) {
+   try {
+    const req = await fetch(`/api/get_chat_member?id=${userId}&task_id=${task_id}`);
     const res = await req.json();
     console.log(res);
     if (res.ok) {
@@ -75,8 +77,12 @@ async function handleVerifyButtonClick(setShowTasksModal, userId, dispatch) {
         alert('Подписка успешно проверена');
         dispatch(updateUserScores(res.scores))
     } else {
-        alert('Подписка не найдена');
+        if(res.error) alert(res.error)
+        else alert('Подписка не найдена');
     }
+   } catch (error) {
+        alert(error)
+   }
 }
 
 function Task({task, index}) {
@@ -112,7 +118,7 @@ function Task({task, index}) {
                             <button onClick={() => setShowTasksModal(false)} className={styles.closeButton}><XCircle size={30} /></button>
                         </div>
                         <a href={task.link} className={styles.taskModalButton}>Подписаться</a>
-                        <button onClick={() => handleVerifyButtonClick(setShowTasksModal, userId, dispatch)} className={styles.taskModalButton}>Проверить</button>
+                        <button onClick={() => handleVerifyButtonClick(setShowTasksModal, userId, dispatch, task.id)} className={styles.taskModalButton}>Проверить</button>
                     </div>
                 </div>
             )}
@@ -122,6 +128,18 @@ function Task({task, index}) {
 
 const CoinManiaBonusPage = () => {
     const [showTasks, setShowTasks] = useState(false);
+    const [tasks, setTasks] = useState([]);
+
+    useEffect(() => {
+        async function fetchTasks() {
+            const req = await fetch('/api/tasks/get', { cache: 'no-store' });
+            const res = await req.json();
+            setTasks(res.data);
+            console.log(res.data);
+        }
+
+        fetchTasks();
+    }, []);
 
     return (
         <div className={styles.container}>
@@ -155,21 +173,21 @@ const CoinManiaBonusPage = () => {
                         <div style={infoBoxStyle}>
                             <p style={{fontSize: '0.9rem', lineHeight: '1.4'}}>Для проверки подписки на каждый аккаунт мы проведем проверку. Для Telegram это займет 15 минут. Для Instagram может потребоваться до 24 часов. Вернитесь в этот раздел позже, чтобы проверить прогресс верификации. В случае успеха вы получите награды на баланс Coinmania.</p>
                         </div>
-                        {TASKS.find(task => task.platform === "Telegram") && (
+                        {tasks.find(task => task.platform === "Telegram") && (
                             <div style={{marginBottom: '25px'}}>
                                 <h3 className={styles.tasksPopupPlatform}>Telegram</h3>
                                 <div className={styles.taskButtonGrid}>
-                                    {TASKS.map((task, idx) => task.platform === "Telegram" &&  (
+                                    {tasks.map((task, idx) => task.platform === "Telegram" &&  (
                                         <Task task={task} key={task.platform + idx} index={idx}/>
                                     ))}
                                 </div>
                             </div>
                         )}
-                        {TASKS.find(task => task.platform === "Instagram") && (
+                        {tasks.find(task => task.platform === "Instagram") && (
                             <div style={{marginBottom: '25px'}}>
                                 <h3 className={styles.tasksPopupPlatform}>Instagram</h3>
                                 <div className={styles.taskButtonGrid}>
-                                    {TASKS.map((task, idx) => task.platform === "Instagram" && (
+                                    {tasks.map((task, idx) => task.platform === "Instagram" && (
                                         <Task task={task} key={task.platform + (idx * 3.1415)} index={idx}/>
                                     ))}
                                 </div>
