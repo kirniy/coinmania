@@ -92,6 +92,48 @@
     font-weight: bold;
 }
 
+.taskModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1100;
+}
+
+.taskModalContent {
+    min-height: 33vh;
+    width: 80%;
+    padding: 20px 40px 40px;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    gap: 20px;
+    background-color: rgba(0, 0, 0, 0.95);
+    border-radius: 25px;
+    border: 1px solid #00000018;
+}
+
+.taskModalCloseContainer {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.taskModalButton {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    color: #fff;
+    background: linear-gradient(145deg, rgb(0, 136, 204), rgba(0, 136, 204, 0.867));
+}
+
 .closeButton {
     background: none;
     border: none;
