@@ -98,22 +98,30 @@ const CoinMania: React.FC = () => {
     }, [])
 
     const handleCoinTap = async (e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>) => {
-        // Проверяем время действия бустера
-        let boosterMultiplier = 1;
-        let energyToDecrease = 1
+        let tapValueMultiplier = 1;
+        let energyToDecrease = 1;
 
         if (userData) {
+            const userTapValue = userData.upgrades.tap_value || 1;
+
+            tapValueMultiplier = tapValueMultiplier * userTapValue;
+            energyToDecrease = energyToDecrease * userTapValue;
+
             const tapBoostRemainingTime = userData.tap_boost_remaining_time;
             const isBoosterActive = tapBoostRemainingTime > 0;
             
             if (isBoosterActive) {
-                boosterMultiplier = 5;
+                tapValueMultiplier = tapValueMultiplier * 5;
+
+                if (tapValueMultiplier > 1) {
+                    energyToDecrease = energyToDecrease * 5;
+                }
             }
         }
 
-        if (userData.energy <= 0 && energyToDecrease > 0) return;
+        if (userData.energy <= 0 || energyToDecrease > userData.energy) return;
 
-        const pointsToAdd = 1 * boosterMultiplier; // Значение с учетом бустера
+        const pointsToAdd = 1 * tapValueMultiplier; // Значение с учетом бустера
 
         dispatch(updateUserScores(userData.scores + pointsToAdd));
         dispatch(updateUserEnergy(Math.min(userData.energy - energyToDecrease, userData?.maxenergy ?? 0)));// Уменьшаем энергию, не превышая maxenergy

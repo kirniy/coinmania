@@ -1,7 +1,7 @@
 import { MAX_SPINS_PER_DAY } from '@/constants/game.js'
 import { BOOSTERS } from '@/constants/earn';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { referredUserRecord, UserData } from '@/types/user';
+import { referredUserRecord, UserData, userUpgrades } from '@/types/user';
 import { AppThunk } from './store';
 import { checkIsSameDay } from '@/utils/dates';
 
@@ -43,6 +43,11 @@ const userSlice = createSlice({
         state.data.energy = action.payload
       }
     },
+    updateUserMaxEnergy: (state, action: PayloadAction<number>) => {
+      if (state.data) {
+        state.data.maxenergy = action.payload;
+      }
+    },
     updateUserSpin: (state, action: PayloadAction<number>) => {
       if (state.data) {
         state.data.daily_spin_count = action.payload
@@ -78,6 +83,11 @@ const userSlice = createSlice({
         state.data.referrals = state.data.referrals.map(referredUserRecord =>
           referredUserRecord.id === action.payload.id ? action.payload : referredUserRecord
         );
+      }
+    },
+    updateUserUpgrades: (state, action: PayloadAction<userUpgrades>) => {
+      if (state.data) {
+        state.data.upgrades = action.payload;
       }
     }
   },
@@ -125,6 +135,20 @@ const userSlice = createSlice({
             state.data[`daily_${booster.slug}_count`] = availableBoostCount;
           }
         })
+
+        // Upgrades
+
+        const defaultUserUpgrades: userUpgrades = {
+          tap_value: 1,
+          energy_limit: 1,
+          recharging_speed: 1,
+        };
+
+        if (!userData.upgrades) {
+          state.data.upgrades = defaultUserUpgrades;
+        } else {
+          state.data.upgrades = userData.upgrades;
+        }
       })
       .addCase(fetchUserData.rejected, (state, action) => {
         console.log('action', action)
@@ -137,6 +161,7 @@ const userSlice = createSlice({
 export const {
   updateUserScores,
   updateUserEnergy,
+  updateUserMaxEnergy,
   updateUserSpin,
   updateUserTapBoosterCount,
   updateUserTapBoosterLastTime,
@@ -144,6 +169,7 @@ export const {
   updateUserFullTankLastTime,
   updateUserTapBoostRemainingTime,
   updateUserReferred,
+  updateUserUpgrades,
 } = userSlice.actions;
 
 export const startCountdown = (): AppThunk => (dispatch, getState) => {
