@@ -113,9 +113,9 @@ const CoinMania: React.FC = () => {
             if (isBoosterActive) {
                 tapValueMultiplier = tapValueMultiplier * 5;
 
-                if (tapValueMultiplier > 1) {
-                    energyToDecrease = energyToDecrease * 5;
-                }
+                // if (tapValueMultiplier > 1) {
+                //     energyToDecrease = energyToDecrease * 5;
+                // }
             }
         }
 
