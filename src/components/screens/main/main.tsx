@@ -1,41 +1,26 @@
 "use client";
 
-import React, { useContext, useEffect, useState, useRef, useCallback } from 'react';
-import { webAppContext } from "@/app/context";
-import supabase from "@/db/supabase";
-import Loader from "@/components/loader/loader";
+import { CoinEmoji as EmojiType } from "@/types/coinEmoji";
 
-import { Button, Link } from "@nextui-org/react";
+import { webAppContext } from "@/app/context"
+import { LoadingContext } from '@/app/context/LoaderContext'
+import Loader from '@/components/loader/loader'
+import supabase from "@/db/supabase"
+import { AppDispatch } from '@/store/store'
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { updateUserEnergy, updateUserScores } from '../../../store/userSlice'
+import Emoji from './Emoji'
+import styles from './Main.module.css'
+import CoinEmojis from "./CoinEmojis";
 
-import TapIcon from '@mui/icons-material/TouchApp';
-import BonusIcon from '@mui/icons-material/CardGiftcard';
-import TasksIcon from '@mui/icons-material/Assignment';
-import TopIcon from '@mui/icons-material/EmojiEvents';
-import FrensIcon from '@mui/icons-material/People';
-import Footer from "@/components/footer/Footer";
+import { throttle } from "@/utils/throttle";
 
-interface UserData {
-    id: string;
-    scores: number | null;
-    booster_x2: string | null;
-    booster_x3: string | null;
-    booster_x5: string | null;
-    energy: number | null;
-    last_login_time: string;
-    maxenergy: number; // Добавляем поле maxenergy
+interface RootState {
+    user: {
+        data: any;
+    }
 }
-
-type EmojiType = {
-    id: number;
-    emoji: string;
-    x: number;
-    y: number;
-    size: number;
-    speedX: number;
-    speedY: number;
-    createdAt: number;
-    opacity?: number; // Добавляем opacity
-};
 
 type ClickType = {
     id: number;
@@ -45,128 +30,57 @@ type ClickType = {
 };
 
 const CoinMania: React.FC = () => {
-    const app = useContext(webAppContext);
-    const [userData, setUserData] = useState<UserData | null>(null);
-    const [points, setPoints] = useState(0);
-    const [energy, setEnergy] = useState(1000);
-    const [loading, setLoading] = useState(true);
+    const dispatch: AppDispatch = useDispatch();
+    const {app} = useContext(webAppContext);
+    const userData = useSelector((state: RootState) => state.user.data);
+    const { isLoading, setLoading } = useContext(LoadingContext);
     const [error, setError] = useState<string | null>(null);
 
+    const [isTouchDevice, setIsTouchDevice] = useState<boolean>(false);
+
     const [isPressed, setIsPressed] = useState(false);
-    const [headerEmojis, setHeaderEmojis] = useState<EmojiType[]>([]);
     const [coinEmojis, setCoinEmojis] = useState<EmojiType[]>([]);
     const [clicks, setClicks] = useState<ClickType[]>([]);
-    const [lastTapTime, setLastTapTime] = useState(Date.now());
+    const lastTapTimeRef = useRef<number>(Date.now());
     const [tilt, setTilt] = useState({ x: 0, y: 0 });
     const headerAnimationSpeedRef = useRef(0.4);
-    const lastUpdateTimeRef = useRef(Date.now());
     const coinRef = useRef<HTMLDivElement>(null);
     const consecutiveTapsRef = useRef(0);
+    
+    const [emogis, setEmogis] = useState<string[]>([])
+    const [speed, setSpeed] = useState(1);
 
-    const [coinSize, setCoinSize] = useState('60vw');
+    const handleButtonClickSpeed = () => {
+        setSpeed((prevSpeed) => (prevSpeed >= 5 ? 5 : prevSpeed + 1)); // Ограничиваем скорость до 5
+      };
+
+    const [coinSize, setCoinSize] = useState(360); // Добавляем состояние для размера монеты
 
     useEffect(() => {
         const updateCoinSize = () => {
-            const size = Math.min(window.innerWidth * 0.6, 360);
-            setCoinSize(`${size}px`);
+            if (window.innerWidth <= 375) { // Размер для iPhone SE
+                setCoinSize(200);
+            } else { // Размер для всех других устройств
+                setCoinSize(360);
+            }
         };
 
+        // Устанавливаем размер монеты при загрузке страницы
         updateCoinSize();
+
+        // Обновляем размер монеты при изменении размера окна
         window.addEventListener('resize', updateCoinSize);
-        return () => window.removeEventListener('resize', updateCoinSize);
+        return () => {
+            window.removeEventListener('resize', updateCoinSize);
+        };
     }, []);
 
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const response = await fetch(`/api/user/data?id=${app.initDataUnsafe.user?.id}`);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                console.log('User data fetched:', data);
-
-                setUserData({ ...data.user });
-                setPoints(data.user.scores ?? 0);
-                setEnergy(Math.min(data.user.energy ?? 0, data.user.maxenergy)); // Устанавливаем энергию, не превышающую maxenergy
-            } catch (error: unknown) {
-                if (error instanceof Error) {
-                    setError(error.message);
-                }
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchUserData();
-    }, [app.initDataUnsafe.user?.id]);
-
-    useEffect(() => {
-        const saveEnergyAndTime = async () => {
-            try {
-                const { error } = await supabase
-                    .from('users')
-                    .update({ energy: energy, last_login_time: new Date().toISOString() })
-                    .eq('id', app.initDataUnsafe.user?.id);
-
-                if (error) {
-                    throw error;
-                }
-            } catch (error: unknown) {
-                if (error instanceof Error) {
-                    setError(error.message);
-                }
-            }
-        };
-
-        const interval = setInterval(saveEnergyAndTime, 2000);
-        return () => clearInterval(interval);
-    }, [energy]);
-
-    const handleButtonClick = async (e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>) => {
-        if (energy <= 0) return;
-
-        // Проверяем время действия бустера
-        const now = new Date();
-        let boosterMultiplier = 1;
-
-        if (userData) {
-            const boosterTypes = ['booster_x2', 'booster_x3', 'booster_x5'] as const;
-            for (const boosterType of boosterTypes) {
-                const boosterEndTime = userData[boosterType];
-                if (boosterEndTime && new Date(boosterEndTime) > now) {
-                    boosterMultiplier = parseInt(boosterType.split('_x')[1]);
-                    break;
-                }
-            }
-        }
-
-        const pointsToAdd = 1 * boosterMultiplier; // Значение с учетом бустера
-
-        setPoints(prevPoints => prevPoints + pointsToAdd);
-        setEnergy(prevEnergy => Math.min(prevEnergy - 1, userData?.maxenergy ?? 0)); // Уменьшаем энергию, не превышая maxenergy
-
-        const rect = coinRef.current?.getBoundingClientRect();
-        if (rect) {
-            let clientX, clientY;
-            if ('touches' in e) {
-                clientX = e.touches[0].clientX;
-                clientY = e.touches[0].clientY;
-            } else {
-                clientX = e.clientX;
-                clientY = e.clientY;
-            }
-            const x = clientX - rect.left;
-            const y = clientY - rect.top;
-            addCoinEmojis(x, y);
-            setClicks(prev => [...prev, { id: Date.now(), x, y, value: pointsToAdd }]); // Добавляем значение
-        }
-
+    const throttledSyncWithDB = useCallback(throttle(async (scores: number, energy: number) => {
         try {
             const { error } = await supabase
                 .from('users')
-                .update({ scores: points + pointsToAdd, energy: energy - 1 })
-                .eq('id', app.initDataUnsafe.user?.id);
+                .update({ scores: scores, energy: energy })
+                .eq('id', userData.id);
 
             if (error) {
                 throw error;
@@ -175,6 +89,67 @@ const CoinMania: React.FC = () => {
             if (error instanceof Error) {
                 setError(error.message);
             }
+        }
+    }, 2000), []);
+
+    useEffect(() => {
+        const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        setIsTouchDevice(isTouch);
+    }, [])
+
+    const handleCoinTap = async (e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>) => {
+        let tapValueMultiplier = 1;
+        let energyToDecrease = 1;
+
+        if (userData) {
+            const userTapValue = userData.upgrades.tap_value || 1;
+
+            tapValueMultiplier = tapValueMultiplier * userTapValue;
+            energyToDecrease = energyToDecrease * userTapValue;
+
+            const tapBoostRemainingTime = userData.tap_boost_remaining_time;
+            const isBoosterActive = tapBoostRemainingTime > 0;
+            
+            if (isBoosterActive) {
+                tapValueMultiplier = tapValueMultiplier * 5;
+
+                // if (tapValueMultiplier > 1) {
+                //     energyToDecrease = energyToDecrease * 5;
+                // }
+            }
+        }
+
+        if (userData.energy <= 0 || energyToDecrease > userData.energy) return;
+
+        const pointsToAdd = 1 * tapValueMultiplier; // Значение с учетом бустера
+
+        dispatch(updateUserScores(userData.scores + pointsToAdd));
+        dispatch(updateUserEnergy(Math.min(userData.energy - energyToDecrease, userData?.maxenergy ?? 0)));// Уменьшаем энергию, не превышая maxenergy
+
+        const rect = coinRef.current?.getBoundingClientRect();
+        if (rect) {
+            let clientX, clientY;
+            if ('changedTouches' in e) {      
+                clientX = e.changedTouches[0].clientX;
+                clientY = e.changedTouches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+            addCoinEmojis(x, y);
+            setClicks(prev => [...prev, { id: Date.now(), x, y, value: pointsToAdd }]); // Добавляем значение
+
+            handleButtonClickSpeed();
+        }
+
+        throttledSyncWithDB(userData.scores + pointsToAdd, userData.energy - 1);
+    }
+
+    const handleButtonClick = async (e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>) => {
+        if (!isTouchDevice) {
+            handleCoinTap(e);
         }
     };
 
@@ -189,8 +164,16 @@ const CoinMania: React.FC = () => {
 
     const handleMouseUp = () => {
         setIsPressed(false);
-        setTilt({ x: 0, y: 0 });
+        setTilt({ x: 0, y: 0 });     
     };
+
+    const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+        setIsPressed(false);
+        setTilt({ x: 0, y: 0 });
+        if (isTouchDevice) {
+            handleCoinTap(e);
+        }
+    }
 
     const handleTilt = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
         if (coinRef.current) {
@@ -211,38 +194,32 @@ const CoinMania: React.FC = () => {
         }
     };
 
+    const getRandomBgEmoji = () => {
+        const emojis = ['🎉', '⭐', '💥', '🚀', '🎤', '🔥'];
+
+        const filledArray = [];
+
+        for (let i = 0; i < 12; i++) {
+            filledArray.push(emojis[Math.floor(Math.random() * emojis.length)]);
+        }
+        setEmogis(filledArray)
+    };
+
     const getRandomEmoji = () => {
         const emojis = ['🎉', '⭐', '💥', '🚀', '🎤', '🔥'];
         return emojis[Math.floor(Math.random() * emojis.length)];
     };
 
-    const createInitialHeaderEmojis = useCallback((count: number) => {
-        return Array(count).fill(null).map(() => ({
-            id: Date.now() + Math.random(),
-            emoji: getRandomEmoji(),
-            x: Math.random() * 100,
-            y: Math.random() * 100,
-            size: Math.random() * 24 + 16,
-            speedX: (Math.random() - 0.5) * 0.1,
-            speedY: (Math.random() - 0.5) * 0.1,
-            createdAt: Date.now()
-        }));
-    }, []);
-
-    useEffect(() => {
-        setHeaderEmojis(createInitialHeaderEmojis(20));
-    }, [createInitialHeaderEmojis]);
-
     const addCoinEmojis = useCallback((x: number, y: number) => {
         const currentTime = Date.now();
-        if (currentTime - lastTapTime > 1000) {
+        if (currentTime - lastTapTimeRef.current > 1000) {
             consecutiveTapsRef.current = 0;
         }
         consecutiveTapsRef.current++;
 
-        if (consecutiveTapsRef.current >= 8 && consecutiveTapsRef.current % 8 === 0) {
-            const newEmojis = Array(12).fill(null).map(() => ({
-                id: Date.now() + Math.random(),
+        if (consecutiveTapsRef.current >= 16 && consecutiveTapsRef.current % 16 === 0) {
+            const newEmojis = Array(8).fill(null).map(() => ({
+                id: String(Date.now()) + String(Math.random()),
                 emoji: getRandomEmoji(),
                 x: x + (Math.random() - 0.5) * 60,
                 y: y + (Math.random() - 0.5) * 60,
@@ -253,122 +230,88 @@ const CoinMania: React.FC = () => {
             }));
             setCoinEmojis(prev => [...prev, ...newEmojis]);
         }
-        setLastTapTime(currentTime);
-    }, [lastTapTime]);
+        lastTapTimeRef.current = currentTime;
+    }, []);
 
     useEffect(() => {
-        const animationFrame = requestAnimationFrame(function animate() {
+        const intervalId = setInterval(() => {
             const currentTime = Date.now();
-            const deltaTime = (currentTime - lastUpdateTimeRef.current) / 1000; // time in seconds
-            lastUpdateTimeRef.current = currentTime;
+            const timeSinceLastTap = currentTime - lastTapTimeRef.current;
 
-            const timeSinceLastTap = currentTime - lastTapTime;
-            headerAnimationSpeedRef.current = timeSinceLastTap > 2000 ? 0.2 : 1;
+            if (timeSinceLastTap > 2000) {
+                setSpeed((currentSpeed) => {
+                    return currentSpeed > 1
+                        ? currentSpeed - 1
+                        : 1;
+                })
+            }
+        }, 2000)
 
-            setHeaderEmojis(prevEmojis =>
-                prevEmojis.map(emoji => ({
-                    ...emoji,
-                    x: (emoji.x + emoji.speedX * headerAnimationSpeedRef.current + 100) % 100,
-                    y: (emoji.y + emoji.speedY * headerAnimationSpeedRef.current + 100) % 100,
-                }))
-            );
-
-            setCoinEmojis(prevEmojis =>
-                prevEmojis
-                    .map(emoji => ({
-                        ...emoji,
-                        x: emoji.x + emoji.speedX * deltaTime,
-                        y: emoji.y + emoji.speedY * deltaTime + (0.5 * 500 * deltaTime * deltaTime),
-                        speedY: emoji.speedY + 500 * deltaTime,
-                        opacity: 1 - (currentTime - emoji.createdAt) / 2000 // Добавляем свойство opacity
-                    }))
-                    .filter(emoji => (currentTime - emoji.createdAt) < 2000 && emoji.y < window.innerHeight && emoji.y > -50) // Удаляем устаревшие эмодзи
-            );
-
-            requestAnimationFrame(animate);
-        });
-
-        return () => cancelAnimationFrame(animationFrame);
-    }, [lastTapTime]);
+        return () => {
+            clearInterval(intervalId)
+        }
+    }, [])
 
     useEffect(() => {
         const preventDefault = (e: Event) => e.preventDefault();
         document.body.style.overflow = 'hidden';
         document.addEventListener('touchmove', preventDefault, { passive: false });
+        getRandomBgEmoji()
         return () => {
             document.body.style.overflow = 'auto';
             document.removeEventListener('touchmove', preventDefault);
         };
     }, []);
 
-    if (loading) {
-        return <Loader loading={loading} />;
+    const id = app.initDataUnsafe.user?.id
+
+    if (isLoading) {
+        return <Loader loading={isLoading} />;
     }
 
     return (
-        <div className="bg-gradient-main min-h-screen flex flex-col items-center text-white font-medium"
-             style={{ userSelect: 'none', contain: 'layout' }}>
+        <div className={styles.background}>
             {/* Gradient background */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black via-zinc-950 to-red-950 z-0"
-                 style={{ height: '100vh' }}></div>
-            <div className="absolute inset-0 flex items-center justify-center z-0">
+            <div className={styles.gradientBackground}></div>
+            <div className={styles.radialGradientOverlay}>
                 <div className="radial-gradient-overlay"></div>
             </div>
-
+    
             {/* Emoji animation layer */}
-            <div className="fixed inset-0 z-10 pointer-events-none overflow-hidden">
-                <div className="relative w-full h-full">
-                    {headerEmojis.map(emoji => (
-                        <div
-                            key={emoji.id}
-                            className="absolute text-2xl transition-opacity duration-1000"
-                            style={{
-                                left: `${emoji.x}%`,
-                                top: `${emoji.y}%`,
-                                fontSize: `${emoji.size}px`,
-                                opacity: emoji.opacity,
-                            }}
-                        >
-                            <span className="emoji">{emoji.emoji}</span>
-                        </div>
+            <div className={styles.emojiLayer}>
+                <div className={styles.emojiContainer}>
+                {emogis.map((emoji, index) => (
+                        <Emoji key={index} emoji={emoji} speed={speed} />
                     ))}
+
                 </div>
             </div>
-
-            <div className="w-full z-30 min-h-screen flex flex-col items-center text-white">
+    
+            <div className={styles.content}>
                 {/* Header */}
-                <div className="fixed bg-gradient-to-b from-zinc-950 to-transparent w-full z-40">
-                    <div className="text-center py-8 relative">
+                <div className={styles.header}>
+                    <div className="text-center relative">
                         <img
                             src='/images/coinmania.webp'
                             alt="COINMANIA"
-                            className="mx-auto"
+                            className={styles.headerImage}
                             width={300}
                         />
                     </div>
                 </div>
-
+    
                 {/* Score and associated components */}
-                <div className="fixed top-24 mx-auto w-full z-40 px-4">
+                <div className={styles.scoreSection}>
                     <div className="text-center">
-
-                        <div className="flex justify-center items-center">
-                            <img src='/images/coin.png' width={30} alt="Coin" className="mr-2" />
-                            <span className="text-3xl font-bold">{points.toLocaleString()}</span>
-                        </div>
-
-                        <div className="mt-2 flex justify-center items-center">
-                            <img src='/images/trophy.png' width={24} height={24} alt="Trophy" className="mr-2" />
-                            <a href="https://t.me/vnvnc_spb" target="_blank" rel="noopener noreferrer"
-                               className="text-xl">
-                                Gold
-                            </a>
+                        <div className={styles.score}>
+                            <img src='/images/coin.png' width={30} alt="Coin" className={styles.scoreImage} />
+                            <span className="text-3xl font-bold">{userData.scores.toLocaleString()}</span>
                         </div>
                     </div>
                 </div>
-
+    
                 {/* Main coin */}
-                <div className="absolute center inset-0 flex items-center justify-center select-none z-40">
+                <div className={styles.mainCoin}>
                     <div
                         ref={coinRef}
                         className="relative select-none touch-none"
@@ -377,7 +320,7 @@ const CoinMania: React.FC = () => {
                         onMouseUp={handleMouseUp}
                         onMouseLeave={handleMouseUp}
                         onTouchStart={handleMouseDown}
-                        onTouchEnd={handleMouseUp}
+                        onTouchEnd={handleTouchEnd}
                         onTouchCancel={handleMouseUp}
                         style={{
                             userSelect: 'none',
@@ -388,34 +331,27 @@ const CoinMania: React.FC = () => {
                             src='/images/notcoin.png'
                             alt="notcoin"
                             draggable="false"
-                            width={coinSize}
+                            width={coinSize} // Замените статическое значение на динамическое
                             style={{
                                 pointerEvents: 'auto',
                                 userSelect: 'none',
                                 transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) ${isPressed ? 'scale(0.95)' : 'scale(1)'}`,
                                 transition: 'transform 0.1s',
                             }}
-                            className='select-none'
+                            className={`${styles.coinImage} select-none`}
                         />
-
-                        {coinEmojis.map(emoji => (
-                            <div
-                                key={emoji.id}
-                                className="absolute text-2xl pointer-events-none transition-opacity duration-1000"
-                                style={{
-                                    left: `${emoji.x}px`,
-                                    top: `${emoji.y}px`,
-                                    fontSize: `${emoji.size}px`,
-                                    opacity: emoji.opacity ?? 1, // Применяем opacity к каждому эмодзи
-                                }}
+    
+                        {coinEmojis.length > 0 &&
+                            <CoinEmojis
+                                emojis={coinEmojis}
+                                setCoinEmojis={setCoinEmojis}
                             >
-                                {emoji.emoji}
-                            </div>
-                        ))}
+                            </CoinEmojis>
+                        }
                         {clicks.map((click) => (
                             <div
                                 key={click.id}
-                                className="absolute text-2xl font-bold float-animation"
+                                className={`${styles.clickValue} float-animation`}
                                 style={{
                                     top: `${click.y - 42}px`,
                                     left: `${click.x - 28}px`,
@@ -426,32 +362,29 @@ const CoinMania: React.FC = () => {
                                 +{click.value}⭐️
                             </div>
                         ))}
-
+    
                     </div>
                 </div>
-
-                {/* Блок с энергией */}
-                <div className="fixed bottom-32 w-full z-28">
-                    <div className="items-center text-center">
-                        <span className="text-center mx-auto text-white text-xl font-bold">
-                            ⚡️{energy} / {userData?.maxenergy ?? 1000}
+    
+                {/* Energy section */}
+                <div className={styles.energySection}>
+    
+                    <div className={styles.energyInfo}>
+                        <span className={styles.energyText}>
+                            ⚡️{userData.energy} / {userData?.maxenergy ?? 1000}
                         </span>
                     </div>
-
-                    <div className="w-full bg-[#f9c035] rounded-md items-center px-2 my-2">
-                        <div
-                            className="bg-gradient-to-r from-[#f3c45a] to-[#fffad0] opacity-10 h-2 rounded-md"
-                            style={{ width: `${(energy / (userData?.maxenergy ?? 1000)) * 100}%` }}
-                        >
+                        <div className={styles.energyWrap}>
+                            <div className={styles.energyBar}>
+                                <div
+                                    className={styles.energyFill}
+                                    style={{width: `${(userData.energy / (userData?.maxenergy ?? 1000)) * 100}%`}}
+                                />
+                            </div>
                         </div>
-                    </div>
+                    
                 </div>
-
-
-                {/* Нижний блок меню */}
-                <div className={'z-50 w-full fixed bottom-0'}>
-                    <Footer activeTab='Home'/>
-                </div>
+    
             </div>
         </div>
     );

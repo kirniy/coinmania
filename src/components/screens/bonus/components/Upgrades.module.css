@@ -1,0 +1,18 @@
+.buyUpgradeButton {
+    background-color: #f8cc46;
+    border-radius: 25px;
+    width: auto;
+    margin-left: auto;
+    max-width: 500px;
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #000000;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    transform: scale(1);
+}

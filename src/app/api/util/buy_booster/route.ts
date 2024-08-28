@@ -1,7 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
-import supabase from "@/db/supabase";
+import supabase from "@/db/supabase"
+import { NextRequest, NextResponse } from 'next/server'
+import { BOOSTERS } from "@/constants/earn";
+import type { Booster } from "@/types/boosters";
+import { checkIsSameDay } from "@/utils/dates";
 
-const currentTime = new Date();
+export const dynamic = "force-dynamic"
 
 async function decrease_points(user: string, points: number): Promise<void> {
     try {
@@ -40,64 +43,84 @@ async function decrease_points(user: string, points: number): Promise<void> {
     }
 }
 
-interface BoosterPrices {
-    [key: string]: number;
-}
-
-interface BoosterDurations {
-    [key: string]: number;
-}
-
 export async function GET(req: NextRequest): Promise<NextResponse> {
     try {
         const { searchParams } = new URL(req.url);
         const userId = searchParams.get('userid');
-        const boosterType = searchParams.get('boosterType');
+        const boosterSlug = searchParams.get('slug');
 
-        if (!userId || !boosterType) {
+        const currentTime = new Date();
+
+        if (!userId || !boosterSlug) {
             return NextResponse.json({ error: "Missing parameters" }, { status: 400 });
         }
 
-        const boosterPrices: BoosterPrices = {
-            x2: 1000,
-            x3: 2500,
-            x5: 5000
-        };
-
-        const boosterDurations: BoosterDurations = {
-            x2: 30, // 30 minutes
-            x3: 15, // 15 minutes
-            x5: 5   // 5 minutes
-        };
-
-        if (!boosterPrices[boosterType]) {
-            return NextResponse.json({ error: "Invalid booster type" }, { status: 400 });
+        if (!BOOSTERS.find(booster => booster.slug === boosterSlug)) {
+            return NextResponse.json({ error: "Incorrect booster slug" }, { status: 400 });
         }
 
-        const points = boosterPrices[boosterType];
-        await decrease_points(userId, points);
+        const booster : Booster = BOOSTERS.find(booster => booster.slug === boosterSlug)!;
 
-        const endTime = new Date(currentTime.getTime() + boosterDurations[boosterType] * 60000);
+        const boosterDuration = booster.duration * 1000;
 
-        const boosterField = `booster_${boosterType}`;
-        const updateData: { [key: string]: string | null } = {
-            booster_x2: null,
-            booster_x3: null,
-            booster_x5: null,
-            [boosterField]: endTime.toISOString()
-        };
+        // Fetch user data
+        const { data: user, error: fetchError } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', userId)
+            .single();        
 
-        const { error: updateError } = await supabase
-            .from("users")
-            .update(updateData)
-            .eq("id", userId);
-
-        if (updateError) {
-            console.error("Failed to update booster:", updateError);
-            return NextResponse.json({ error: "Failed to update booster" }, { status: 500 });
+        if (fetchError) {
+            console.error("Failed to fetch user:", fetchError);
+            return NextResponse.json({ result: false, error: "Failed to fetch user" }, { status: 500 });
         }
 
-        return NextResponse.json({ success: true, boosterType, endTime });
+        if (!user) {
+            return NextResponse.json({ result: false, error: "User not found" }, { status: 404 });
+        }
+
+        const lastBoostTime = user[`last_${booster.slug}_time`] ? new Date(user[`last_${booster.slug}_time`]) : new Date(0);
+        const isSameDay = checkIsSameDay(lastBoostTime, currentTime);
+        const boostsToday = isSameDay
+            ? user[`daily_${booster.slug}_count`] ?? booster.maxUsePerDay
+            : booster.maxUsePerDay;
+            
+        const isBoostLimitReached = isSameDay && boostsToday <= 0;
+
+        const endTime = new Date(currentTime.getTime() + boosterDuration); 
+
+        const response = {
+            isLimitReached: isBoostLimitReached,
+            newAvailableBoostCount: isBoostLimitReached ? 0 : (boostsToday - 1),
+            endTime: endTime,
+            remainingTime: boosterDuration,
+            data: null,
+        };
+
+        if (!isBoostLimitReached) {
+            const updatedFields = {
+                [`daily_${booster.slug}_count`]: boostsToday - 1,
+                [`last_${booster.slug}_time`]: endTime.toISOString(),
+            };
+
+            if (booster.action === 'resetEnergy') {
+                updatedFields.energy = user.maxenergy;
+
+                response.data = user.maxenergy;
+            }
+
+            const { error: updateError } = await supabase
+                .from('users')
+                .update(updatedFields)
+                .eq('id', userId)
+
+            if (updateError) {
+                console.error("Failed to update user:", updateError);
+                return NextResponse.json({ result: false, error: "Failed to update user" }, { status: 500 });
+            }
+        }
+
+        return NextResponse.json(response);
     } catch (error) {
         console.error("Error processing request:", error);
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });

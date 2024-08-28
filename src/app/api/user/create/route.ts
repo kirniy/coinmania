@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import supabase from "@/db/supabase";
-import increase_max_energy from "@/app/api/util/add_energy";
+import increase_max_energy from "@/app/api/util/add_energy"
+import supabase from "@/db/supabase"
+import { NextRequest, NextResponse } from 'next/server'
 
 /*
 POST http://localhost:3000/api/user/create
@@ -16,9 +16,9 @@ POST http://localhost:3000/api/user/create
 
 export async function POST(req: NextRequest) {
     try {
-        const { id, first_name, last_name, username, referal_id } = await req.json();
+        const { id, first_name, last_name, username, referal_id, maxenergy = 1000 } = await req.json();
 
-        if (!id || !username || !first_name) {
+        if (!id || !first_name) {
             return NextResponse.json({ error: "Invalid input data" }, { status: 400 });
         }
 
@@ -33,9 +33,10 @@ export async function POST(req: NextRequest) {
             console.error("Failed to fetch user:", fetchError);
             return NextResponse.json({ error: "Failed to fetch user" }, { status: 500 });
         }
-
+        console.log('existingUser')
         // Если пользователь не существует, добавляем его
         if (!existingUser) {
+            console.log('!existingUser')
             const { error: insertError } = await supabase
                 .from('users')
                 .insert([{
@@ -45,7 +46,8 @@ export async function POST(req: NextRequest) {
                     scores: 0,
                     username: username,
                     referal_id: referal_id,
-
+                    maxenergy: maxenergy,
+                    energy: maxenergy,
                 }]);
 
             if (insertError) {
@@ -54,7 +56,17 @@ export async function POST(req: NextRequest) {
             }
 
             if (referal_id) {
-                await increase_max_energy(referal_id, 500);
+                const { error: insertError } = await supabase
+                    .from('referrals')
+                    .insert({
+                        referrer_id: referal_id,
+                        referred_id: id
+                    });
+
+                if (insertError) {
+                    console.error("Failed to insert referral info:", insertError);
+                    return NextResponse.json({ error: "Failed to insert referral info!" }, { status: 500 });
+                }
             }
 
             return NextResponse.json({ message: "User added successfully" }, { status: 200 });

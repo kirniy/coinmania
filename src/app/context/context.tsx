@@ -1,63 +1,82 @@
-import React, { createContext, useEffect, useState } from "react";
-import type { TelegramWebApps } from 'telegram-webapps-types-new';
+import { lockBrowserEvents } from '@/helpers/lockBrowserEvents'
+import React, { createContext, useEffect, useState } from 'react'
+import type { TelegramWebApps } from 'telegram-webapps-types-new'
 
 interface IProps {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }
 
-export const webAppContext = createContext<TelegramWebApps.WebApp>({} as TelegramWebApps.WebApp);
+interface WebAppContextValue {
+  app: TelegramWebApps.WebApp;
+  isMounted: boolean;
+}
+
+export const webAppContext = createContext<WebAppContextValue>({
+  app: {} as TelegramWebApps.WebApp,
+  isMounted: false,
+});
 
 export const WebAppProvider = ({ children }: IProps) => {
-    const [app, setApp] = useState({} as TelegramWebApps.WebApp);
+  const [app, setApp] = useState({} as TelegramWebApps.WebApp);
+  const [isMounted, setIsMounted] = useState(false);
 
-    useEffect(() => {
-        setApp(window.Telegram.WebApp);
-    }, []);
+  useEffect(() => {
+    setApp(window.Telegram.WebApp);
+  }, []);
 
-    useEffect(() => {
-        if (!app) return;
-        if (app.ready) app.ready();
+  useEffect(() => {
+    if (!app || !app.ready) return;
 
-        const addUserToContext = async () => {
-            const userId = app.initDataUnsafe?.user?.id;
-            const username = app.initDataUnsafe?.user?.username;
-            const firstName = app.initDataUnsafe?.user?.first_name;
-            const lastName = app.initDataUnsafe?.user?.last_name;
-            const scores = Number('0');
-            const referralId = app.initDataUnsafe?.start_param; // Получаем реферальный ID из start_param
+    app.ready();
+    app.disableVerticalSwipes();
+    app.expand();
 
-            if (!userId || !username || !firstName) {
-                console.error("User data is missing");
-                return;
-            }
+    lockBrowserEvents();
 
-            try {
-                const response = await fetch('/api/user/create', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        id: userId,
-                        first_name: firstName,
-                        last_name: lastName,
-                        username: username,
-                        scores: scores,
-                        referal_id: referralId
-                    }),
-                });
+    const addUserToContext = async () => {
+      const userId = app.initDataUnsafe?.user?.id;
+      const username = app.initDataUnsafe?.user?.username;
+      const firstName = app.initDataUnsafe?.user?.first_name;
+      const lastName = app.initDataUnsafe?.user?.last_name;
+      const scores = Number('0');
+      const referralId = app.initDataUnsafe?.start_param; // Получаем реферальный ID из start_param
 
-                const result = await response.json();
-                console.log(result.message);
-            } catch (error) {
-                console.error("Error adding user to context:", error);
-            }
-        };
+      if (!userId || !firstName) {
+        console.error('User data is missing');
+        return;
+      }
 
-        addUserToContext();
-    }, [app]);
+      try {
+        const response = await fetch('/api/user/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            id: userId,
+            first_name: firstName,
+            last_name: lastName,
+            username: username,
+            scores: scores,
+            referal_id: referralId
+          })
+        });
 
-    return (
-        <webAppContext.Provider value={app}>{children}</webAppContext.Provider>
-    );
+        const result = await response.json();
+        console.log(result.message);
+
+        setIsMounted(true);
+      } catch (error) {
+        console.error('Error adding user to context:', error);
+      }
+    };
+
+    addUserToContext();
+  }, [app]);
+
+  return (
+    <webAppContext.Provider value={{ app, isMounted }}>
+      {children}
+    </webAppContext.Provider>
+  );
 };

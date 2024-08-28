@@ -1,22 +1,17 @@
 "use client";
 
-import {useContext, useEffect, useState} from "react";
-import { webAppContext } from "../context";
-import Slots from "@/components/screens_new/game/Slots"
-import Loader from "@/components/loader/loader";
+import Loader from "@/components/loader/loader"
+import Slots from "@/components/screens/game/Slots"
+import { useContext } from "react"
+import { webAppContext } from "../context"
+import { LoadingContext } from '../context/LoaderContext'
 
 export default function Home() {
-    const app = useContext(webAppContext);
-    const [loading, setLoading] = useState(true);
+    const {app} = useContext(webAppContext);
+    const { isLoading, setLoading } = useContext(LoadingContext);
 
-    useEffect(() => {
-        if (app.version) {
-            setLoading(false);
-        }
-    }, [app.version]);
-
-    if (loading) {
-        return <Loader loading={loading} />;
+    if (isLoading) {
+        return <Loader loading={isLoading} />;
     }
 
     return (
@@ -36,7 +31,7 @@ export default function Home() {
                 {app.version ? (
                     <Slots />
                 ) : (
-                    <Loader loading={loading} />
+                    <Loader loading={isLoading} />
                 )}
             </>
         </>

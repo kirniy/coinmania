@@ -25,6 +25,7 @@ const config: Config = {
         'telegram-primary': 'var(--telegram-button-color)',
         'telegram-primary-text': 'var(--telegram-button-text-color)',
         'telegram-secondary-white': 'var(--telegram-secondary-bg-color)',
+        'title': '#f0f0f0',
       },
     },
   },
