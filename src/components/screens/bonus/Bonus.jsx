@@ -6,10 +6,7 @@ import Boosters from './components/Boosters';
 import InfoBox from "@/components/common/InfoBox";
 import { useDispatch, useSelector } from "react-redux";
 import { Upgrades } from "./components/Upgrades";
-
-// import { tasks } from "@/constants/earn";
 import { updateUserScores } from "@/store/userSlice";
-// import { Task } from '@/types/tasks';
 
 // STYLES
 
@@ -47,32 +44,12 @@ const infoBoxStyle = {
 
 const handleButtonClick = async (setShowTasksModal) => {
     setShowTasksModal(true);
-
-    // try {
-    //     setLoadingTasks(prev => ({ ...prev, [`${platform}-${channel}`]: true }));
-    //     await axios.post('/api/tasks/update', {
-    //         taskId: `${platform}-${channel}`,
-    //         userId: app.initDataUnsafe.user?.id,
-    //         name: channel,
-    //         platform,
-    //         reward: tasks.find(t => t.platform === platform).reward,
-    //         link: ''
-    //     });
-    //     setTaskStatus(prev => ({
-    //         ...prev,
-    //         [`${platform}-${channel}`]: { status: 'checking', timeLeft: tasks.find(t => t.platform === platform).duration * 60 }
-    //     }));
-    // } catch (error) {
-    //     console.error("Failed to update task:", error);
-    //     setLoadingTasks(prev => ({ ...prev, [`${platform}-${channel}`]: false }));
-    // }
 };
 
 async function handleVerifyButtonClick(setShowTasksModal, userId, dispatch, task_id) {
    try {
     const req = await fetch(`/api/get_chat_member?id=${userId}&task_id=${task_id}`);
     const res = await req.json();
-    console.log(res);
     if (res.ok) {
         setShowTasksModal(false);
         alert('Подписка успешно проверена');
@@ -95,8 +72,7 @@ function Task({task, index}) {
 
     const isMain = index === 0 || index === 3;
     const status = 'pending';
-    console.log(status);
-    console.log("InDeX",index, task.name);
+
     return (
         <React.Fragment> 
             <button 
@@ -136,7 +112,6 @@ const CoinManiaBonusPage = () => {
             const req = await fetch('/api/tasks/get', { cache: 'no-store' });
             const res = await req.json();
             setTasks(res.data);
-            console.log(res.data);
         }
 
         fetchTasks();

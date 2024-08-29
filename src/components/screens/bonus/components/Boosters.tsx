@@ -16,10 +16,27 @@ import {
     updateUserTapBoostRemainingTime,
 } from "@/store/userSlice";
 import { Booster } from '@/types/boosters';
+import { Popup } from '@/components/popup/Popup';
+import { PopupProps } from '@/types/popup';
 
 const Boosters: React.FC = ({}) => {
     const dispatch = useDispatch<AppDispatch>();
     const userData = useSelector((state: RootState) => state.user.data);
+    const [showPopupEnergy, setShowPopupEnergy] = React.useState(false);
+    const [showPopupBooster, setShowPopupBooster] = React.useState(false);
+    const [showPositivePopup, setShowPositivePopup] = React.useState(false);
+    const popupEnegry: PopupProps = {
+        pic: "attention",
+        text: "У вас достаточно энергии",
+    }
+    const popupBooster: PopupProps = {
+        pic: "attention",
+        text: "Бустер сейчас активен",
+    }
+    const popupPositive: PopupProps = {
+        pic: "info",
+        text: "Бустер применён",
+    }
 
     const dynamicStyles = (booster: Booster, isAvailable: Boolean = true) => ({
         background: isAvailable
@@ -73,12 +90,32 @@ const Boosters: React.FC = ({}) => {
         }
     };
 
-    const handleBoosterClick = (booster: Booster) => {
+    const handleBoosterClick = (booster: Booster, e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         switch (booster.action) {
             case 'resetEnergy':
-                resetEnergy(booster);
+                if(userData?.energy && userData.energy > 10) {
+                    e.currentTarget.disabled = true;
+                    setShowPopupEnergy(true);
+                    setTimeout(() => setShowPopupEnergy(false), 2000);
+                    break;
+                } else {
+                    e.currentTarget.disabled = false;
+                    setShowPositivePopup(true);
+                    setTimeout(() => setShowPositivePopup(false), 2000);
+                    resetEnergy(booster);
+                }
                 break;
             case 'tapBoost':
+                const tapBoostRemainingTime = userData?.tap_boost_remaining_time;
+                const isBoosterActive = tapBoostRemainingTime && (tapBoostRemainingTime > 0);
+                if (isBoosterActive) {
+                    setShowPopupBooster(true);
+                    setTimeout(() => setShowPopupBooster(false), 2000);
+                    break;
+                } else {
+                    setShowPositivePopup(true);
+                    setTimeout(() => setShowPositivePopup(false), 2000);
+                }
                 activateBooster(booster);
                 break;
             default:
@@ -97,7 +134,7 @@ const Boosters: React.FC = ({}) => {
                         </span>
                         <button
                             key={booster.name}
-                            onClick={() => {handleBoosterClick(booster)}}
+                            onClick={(e) => {handleBoosterClick(booster, e)}}
                             className={styles.button}
                             style={dynamicStyles(booster, isAvailable)}
                             disabled={!isAvailable}
@@ -107,6 +144,15 @@ const Boosters: React.FC = ({}) => {
                     </div>
                 )
             })}
+            {showPopupEnergy && (
+                <Popup popup={popupEnegry}/>
+            )}
+            {showPopupBooster && (
+                <Popup popup={popupBooster}/>
+            )}
+            {showPositivePopup && (
+                <Popup popup={popupPositive}/>
+            )}
         </div>
     )
 }

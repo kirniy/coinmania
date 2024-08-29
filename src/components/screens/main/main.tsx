@@ -15,6 +15,10 @@ import styles from './Main.module.css'
 import CoinEmojis from "./CoinEmojis";
 
 import { throttle } from "@/utils/throttle";
+import { Modal } from "@/components/modal/Modal";
+
+import { PRIZES, RULES } from "@/constants/rules";
+import { Prize, Rule } from "@/components/rule/Rule";
 
 interface RootState {
     user: {
@@ -49,6 +53,9 @@ const CoinMania: React.FC = () => {
     
     const [emogis, setEmogis] = useState<string[]>([])
     const [speed, setSpeed] = useState(1);
+
+    const [openRules, setOpenRules] = useState(false);
+    const [openPrizes, setOpenPrizes] = useState(false);
 
     const handleButtonClickSpeed = () => {
         setSpeed((prevSpeed) => (prevSpeed >= 5 ? 5 : prevSpeed + 1)); // Ограничиваем скорость до 5
@@ -194,6 +201,19 @@ const CoinMania: React.FC = () => {
         }
     };
 
+    function handleRulesButtonClick() {
+        setOpenRules(true);
+    }
+    function handlePrizesButtonClick() {
+        setOpenPrizes(true);
+    }
+    function handleCloseRules() {
+        setOpenRules(false);
+    }
+    function handleClosePrizes() {
+        setOpenPrizes(false);
+    }
+
     const getRandomBgEmoji = () => {
         const emojis = ['🎉', '⭐', '💥', '🚀', '🎤', '🔥'];
 
@@ -308,6 +328,40 @@ const CoinMania: React.FC = () => {
                             <span className="text-3xl font-bold">{userData.scores.toLocaleString()}</span>
                         </div>
                     </div>
+                </div>
+
+                {/* Rules and prizes */}
+                <div className="fixed w-full mx-auto top-20 px-4 z-[100] flex justify-between items-center">
+                    <button onClick={handleRulesButtonClick} className="w-16 h-16 flex justify-center items-center rounded-full relative">
+                        <div className="rounded-full" style={{position: "absolute",top: 0,left: 0,right: 0,bottom: 0,backgroundColor: "rgba(255, 255, 255, 0.1)",backdropFilter: "blur(10px)",WebkitBackdropFilter: "blur(10px)",boxShadow: "rgba(255, 255, 255, 0.2) 0px 0px 10px, rgba(255, 255, 255, 0.1) 0px 0px 15px inset",zIndex: -1}}></div>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-book"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>
+                    </button>
+                    <button onClick={handlePrizesButtonClick} className="w-16 h-16 flex justify-center items-center rounded-full relative">
+                        <div className="rounded-full" style={{position: "absolute",top: 0,left: 0,right: 0,bottom: 0,backgroundColor: "rgba(255, 255, 255, 0.1)",backdropFilter: "blur(10px)",WebkitBackdropFilter: "blur(10px)",boxShadow: "rgba(255, 255, 255, 0.2) 0px 0px 10px, rgba(255, 255, 255, 0.1) 0px 0px 15px inset",zIndex: -1}}></div>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-gift"><rect x="3" y="8" width="18" height="4" rx="1"></rect><path d="M12 8v13"></path><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"></path><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"></path></svg>
+                    </button>
+                    {openRules && 
+                        <Modal onClose={handleCloseRules}>
+                            <div className="">
+                                <h2 className="text-lg font-semibold leading-none tracking-tight text-center text-yellow-400">Правила игры</h2>
+                            </div>
+                            {RULES.map((rule, idx) => (
+                                <Rule key={idx * 0.8829} text={rule.text} icon={rule.icon} />
+                            ))}
+                        </Modal>
+                    }
+                    {openPrizes &&
+                        <Modal onClose={handleClosePrizes}>
+                            <div className="">
+                                <h2 className="text-lg font-semibold leading-none tracking-tight text-center text-yellow-400">Призы</h2>
+                            </div>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                                {PRIZES.map((prize, idx) => (
+                                    <Prize key={idx * 0.12829} {...prize} />
+                                ))}
+                            </div>
+                        </Modal>
+                    }
                 </div>
     
                 {/* Main coin */}
