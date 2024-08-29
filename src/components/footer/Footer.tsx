@@ -47,7 +47,7 @@ const Footer = () => {
     }
 
     return (
-        <div className={'z-50 w-full fixed bottom-0'}>
+        <div className={'z-30 w-full fixed bottom-0'}>
             <div className={styles.footerContainer}>
                 <div className={styles.navbar}>
                     <div className={styles.frostedGlass} />
