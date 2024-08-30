@@ -18,6 +18,7 @@ import {
 import { Booster } from '@/types/boosters';
 import { Popup } from '@/components/popup/Popup';
 import { PopupProps } from '@/types/popup';
+import { showPopup } from '@/utils/showPopup';
 
 const Boosters: React.FC = ({}) => {
     const dispatch = useDispatch<AppDispatch>();
@@ -94,24 +95,6 @@ const Boosters: React.FC = ({}) => {
             console.error('Failed to buy booster:', error)
         }
     };
-
-    interface ShowPopupProps {
-        state: [boolean, null | NodeJS.Timeout];
-        setState: React.Dispatch<React.SetStateAction<[boolean, null | NodeJS.Timeout]>>;
-    }
-
-    function showPopup({state, setState}: ShowPopupProps) {
-        // Очищаем таймаут если предыдущий не закончился
-        if(state[1] !== null) {
-            clearTimeout(state[1])
-        }
-        // Запускаем новый таймаут
-        const timeout = setTimeout(() => {
-            setState([false, null])
-        }, 2000);
-        // Показываем попап
-        setState([true, timeout])
-    }
 
     const handleBoosterClick = (booster: Booster, e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         switch (booster.action) {

@@ -8,3 +8,9 @@ export interface PopupProps {
 export type PopupType = {
     popup: PopupProps;
 }
+
+export interface ShowPopupProps {
+    state: [boolean, null | NodeJS.Timeout];
+    setState: React.Dispatch<React.SetStateAction<[boolean, null | NodeJS.Timeout]>>;
+    duration?: number;
+}

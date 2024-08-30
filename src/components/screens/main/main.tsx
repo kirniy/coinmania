@@ -19,6 +19,9 @@ import { Modal } from "@/components/modal/Modal";
 
 import { PRIZES, RULES } from "@/constants/rules";
 import { Prize, Rule } from "@/components/rule/Rule";
+import { Popup } from "@/components/popup/Popup";
+import { PopupProps } from "@/types/popup";
+import { showPopup } from "@/utils/showPopup";
 
 interface RootState {
     user: {
@@ -62,6 +65,12 @@ const CoinMania: React.FC = () => {
       };
 
     const [coinSize, setCoinSize] = useState(360); // Добавляем состояние для размера монеты
+    const [showLowEnergyPopup, setShowLowEnergyPopup] = useState([false, null] as [boolean, null | NodeJS.Timeout])
+
+    const popupNegative: PopupProps = {
+        pic: "info",
+        text: "Не достаточно энергии",
+    }
 
     useEffect(() => {
         const updateCoinSize = () => {
@@ -110,6 +119,7 @@ const CoinMania: React.FC = () => {
 
         if (userData) {
             const userTapValue = userData.upgrades.tap_value || 1;
+            const userEnergy = userData.energy;
 
             tapValueMultiplier = tapValueMultiplier * userTapValue;
             energyToDecrease = energyToDecrease * userTapValue;
@@ -119,10 +129,10 @@ const CoinMania: React.FC = () => {
             
             if (isBoosterActive) {
                 tapValueMultiplier = tapValueMultiplier * 5;
+            }
 
-                // if (tapValueMultiplier > 1) {
-                //     energyToDecrease = energyToDecrease * 5;
-                // }
+            if (userEnergy < userTapValue) {
+                showPopup({state: showLowEnergyPopup, setState: setShowLowEnergyPopup})
             }
         }
 
@@ -440,6 +450,7 @@ const CoinMania: React.FC = () => {
                 </div>
     
             </div>
+            {showLowEnergyPopup[0] && <Popup popup={popupNegative}/>}
         </div>
     );
 };
