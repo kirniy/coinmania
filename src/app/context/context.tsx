@@ -40,6 +40,7 @@ export const WebAppProvider = ({ children }: IProps) => {
       const lastName = app.initDataUnsafe?.user?.last_name;
       const scores = Number('0');
       const referralId = app.initDataUnsafe?.start_param; // Получаем реферальный ID из start_param
+      const createdAt = new Date();
 
       if (!userId || !firstName) {
         console.error('User data is missing');
@@ -58,7 +59,8 @@ export const WebAppProvider = ({ children }: IProps) => {
             last_name: lastName,
             username: username,
             scores: scores,
-            referal_id: referralId
+            referal_id: referralId,
+            created_at: createdAt
           })
         });
 

@@ -22,6 +22,11 @@ const FriendsPage = () => {
 
     const dispatch = useDispatch();
 
+    const now = new Date().getTime();
+    const created = new Date(userData?.created_at as string).getTime();
+    const differenceInMilliseconds = now - created;
+    const differenceInDays = Math.floor(differenceInMilliseconds / (1000 * 60 * 60 * 24));
+
     const fetchUsers = async () => {
         try {
             const response = await fetch('/api/users');
@@ -128,8 +133,9 @@ const FriendsPage = () => {
                     <ScoreboardDisplay icon="⚡️" value={userData?.energy + '/' + userData?.maxenergy } color="#ffffff" fontSize="1.2rem" width="60%" />
                     <h4 className={styles.statsTitle}>📊 Статистика:</h4>
                     <div className={styles.stats}>
-                        <div>🪙 Всего нажатий: <span style={{ color: '#f8cc46' }}>{userData?.scores || 0}</span></div>
-                        <div>🎰 Прокруток слота: <span style={{ color: '#f8cc46' }}>1000</span></div>
+                        {/* <div>🪙 Всего нажатий: <span style={{ color: '#f8cc46' }}>{userData?.scores || 0}</span></div> */}
+                        {/* <div>🎰 Прокруток слота: <span style={{ color: '#f8cc46' }}>1000</span></div> */}
+                        <div>📅 Количество дней в игре: <span style={{ color: '#f8cc46' }}>{differenceInDays === 0 ? 1 : differenceInDays}</span></div>
                         <div>👥 Приглашено друзей: <span style={{ color: '#f8cc46' }}>{userData?.referrals?.length ?? 0}</span></div>
                     </div>
                     <a
@@ -222,8 +228,13 @@ const FriendsPage = () => {
                             <button onClick={() => setShowLeaderboard(false)} className={styles.closeButton}><XCircle size={30} /></button>
                         </div>
                         <div className={styles.leaderboardList}>
-                            {users.map((user, index) => (
-                                <div key={index} className={styles.leaderboardItem} style={{ backgroundColor: index < 3 ? ['gold', 'silver', '#cd7f32'][index] : 'rgba(255,255,255,0.1)', color: index < 3 ? '#000000' : '#ffffff' }}>
+                            {users.map((user, index) => {
+
+                                return (
+                                <div 
+                                    key={index} 
+                                    className={styles.leaderboardItem} 
+                                    style={{ backgroundColor: index < 3 ? ['gold', 'silver', '#cd7f32'][index] : user.id === userData?.id ? '#772422' : 'rgba(255,255,255,0.1)', color: index < 3 ? '#000000' : '#ffffff', border: user.id === userData?.id ? '2px solid white' : ''}}>
                                     <div className={styles.leaderboardUserInfo}>
                                         <span className={styles.leaderboardUserIndex} style={{ color: index < 3 ? '#96231a' : 'inherit' }}>{index + 1}</span>
                                         <span>{user.first_name}</span>
@@ -234,7 +245,7 @@ const FriendsPage = () => {
                                         <span className="text-yellow-300">⭐</span>
                                     </div>
                                 </div>
-                            ))}
+                            )})}
                         </div>
                         <p className={styles.leaderboardFooterText}>
                             В полной версии отображается топ-30 игроков
