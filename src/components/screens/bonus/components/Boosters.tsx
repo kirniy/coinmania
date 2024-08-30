@@ -22,9 +22,9 @@ import { PopupProps } from '@/types/popup';
 const Boosters: React.FC = ({}) => {
     const dispatch = useDispatch<AppDispatch>();
     const userData = useSelector((state: RootState) => state.user.data);
-    const [showPopupEnergy, setShowPopupEnergy] = React.useState(false);
-    const [showPopupBooster, setShowPopupBooster] = React.useState(false);
-    const [showPositivePopup, setShowPositivePopup] = React.useState(false);
+    const [showPopupEnergy, setShowPopupEnergy] = React.useState([false, null] as [boolean, null | NodeJS.Timeout]);
+    const [showPopupBooster, setShowPopupBooster] = React.useState([false, null] as [boolean, null | NodeJS.Timeout]);
+    const [showPositivePopup, setShowPositivePopup] = React.useState([false, null] as [boolean, null | NodeJS.Timeout]);
     const popupEnegry: PopupProps = {
         pic: "attention",
         text: "У вас достаточно энергии",
@@ -90,18 +90,33 @@ const Boosters: React.FC = ({}) => {
         }
     };
 
+    interface ShowPopupProps {
+        state: [boolean, null | NodeJS.Timeout];
+        setState: React.Dispatch<React.SetStateAction<[boolean, null | NodeJS.Timeout]>>;
+    }
+
+    function showPopup({state, setState}: ShowPopupProps) {
+        // Очищаем таймаут если предыдущий не закончился
+        if(state[1] !== null) {
+            clearTimeout(state[1])
+        }
+        // Запускаем новый таймаут
+        const timeout = setTimeout(() => {
+            setState([false, null])
+        }, 2000);
+        // Показываем попап
+        setState([true, timeout])
+    }
+
     const handleBoosterClick = (booster: Booster, e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        console.log(showPopupEnergy);
         switch (booster.action) {
             case 'resetEnergy':
-                if(userData?.energy && userData.energy > 10) {
-                    e.currentTarget.disabled = true;
-                    setShowPopupEnergy(true);
-                    setTimeout(() => setShowPopupEnergy(false), 2000);
+                if(userData?.energy && userData.energy > 100) {
+                    showPopup({state: showPopupEnergy, setState: setShowPopupEnergy});
                     break;
                 } else {
-                    e.currentTarget.disabled = false;
-                    setShowPositivePopup(true);
-                    setTimeout(() => setShowPositivePopup(false), 2000);
+                    showPopup({state: showPositivePopup, setState: setShowPositivePopup});
                     resetEnergy(booster);
                 }
                 break;
@@ -109,12 +124,10 @@ const Boosters: React.FC = ({}) => {
                 const tapBoostRemainingTime = userData?.tap_boost_remaining_time;
                 const isBoosterActive = tapBoostRemainingTime && (tapBoostRemainingTime > 0);
                 if (isBoosterActive) {
-                    setShowPopupBooster(true);
-                    setTimeout(() => setShowPopupBooster(false), 2000);
+                    showPopup({state: showPopupBooster, setState: setShowPopupBooster});
                     break;
                 } else {
-                    setShowPositivePopup(true);
-                    setTimeout(() => setShowPositivePopup(false), 2000);
+                    showPopup({state: showPositivePopup, setState: setShowPositivePopup});
                 }
                 activateBooster(booster);
                 break;
@@ -144,13 +157,13 @@ const Boosters: React.FC = ({}) => {
                     </div>
                 )
             })}
-            {showPopupEnergy && (
+            {showPopupEnergy[0] && (
                 <Popup popup={popupEnegry}/>
             )}
-            {showPopupBooster && (
+            {showPopupBooster[0] && (
                 <Popup popup={popupBooster}/>
             )}
-            {showPositivePopup && (
+            {showPositivePopup[0] && (
                 <Popup popup={popupPositive}/>
             )}
         </div>

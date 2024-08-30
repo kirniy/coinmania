@@ -122,7 +122,7 @@ const FriendsPage = () => {
                     <h2 className={styles.title}>👤 Мой профиль</h2>
                     <div className={styles.userInfo}>
                         <h3 className={styles.userName}>{app.initDataUnsafe.user?.first_name}</h3>
-                        <span className={styles.userTitle}>Король танцпола</span>
+                        <span className={styles.userTitle}>Участник клуба VNVNC</span>
                     </div>
                     <ScoreboardDisplay icon="⭐" value={userData?.scores || 0} color="#f8cc46" fontSize="1.8rem" width="100%" />
                     <ScoreboardDisplay icon="⚡️" value={userData?.energy + '/' + userData?.maxenergy } color="#ffffff" fontSize="1.2rem" width="60%" />
