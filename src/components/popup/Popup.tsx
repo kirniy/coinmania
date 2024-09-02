@@ -5,7 +5,7 @@ import React from "react";
 export function Popup({ popup }: PopupType) {
   return (
     <div className="fixed w-[calc(100%-64px)] top-0 left-8 right-8 min-h-fit flex justify-center z-50">
-      <div className="mt-2 p-2 flex gap-2 text-sm rounded-md border border-orange-400 relative">
+      <div className="mt-2 p-2 flex gap-2 text-sm rounded-lg border border-yellow-500 relative">
         <div style={popupBgStyle}></div>
         {popup.pic === "info" && (
           <div className="w-5 h-5 flex justify-center shrink-0 items-center border-2 border-blue-400 rounded-full text-blue-400">
@@ -13,7 +13,7 @@ export function Popup({ popup }: PopupType) {
           </div>
         )}
         {popup.pic === "attention" && (
-          <div className="w-5 h-5 flex justify-center shrink-0 items-center border-2 border-orange-500 rounded-full text-orange-500">
+          <div className="w-5 h-5 flex justify-center shrink-0 items-center border-2 border-yellow-500 rounded-full text-yellow-500">
             !
           </div>
         )}
