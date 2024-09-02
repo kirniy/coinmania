@@ -7,14 +7,17 @@ interface ConfirmModalProps extends DialogModalProps {}
 
 export function ConfirmModal(props: ConfirmModalProps) {
   return (
-    <div className="mt-2 p-6 flex gap-2 text-sm rounded-lg border border-yellow-500 relative">
-      <div className="mt-2 p-6 flex gap-2 text-sm rounded-lg border border-yellow-500 relative">
-        <div style={popupBgStyle}></div>
-        <h2>{props.title}</h2>
-        <p>{props.description}</p>
-        {props.children}
-        <button onClick={props.onConfirm}>{props.confirmMessage ?? "Хорошо"}</button>
-      </div>
+    <div className="bg-gray-800/80 backdrop-blur-sm text-center p-6 rounded-2xl border border-yellow-500/30">
+    <h3 className="text-yellow-500 text-xl font-bold mb-3">{props.title}</h3>
+    <p className="text-white mb-4">{props.description}</p>
+    <div className="space-y-2">
+      <button
+        onClick={props.onConfirm}
+        className="w-full bg-yellow-500 text-gray-900 py-2 rounded-lg font-semibold"
+      >
+        {props.confirmMessage}
+      </button>
     </div>
+  </div>
   );
 }

@@ -32,8 +32,7 @@ export function InnerModal(props: InnerModalProps) {
           description={props.description ?? ""}
           onConfirm={props.onConfirm ? props.onConfirm : () => {}}
           title={props.title ?? ""}
-          confirmMessage={props.confirmMessage ?? "Да"}
-          cancelMessage={props.cancelMessage ?? "Нет"}
+          confirmMessage={props.confirmMessage ?? "Понятно"}
         >
           {props.children}
         </ConfirmModal>

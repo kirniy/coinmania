@@ -7,7 +7,7 @@ export interface DialogModalProps extends ModalProps {
   description: string;
   onConfirm: () => void;
   confirmMessage: string;
-  cancelMessage: string;
+  cancelMessage?: string;
 }
 
 export function DialogModal(props: DialogModalProps) {
@@ -26,7 +26,7 @@ export function DialogModal(props: DialogModalProps) {
           onClick={props.onClose}
           className="w-full bg-gray-700 text-white py-2 rounded-lg font-semibold"
         >
-          {props.cancelMessage}
+          {props.cancelMessage ?? "Нет"}
         </button>
       </div>
     </div>

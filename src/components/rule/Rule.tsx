@@ -49,16 +49,16 @@ export function Prize(props: PrizeProps) {
         </p>
       </button>
       {openRule && (
-        <InnerModal type="info" onClose={handleClosePrize}>
-          <PrizeDetailed {...props} />
-        </InnerModal>
-        // <InnerModal
-        //   type="dialog"
-        //   onClose={handleClosePrize}
-        //   title="Title"
-        //   description="Descr"
-        //   onConfirm={handleClosePrize}
-        // ></InnerModal>
+        //   <InnerModal type="info" onClose={handleClosePrize}>
+        //   <PrizeDetailed {...props} />
+        // </InnerModal>
+        <InnerModal
+          type="confirm"
+          onClose={handleClosePrize}
+          title="Title"
+          description="Descr"
+          onConfirm={handleClosePrize}
+        ></InnerModal>
       )}
     </>
   );
