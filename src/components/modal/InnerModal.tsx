@@ -30,7 +30,7 @@ export function InnerModal(props: InnerModalProps) {
         <ConfirmModal
           onClose={props.onClose}
           description={props.description ?? ""}
-          onConfirm={props.onConfirm ? props.onConfirm : () => {}}
+          onConfirm={props.onConfirm ? props.onConfirm : props.onClose}
           title={props.title ?? ""}
           confirmMessage={props.confirmMessage ?? "Понятно"}
         >
@@ -41,7 +41,7 @@ export function InnerModal(props: InnerModalProps) {
         <DialogModal
           onClose={props.onClose}
           description={props.description ?? ""}
-          onConfirm={props.onConfirm ? props.onConfirm : () => {}}
+          onConfirm={props.onConfirm ? props.onConfirm : props.onClose}
           title={props.title ?? ""}
           confirmMessage={props.confirmMessage ?? "Да"}
           cancelMessage={props.cancelMessage ?? "Нет"}

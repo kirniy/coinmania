@@ -7,6 +7,8 @@ import InfoBox from "@/components/common/InfoBox";
 import { useDispatch, useSelector } from "react-redux";
 import { Upgrades } from "./components/Upgrades";
 import { updateUserScores } from "@/store/userSlice";
+import { InnerModal } from '@/components/modal/InnerModal';
+import { Modal } from '@/components/modal/Modal';
 
 // STYLES
 
@@ -46,32 +48,44 @@ const handleButtonClick = async (setShowTasksModal) => {
     setShowTasksModal(true);
 };
 
-async function handleVerifyButtonClick(setShowTasksModal, userId, dispatch, task_id) {
-   try {
-    const req = await fetch(`/api/get_chat_member?id=${userId}&task_id=${task_id}`);
-    const res = await req.json();
-    if (res.ok) {
-        setShowTasksModal(false);
-        alert('Подписка успешно проверена');
-        dispatch(updateUserScores(res.scores))
-    } else {
-        if(res.error) alert(res.error)
-        else alert('Подписка не найдена');
-    }
-   } catch (error) {
-        alert(error)
-   }
-}
-
 function Task({task, index}) {
     const userData = useSelector((state) => state.user.data);
     const userId = userData.id;
     const dispatch = useDispatch();
 
     const [showTasksModal, setShowTasksModal] = useState(false);
+    const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+    const [showAlertSubscrNotFound, setShowAlertSubscrNotFound] = useState(false);
+    const [showErrorAlert, setShowErrorAlert] = useState([false, null]);
 
     const isMain = index === 0 || index === 3;
     const status = 'pending';
+
+    function handleCloseAlert() {
+        setShowSuccessAlert(false);
+        setShowAlertSubscrNotFound(false);
+        setShowErrorAlert([false, null]);
+    }
+    function handleModalClose() {
+        setShowTasksModal(false);
+    }
+
+    async function handleVerifyButtonClick( task_id) {
+        try {
+         const req = await fetch(`/api/get_chat_member?id=${userId}&task_id=${task_id}`);
+         const res = await req.json();
+         if (res.ok) {
+             setShowTasksModal(false);
+             setShowSuccessAlert(true);
+             dispatch(updateUserScores(res.scores))
+         } else {
+             if(res.error) setShowErrorAlert([true, res.error])
+             else setShowAlertSubscrNotFound(true);
+         }
+        } catch (error) {
+            setShowErrorAlert([true, error])
+        }
+     }
 
     return (
         <React.Fragment> 
@@ -89,15 +103,21 @@ function Task({task, index}) {
                 )}
             </button>
             {showTasksModal && (
-                <div className={styles.taskModal}>
-                    <div className={styles.taskModalContent}>
-                        <div className={styles.taskModalCloseContainer}>
-                            <button onClick={() => setShowTasksModal(false)} className={styles.closeButton}><XCircle size={30} /></button>
-                        </div>
-                        <a href={task.link} className={styles.taskModalButton}>Подписаться</a>
-                        <button onClick={() => handleVerifyButtonClick(setShowTasksModal, userId, dispatch, task.id)} className={styles.taskModalButton}>Проверить</button>
-                    </div>
-                </div>
+                <Modal onClose={handleModalClose}>
+                    <h3 className="text-yellow-500 text-xl font-bold mb-3">{task.platform}</h3>
+                    <p className="text-white mb-4">{task.name}</p>
+                    <a href={task.link} className="w-full bg-yellow-500 text-center text-gray-900 py-2 rounded-lg font-semibold">Подписаться</a>
+                    <button onClick={() => handleVerifyButtonClick( task.id)} className="w-full bg-gray-700 text-white py-2 rounded-lg font-semibold">Проверить</button>
+                </Modal>
+            )}
+            {showSuccessAlert && (
+                <InnerModal type='confirm' onClose={handleCloseAlert} title='Успех!' description='Подписка проверена' confirmMessage='Получить награду'/>
+            )}
+            {showAlertSubscrNotFound && (
+                <InnerModal type='confirm' onClose={handleCloseAlert} title='Ошибка' description='Подписка не найдена' confirmMessage='Закрыть'/>
+            )}
+            {showErrorAlert[0] && (
+                <InnerModal type='confirm' onClose={handleCloseAlert} title='Ошибка' description={showErrorAlert[1]} confirmMessage='Закрыть'/>
             )}
         </React.Fragment>
     );
@@ -162,21 +182,31 @@ const CoinManiaBonusPage = () => {
                         <div style={infoBoxStyle}>
                             <p style={{fontSize: '0.9rem', lineHeight: '1.4'}}>Для проверки подписки на каждый аккаунт мы проведем проверку. Для Telegram это займет 15 минут. Для Instagram может потребоваться до 24 часов. Вернитесь в этот раздел позже, чтобы проверить прогресс верификации. В случае успеха вы получите награды на баланс Coinmania.</p>
                         </div>
-                        {tasks.find(task => task.platform === "Telegram") && (
+                        {tasks.find(task => task.platform === "Подписки Telegram") && (
                             <div style={{marginBottom: '25px'}}>
-                                <h3 className={styles.tasksPopupPlatform}>Telegram</h3>
+                                <h3 className={styles.tasksPopupPlatform}>Подписки Telegram</h3>
                                 <div className={styles.taskButtonGrid}>
-                                    {tasks.map((task, idx) => task.platform === "Telegram" &&  (
+                                    {tasks.map((task, idx) => task.platform === "Подписки Telegram" &&  (
                                         <Task task={task} key={task.platform + idx} index={idx}/>
                                     ))}
                                 </div>
                             </div>
                         )}
-                        {tasks.find(task => task.platform === "Instagram") && (
+                        {tasks.find(task => task.platform === "Буст Telegram Каналов") && (
                             <div style={{marginBottom: '25px'}}>
-                                <h3 className={styles.tasksPopupPlatform}>Instagram</h3>
+                                <h3 className={styles.tasksPopupPlatform}>Буст Telegram Каналов</h3>
                                 <div className={styles.taskButtonGrid}>
-                                    {tasks.map((task, idx) => task.platform === "Instagram" && (
+                                    {tasks.map((task, idx) => task.platform === "Буст Telegram Каналов" &&  (
+                                        <Task task={task} key={task.platform + idx} index={idx}/>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                        {tasks.find(task => task.platform === "Подписки Instagram") && (
+                            <div style={{marginBottom: '25px'}}>
+                                <h3 className={styles.tasksPopupPlatform}>Подписки Instagram</h3>
+                                <div className={styles.taskButtonGrid}>
+                                    {tasks.map((task, idx) => task.platform === "Подписки Instagram" && (
                                         <Task task={task} key={task.platform + (idx * 3.1415)} index={idx}/>
                                     ))}
                                 </div>
