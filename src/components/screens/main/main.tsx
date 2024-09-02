@@ -19,6 +19,9 @@ import { Modal } from "@/components/modal/Modal";
 
 import { PRIZES, RULES } from "@/constants/rules";
 import { Prize, Rule } from "@/components/rule/Rule";
+import { Popup } from "@/components/popup/Popup";
+import { PopupProps } from "@/types/popup";
+import { showPopup } from "@/utils/showPopup";
 
 interface RootState {
     user: {
@@ -62,6 +65,12 @@ const CoinMania: React.FC = () => {
       };
 
     const [coinSize, setCoinSize] = useState(360); // Добавляем состояние для размера монеты
+    const [showLowEnergyPopup, setShowLowEnergyPopup] = useState([false, null] as [boolean, null | NodeJS.Timeout])
+
+    const popupNegative: PopupProps = {
+        pic: "info",
+        text: "Не достаточно энергии",
+    }
 
     useEffect(() => {
         const updateCoinSize = () => {
@@ -110,6 +119,7 @@ const CoinMania: React.FC = () => {
 
         if (userData) {
             const userTapValue = userData.upgrades.tap_value || 1;
+            const userEnergy = userData.energy;
 
             tapValueMultiplier = tapValueMultiplier * userTapValue;
             energyToDecrease = energyToDecrease * userTapValue;
@@ -119,10 +129,10 @@ const CoinMania: React.FC = () => {
             
             if (isBoosterActive) {
                 tapValueMultiplier = tapValueMultiplier * 5;
+            }
 
-                // if (tapValueMultiplier > 1) {
-                //     energyToDecrease = energyToDecrease * 5;
-                // }
+            if (userEnergy < userTapValue) {
+                showPopup({state: showLowEnergyPopup, setState: setShowLowEnergyPopup})
             }
         }
 
@@ -334,11 +344,11 @@ const CoinMania: React.FC = () => {
                 <div className="fixed w-full mx-auto top-20 px-4 z-[100] flex justify-between items-center">
                     <button onClick={handleRulesButtonClick} className="w-16 h-16 flex justify-center items-center rounded-full relative">
                         <div className="rounded-full" style={{position: "absolute",top: 0,left: 0,right: 0,bottom: 0,backgroundColor: "rgba(255, 255, 255, 0.1)",backdropFilter: "blur(10px)",WebkitBackdropFilter: "blur(10px)",boxShadow: "rgba(255, 255, 255, 0.2) 0px 0px 10px, rgba(255, 255, 255, 0.1) 0px 0px 15px inset",zIndex: -1}}></div>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-book"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-book"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>
                     </button>
                     <button onClick={handlePrizesButtonClick} className="w-16 h-16 flex justify-center items-center rounded-full relative">
                         <div className="rounded-full" style={{position: "absolute",top: 0,left: 0,right: 0,bottom: 0,backgroundColor: "rgba(255, 255, 255, 0.1)",backdropFilter: "blur(10px)",WebkitBackdropFilter: "blur(10px)",boxShadow: "rgba(255, 255, 255, 0.2) 0px 0px 10px, rgba(255, 255, 255, 0.1) 0px 0px 15px inset",zIndex: -1}}></div>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-gift"><rect x="3" y="8" width="18" height="4" rx="1"></rect><path d="M12 8v13"></path><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"></path><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"></path></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-gift"><rect x="3" y="8" width="18" height="4" rx="1"></rect><path d="M12 8v13"></path><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"></path><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"></path></svg>
                     </button>
                     {openRules && 
                         <Modal onClose={handleCloseRules}>
@@ -440,6 +450,7 @@ const CoinMania: React.FC = () => {
                 </div>
     
             </div>
+            {showLowEnergyPopup[0] && <Popup popup={popupNegative}/>}
         </div>
     );
 };

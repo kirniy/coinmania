@@ -16,7 +16,7 @@ POST http://localhost:3000/api/user/create
 
 export async function POST(req: NextRequest) {
     try {
-        const { id, first_name, last_name, username, referal_id, maxenergy = 1000 } = await req.json();
+        const { id, first_name, last_name, username, referal_id, maxenergy = 1000, created_at } = await req.json();
 
         if (!id || !first_name) {
             return NextResponse.json({ error: "Invalid input data" }, { status: 400 });
@@ -48,6 +48,7 @@ export async function POST(req: NextRequest) {
                     referal_id: referal_id,
                     maxenergy: maxenergy,
                     energy: maxenergy,
+                    created_at: created_at,
                 }]);
 
             if (insertError) {
