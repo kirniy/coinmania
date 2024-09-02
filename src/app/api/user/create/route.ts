@@ -16,7 +16,7 @@ POST http://localhost:3000/api/user/create
 
 export async function POST(req: NextRequest) {
     try {
-        const { id, first_name, last_name, username, referal_id, maxenergy = 1000 } = await req.json();
+        const { id, first_name, last_name, username, referal_id, maxenergy = 1000, created_at } = await req.json();
 
         if (!id || !first_name) {
             return NextResponse.json({ error: "Invalid input data" }, { status: 400 });
@@ -33,9 +33,10 @@ export async function POST(req: NextRequest) {
             console.error("Failed to fetch user:", fetchError);
             return NextResponse.json({ error: "Failed to fetch user" }, { status: 500 });
         }
-
+        console.log('existingUser')
         // Если пользователь не существует, добавляем его
         if (!existingUser) {
+            console.log('!existingUser')
             const { error: insertError } = await supabase
                 .from('users')
                 .insert([{
@@ -47,6 +48,7 @@ export async function POST(req: NextRequest) {
                     referal_id: referal_id,
                     maxenergy: maxenergy,
                     energy: maxenergy,
+                    created_at: created_at,
                 }]);
 
             if (insertError) {

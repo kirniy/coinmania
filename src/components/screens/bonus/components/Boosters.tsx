@@ -16,10 +16,33 @@ import {
     updateUserTapBoostRemainingTime,
 } from "@/store/userSlice";
 import { Booster } from '@/types/boosters';
+import { Popup } from '@/components/popup/Popup';
+import { PopupProps } from '@/types/popup';
+import { showPopup } from '@/utils/showPopup';
 
 const Boosters: React.FC = ({}) => {
     const dispatch = useDispatch<AppDispatch>();
     const userData = useSelector((state: RootState) => state.user.data);
+    const [showPopupEnergy, setShowPopupEnergy] = React.useState([false, null] as [boolean, null | NodeJS.Timeout]);
+    const [showPopupBooster, setShowPopupBooster] = React.useState([false, null] as [boolean, null | NodeJS.Timeout]);
+    const [showPositivePopup, setShowPositivePopup] = React.useState([false, null] as [boolean, null | NodeJS.Timeout]);
+    const [showNegativePopup, setShowNegativePopup] = React.useState([false, null] as [boolean, null | NodeJS.Timeout]);
+    const popupEnegry: PopupProps = {
+        pic: "attention",
+        text: "У вас достаточно энергии",
+    }
+    const popupBooster: PopupProps = {
+        pic: "attention",
+        text: "Бустер сейчас активен",
+    }
+    const popupPositive: PopupProps = {
+        pic: "info",
+        text: "Бустер применён",
+    }
+    const popupNegative: PopupProps = {
+        pic: "error",
+        text: "Бустер закончился",
+    }
 
     const dynamicStyles = (booster: Booster, isAvailable: Boolean = true) => ({
         background: isAvailable
@@ -73,13 +96,32 @@ const Boosters: React.FC = ({}) => {
         }
     };
 
-    const handleBoosterClick = (booster: Booster) => {
+    const handleBoosterClick = (booster: Booster, e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         switch (booster.action) {
             case 'resetEnergy':
-                resetEnergy(booster);
+                const energyBoostsRemainig = userData?.daily_full_tank_count;
+                if(userData?.energy && userData.energy > 100) {
+                    showPopup({state: showPopupEnergy, setState: setShowPopupEnergy});
+                }  else if (energyBoostsRemainig === 0) {
+                    showPopup({state: showNegativePopup, setState: setShowNegativePopup});
+                } else {
+                    showPopup({state: showPositivePopup, setState: setShowPositivePopup});
+                    resetEnergy(booster);
+                }
                 break;
             case 'tapBoost':
-                activateBooster(booster);
+                const tapBoostRemainingTime = userData?.tap_boost_remaining_time;
+                const isBoosterActive = tapBoostRemainingTime && (tapBoostRemainingTime > 0);
+                const tapBoostsRemainig = userData?.daily_tap_boost_count;
+                
+                if (isBoosterActive) {
+                    showPopup({state: showPopupBooster, setState: setShowPopupBooster});
+                } else if (tapBoostsRemainig === 0) {
+                    showPopup({state: showNegativePopup, setState: setShowNegativePopup});
+                } else {
+                    showPopup({state: showPositivePopup, setState: setShowPositivePopup});
+                    activateBooster(booster);    
+                }
                 break;
             default:
                 break;
@@ -97,16 +139,28 @@ const Boosters: React.FC = ({}) => {
                         </span>
                         <button
                             key={booster.name}
-                            onClick={() => {handleBoosterClick(booster)}}
+                            onClick={(e) => {handleBoosterClick(booster, e)}}
                             className={styles.button}
                             style={dynamicStyles(booster, isAvailable)}
-                            disabled={!isAvailable}
+                            // disabled={!isAvailable}
                         >
                             {booster.name} ({(userData && userData[`daily_${booster.slug}_count`]) ?? booster.maxUsePerDay} / {booster.maxUsePerDay})
                         </button>
                     </div>
                 )
             })}
+            {showPopupEnergy[0] && (
+                <Popup popup={popupEnegry}/>
+            )}
+            {showPopupBooster[0] && (
+                <Popup popup={popupBooster}/>
+            )}
+            {showPositivePopup[0] && (
+                <Popup popup={popupPositive}/>
+            )}
+            {showNegativePopup[0] && (
+                <Popup popup={popupNegative}/>
+            )}
         </div>
     )
 }
