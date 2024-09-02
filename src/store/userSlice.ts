@@ -4,6 +4,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { referredUserRecord, UserData, userUpgrades } from '@/types/user';
 import { AppThunk } from './store';
 import { checkIsSameDay } from '@/utils/dates';
+import axios from 'axios';
 
 interface UserState {
   data: UserData | null;
@@ -185,6 +186,35 @@ export const startCountdown = (): AppThunk => (dispatch, getState) => {
     }
 
   }, 1000);
+};
+
+export const startEnergyResetInterval = (): AppThunk => (dispatch, getState) => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  const interval = setInterval(() => {
+    const state = getState().user;
+    if (state.data) {     
+      if (
+        state.data.energy !== null
+        && state.data.upgrades.recharging_speed
+        && state.data.energy < state.data.maxenergy
+        && state.data.isRechargingEnergy
+      ) {
+        dispatch(updateUserEnergy(Math.min(state.data.energy + state.data.upgrades.recharging_speed, state.data.maxenergy)));
+      }
+    }
+
+  }, 1000);
+
+  const heartbeatIntervalId = setInterval(async () => {
+    const state = getState().user;
+
+    if (state.data) {
+      axios.get(`/api/user/heartbeat?id=${state.data.id}&energy=${state.data.energy}`)
+    }
+  }, 10000)
 };
 
 export default userSlice.reducer;
