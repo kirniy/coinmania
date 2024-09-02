@@ -1,9 +1,17 @@
 import { popupBgStyle } from "@/constants/styles";
 import React from "react";
+import { InfoModal } from "./InfoModal";
+import { DialogModal } from "./DialogModal";
+import { ModalProps } from "./Modal";
+import { ConfirmModal } from "./ConfirmModal";
 
-interface InnerModalProps extends React.PropsWithChildren {
+interface InnerModalProps extends ModalProps {
   type: "info" | "confirm" | "dialog";
-  onClose: () => void;
+  description?: string;
+  onConfirm?: () => void;
+  title?: string;
+  confirmMessage?: string;
+  cancelMessage?: string;
 }
 
 export function InnerModal(props: InnerModalProps) {
@@ -16,22 +24,31 @@ export function InnerModal(props: InnerModalProps) {
         </button>
       </div>
       {props.type === "info" && (
-        <div className="mt-2 p-6 flex gap-2 text-sm rounded-lg border border-yellow-500 relative">
-          <div style={popupBgStyle}></div>
-          {props.children}
-        </div>
+        <InfoModal onClose={props.onClose}>{props.children}</InfoModal>
       )}
       {props.type === "confirm" && (
-        <div className="mt-2 p-2 flex gap-2 text-sm rounded-lg border border-yellow-500 relative">
-          <div style={popupBgStyle}></div>
+        <ConfirmModal
+          onClose={props.onClose}
+          description={props.description ?? ""}
+          onConfirm={props.onConfirm ? props.onConfirm : () => {}}
+          title={props.title ?? ""}
+          confirmMessage={props.confirmMessage ?? "Да"}
+          cancelMessage={props.cancelMessage ?? "Нет"}
+        >
           {props.children}
-        </div>
+        </ConfirmModal>
       )}
       {props.type === "dialog" && (
-        <div className="mt-2 p-2 flex gap-2 text-sm rounded-lg border border-yellow-500 relative">
-          <div style={popupBgStyle}></div>
+        <DialogModal
+          onClose={props.onClose}
+          description={props.description ?? ""}
+          onConfirm={props.onConfirm ? props.onConfirm : () => {}}
+          title={props.title ?? ""}
+          confirmMessage={props.confirmMessage ?? "Да"}
+          cancelMessage={props.cancelMessage ?? "Нет"}
+        >
           {props.children}
-        </div>
+        </DialogModal>
       )}
     </div>
     // </div>

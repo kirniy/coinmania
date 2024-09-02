@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, useEffect } from "react";
 
-interface ModalProps extends PropsWithChildren {
+export interface ModalProps extends PropsWithChildren {
     onClose: () => void;
 }
 
