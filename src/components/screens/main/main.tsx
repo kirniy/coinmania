@@ -264,7 +264,7 @@ const CoinMania: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        const intervalId = setInterval(() => {
+        const speedUpdatingIntervalId = setInterval(() => {
             const currentTime = Date.now();
             const timeSinceLastTap = currentTime - lastTapTimeRef.current;
 
@@ -275,10 +275,10 @@ const CoinMania: React.FC = () => {
                         : 1;
                 })
             }
-        }, 2000)
+        }, 2000);
 
         return () => {
-            clearInterval(intervalId)
+            clearInterval(speedUpdatingIntervalId);
         }
     }, [])
 
