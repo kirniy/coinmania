@@ -89,6 +89,11 @@ const userSlice = createSlice({
       if (state.data) {
         state.data.upgrades = action.payload;
       }
+    },
+    updateIsRechargingEnergy: (state, action: PayloadAction<boolean>) => {
+      if (state.data) {
+        state.data.isRechargingEnergy = action.payload;
+      }
     }
   },
   extraReducers: (builder) => {
