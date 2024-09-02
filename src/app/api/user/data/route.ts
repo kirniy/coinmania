@@ -1,5 +1,6 @@
 import supabase from "@/db/supabase"
 import { NextRequest, NextResponse } from 'next/server'
+import type { userUpgrades } from "@/types/user";
 
 export const dynamic = "force-dynamic"
 
@@ -56,6 +57,16 @@ export async function GET(req: NextRequest) {
         }
 
         const serverTime = new Date();
+
+        const defaultUserUpgrades: userUpgrades = {
+            tap_value: 1,
+            energy_limit: 1,
+            recharging_speed: 1,
+        };
+  
+        if (!user.upgrades) {
+            user.upgrades = defaultUserUpgrades;
+        }
 
         return NextResponse.json({ user, serverTime }, { status: 200 });
     } catch (error) {

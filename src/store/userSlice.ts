@@ -141,19 +141,7 @@ const userSlice = createSlice({
           }
         })
 
-        // Upgrades
-
-        const defaultUserUpgrades: userUpgrades = {
-          tap_value: 1,
-          energy_limit: 1,
-          recharging_speed: 1,
-        };
-
-        if (!userData.upgrades) {
-          state.data.upgrades = defaultUserUpgrades;
-        } else {
-          state.data.upgrades = userData.upgrades;
-        }
+        state.data.isRechargingEnergy = true;
       })
       .addCase(fetchUserData.rejected, (state, action) => {
         console.log('action', action)
@@ -175,6 +163,7 @@ export const {
   updateUserTapBoostRemainingTime,
   updateUserReferred,
   updateUserUpgrades,
+  updateIsRechargingEnergy,
 } = userSlice.actions;
 
 export const startCountdown = (): AppThunk => (dispatch, getState) => {
