@@ -1,13 +1,14 @@
 import { configureStore, Action, ThunkAction } from '@reduxjs/toolkit'
 import rootReducer from './rootReducer'
 import type { RootState } from './rootReducer';
-import { startCountdown } from './userSlice';
+import { startCountdown, startEnergyResetInterval } from './userSlice';
 
 const store = configureStore({
   reducer: rootReducer,
 });
 
 store.dispatch(startCountdown());
+store.dispatch(startEnergyResetInterval());
 
 export type AppDispatch = typeof store.dispatch;
 

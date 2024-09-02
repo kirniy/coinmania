@@ -67,4 +67,31 @@ export const UPGRADES: upgrade[] = [
             },
         ]
     },
+    {
+        type: 'recharging_speed',
+        name: 'Recharging Speed',
+        maxLevel: 5,
+        levels: [
+            {
+                level: 1,
+                cost: 0,
+            },
+            {
+                level: 2,
+                cost: 2000,
+            },
+            {
+                level: 3,
+                cost: 10000,
+            },
+            {
+                level: 4,
+                cost: 100000,
+            },
+            {
+                level: 5,
+                cost: 250000,
+            },
+        ]
+    },
 ]

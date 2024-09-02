@@ -1,5 +1,6 @@
 import supabase from "@/db/supabase"
 import { NextRequest, NextResponse } from 'next/server'
+import type { userUpgrades } from "@/types/user";
 
 export const dynamic = "force-dynamic"
 
@@ -56,6 +57,39 @@ export async function GET(req: NextRequest) {
         }
 
         const serverTime = new Date();
+
+        const defaultUserUpgrades: userUpgrades = {
+            tap_value: 1,
+            energy_limit: 1,
+            recharging_speed: 1,
+        };
+  
+        if (!user.upgrades) {
+            user.upgrades = defaultUserUpgrades;
+        }
+
+        const userLastLoginTime = user.last_login_time
+            ? new Date(user.last_login_time)
+            : new Date();
+        
+        const timeInSecondsSinceLastLogin = Math.round((serverTime.getTime() - userLastLoginTime.getTime()) / 1000);
+        const energyToIncrease = user.upgrades.recharging_speed * timeInSecondsSinceLastLogin;
+
+        if (energyToIncrease > 0) {
+            const { error: updatingError } = await supabase
+                .from('users')
+                .update({
+                    energy: Math.min(user.energy + energyToIncrease, user.maxenergy),
+                    last_login_time: serverTime.toISOString()
+                })
+                .eq('id', id);
+
+            if (updatingError) {
+                return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+            }
+
+            user.energy = Math.min(user.energy + energyToIncrease, user.maxenergy);
+        }
 
         return NextResponse.json({ user, serverTime }, { status: 200 });
     } catch (error) {

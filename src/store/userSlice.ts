@@ -4,6 +4,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { referredUserRecord, UserData, userUpgrades } from '@/types/user';
 import { AppThunk } from './store';
 import { checkIsSameDay } from '@/utils/dates';
+import axios from 'axios';
 
 interface UserState {
   data: UserData | null;
@@ -89,6 +90,11 @@ const userSlice = createSlice({
       if (state.data) {
         state.data.upgrades = action.payload;
       }
+    },
+    updateIsRechargingEnergy: (state, action: PayloadAction<boolean>) => {
+      if (state.data) {
+        state.data.isRechargingEnergy = action.payload;
+      }
     }
   },
   extraReducers: (builder) => {
@@ -136,19 +142,7 @@ const userSlice = createSlice({
           }
         })
 
-        // Upgrades
-
-        const defaultUserUpgrades: userUpgrades = {
-          tap_value: 1,
-          energy_limit: 1,
-          recharging_speed: 1,
-        };
-
-        if (!userData.upgrades) {
-          state.data.upgrades = defaultUserUpgrades;
-        } else {
-          state.data.upgrades = userData.upgrades;
-        }
+        state.data.isRechargingEnergy = true;
       })
       .addCase(fetchUserData.rejected, (state, action) => {
         console.log('action', action)
@@ -170,6 +164,7 @@ export const {
   updateUserTapBoostRemainingTime,
   updateUserReferred,
   updateUserUpgrades,
+  updateIsRechargingEnergy,
 } = userSlice.actions;
 
 export const startCountdown = (): AppThunk => (dispatch, getState) => {
@@ -191,6 +186,35 @@ export const startCountdown = (): AppThunk => (dispatch, getState) => {
     }
 
   }, 1000);
+};
+
+export const startEnergyResetInterval = (): AppThunk => (dispatch, getState) => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  const interval = setInterval(() => {
+    const state = getState().user;
+    if (state.data) {     
+      if (
+        state.data.energy !== null
+        && state.data.upgrades.recharging_speed
+        && state.data.energy < state.data.maxenergy
+        && state.data.isRechargingEnergy
+      ) {
+        dispatch(updateUserEnergy(Math.min(state.data.energy + state.data.upgrades.recharging_speed, state.data.maxenergy)));
+      }
+    }
+
+  }, 1000);
+
+  const heartbeatIntervalId = setInterval(async () => {
+    const state = getState().user;
+
+    if (state.data) {
+      axios.get(`/api/user/heartbeat?id=${state.data.id}&energy=${state.data.energy}`)
+    }
+  }, 10000)
 };
 
 export default userSlice.reducer;
