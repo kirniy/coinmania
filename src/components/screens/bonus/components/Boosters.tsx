@@ -100,7 +100,7 @@ const Boosters: React.FC = ({}) => {
         switch (booster.action) {
             case 'resetEnergy':
                 const energyBoostsRemainig = userData?.daily_full_tank_count;
-                if(userData?.energy && userData.energy > 100) {
+                if(userData?.energy && userData.energy > 100 && energyBoostsRemainig !== 0) {
                     showPopup({state: showPopupEnergy, setState: setShowPopupEnergy});
                 }  else if (energyBoostsRemainig === 0) {
                     showPopup({state: showNegativePopup, setState: setShowNegativePopup});
