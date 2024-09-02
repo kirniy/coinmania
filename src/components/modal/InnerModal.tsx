@@ -16,19 +16,19 @@ export function InnerModal(props: InnerModalProps) {
         </button>
       </div>
       {props.type === "info" && (
-        <div className="mt-2 p-6 flex gap-2 text-sm rounded-md border border-orange-400 relative">
+        <div className="mt-2 p-6 flex gap-2 text-sm rounded-lg border border-yellow-500 relative">
           <div style={popupBgStyle}></div>
           {props.children}
         </div>
       )}
       {props.type === "confirm" && (
-        <div className="mt-2 p-2 flex gap-2 text-sm rounded-md border border-orange-400 relative">
+        <div className="mt-2 p-2 flex gap-2 text-sm rounded-lg border border-yellow-500 relative">
           <div style={popupBgStyle}></div>
           {props.children}
         </div>
       )}
       {props.type === "dialog" && (
-        <div className="mt-2 p-2 flex gap-2 text-sm rounded-md border border-orange-400 relative">
+        <div className="mt-2 p-2 flex gap-2 text-sm rounded-lg border border-yellow-500 relative">
           <div style={popupBgStyle}></div>
           {props.children}
         </div>
