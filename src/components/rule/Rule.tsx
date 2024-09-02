@@ -1,7 +1,7 @@
 import { PrizeProps, RuleProps } from "@/types/rules";
 import React, { use, useState } from "react";
 import { InnerModal } from "../modal/InnerModal";
-import { PrizeModal } from "../modal/PrizeModal";
+import { PrizeDetailed } from "./PrizeDetailed";
 
 export function Rule({ text, icon }: RuleProps) {
   return (
@@ -49,9 +49,16 @@ export function Prize(props: PrizeProps) {
         </p>
       </button>
       {openRule && (
-        <InnerModal type="info" onClose={handleClosePrize}>
-          <PrizeModal {...props} />
-        </InnerModal>
+        //   <InnerModal type="info" onClose={handleClosePrize}>
+        //   <PrizeDetailed {...props} />
+        // </InnerModal>
+        <InnerModal
+          type="confirm"
+          onClose={handleClosePrize}
+          title="Title"
+          description="Descr"
+          onConfirm={handleClosePrize}
+        ></InnerModal>
       )}
     </>
   );

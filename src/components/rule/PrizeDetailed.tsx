@@ -1,7 +1,7 @@
 import { PrizeProps } from "@/types/rules";
 import React from "react";
 
-export function PrizeModal(props: PrizeProps) {
+export function PrizeDetailed(props: PrizeProps) {
   return (
     <div className="flex flex-col space-y-1.5 text-center sm:text-left gap-4">
       <h2 className="text-lg font-semibold leading-none tracking-tight text-center text-yellow-400">
