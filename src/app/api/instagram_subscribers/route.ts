@@ -67,7 +67,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
     const [code1, code2] = await generateUniqueCodes();
 
-    // Update user scores
     const { data: completedSubs, error: completedSubsError } = await supabase
       .from('instagram_subscribers')
       .insert([
@@ -81,7 +80,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
     if (completedSubsError) {
       console.error("Failed to update user:", completedSubsError);
-      return NextResponse.json({ error: "Failed to update user" }, { status: 500 });
+      return NextResponse.json({ error: "Не удалось сгенерировать ключ для отправки" }, { status: 500 });
     }
 
     return NextResponse.json({
