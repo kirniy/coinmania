@@ -9,6 +9,7 @@ import { Upgrades } from "./components/Upgrades";
 import { updateUserScores } from "@/store/userSlice";
 import { InnerModal } from '@/components/modal/InnerModal';
 import { Modal } from '@/components/modal/Modal';
+import { createPortal } from 'react-dom';
 
 // STYLES
 
@@ -102,22 +103,27 @@ function Task({task, index}) {
                     </>
                 )}
             </button>
-            {showTasksModal && (
+            {showTasksModal && 
+            createPortal(
                 <Modal onClose={handleModalClose}>
                     <h3 className="text-yellow-500 text-xl font-bold mb-3">{task.platform}</h3>
                     <p className="text-white mb-4">{task.name}</p>
                     <a href={task.link} className="w-full bg-yellow-500 text-center text-gray-900 py-2 rounded-lg font-semibold">{task.platform === "Подписки Telegram" || task.platform === "Подписки Instagram" ? "Подписаться" : "Забустить"}</a>
                     <button onClick={() => handleVerifyButtonClick( task.id)} className="w-full bg-gray-700 text-white py-2 rounded-lg font-semibold">Проверить</button>
-                </Modal>
+                </Modal>,
+                document.body
             )}
-            {showSuccessAlert && (
-                <InnerModal type='confirm' onClose={handleCloseAlert} title='Успех!' description='Подписка проверена' confirmMessage='Получить награду'/>
+            {showSuccessAlert && createPortal(
+                <InnerModal type='confirm' onClose={handleCloseAlert} title='Успех!' description='Подписка проверена' confirmMessage='Получить награду'/>,
+                document.body
             )}
-            {showAlertSubscrNotFound && (
-                <InnerModal type='confirm' onClose={handleCloseAlert} title='Ошибка' description='Подписка не найдена' confirmMessage='Закрыть'/>
+            {showAlertSubscrNotFound && createPortal(
+                <InnerModal type='confirm' onClose={handleCloseAlert} title='Ошибка' description='Подписка не найдена' confirmMessage='Закрыть'/>,
+                document.body
             )}
-            {showErrorAlert[0] && (
-                <InnerModal type='confirm' onClose={handleCloseAlert} title='Ошибка' description={showErrorAlert[1]} confirmMessage='Закрыть'/>
+            {showErrorAlert[0] && createPortal(
+                <InnerModal type='confirm' onClose={handleCloseAlert} title='Ошибка' description={showErrorAlert[1]} confirmMessage='Закрыть'/>,
+                document.body
             )}
         </React.Fragment>
     );

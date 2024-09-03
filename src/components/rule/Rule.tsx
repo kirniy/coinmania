@@ -2,6 +2,7 @@ import { PrizeProps, RuleProps } from "@/types/rules";
 import React, { use, useState } from "react";
 import { InnerModal } from "../modal/InnerModal";
 import { PrizeDetailed } from "./PrizeDetailed";
+import { createPortal } from "react-dom";
 
 export function Rule({ text, icon }: RuleProps) {
   return (
@@ -48,18 +49,13 @@ export function Prize(props: PrizeProps) {
           <span className="blur-none">⭐</span>
         </p>
       </button>
-      {openRule && (
-        //   <InnerModal type="info" onClose={handleClosePrize}>
-        //   <PrizeDetailed {...props} />
-        // </InnerModal>
-        <InnerModal
-          type="confirm"
-          onClose={handleClosePrize}
-          title="Title"
-          description="Descr"
-          onConfirm={handleClosePrize}
-        ></InnerModal>
-      )}
+      {openRule &&
+        createPortal(
+          <InnerModal type="info" onClose={handleClosePrize}>
+            <PrizeDetailed {...props} />
+          </InnerModal>,
+          document.body
+        )}
     </>
   );
 }
