@@ -95,18 +95,22 @@ const CoinMania: React.FC = () => {
 
     const throttledSyncWithDB = useCallback(throttle(async (scores: number, energy: number) => {
         try {
-            const { error } = await supabase
-                .from('users')
-                .update({ scores: scores, energy: energy })
-                .eq('id', userData.id);
+            const response = await fetch(`/api/user/sync`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    id: userData.id,
+                    energy: energy,
+                    scores: scores,
+                })
+            })
+            
+            const data = await response.json();
 
-            if (error) {
-                throw error;
+            if (data.error) {
+                throw new Error('Error syncing data')
             }
         } catch (error: unknown) {
-            if (error instanceof Error) {
-                setError(error.message);
-            }
+            console.error('Error syncing data: ', error);
         }
     }, 2000), []);
 
@@ -142,8 +146,11 @@ const CoinMania: React.FC = () => {
 
         const pointsToAdd = 1 * tapValueMultiplier; // Значение с учетом бустера
 
-        dispatch(updateUserScores(userData.scores + pointsToAdd));
-        dispatch(updateUserEnergy(Math.min(userData.energy - energyToDecrease, userData?.maxenergy ?? 0)));// Уменьшаем энергию, не превышая maxenergy
+        const newScoresValue = userData.scores + pointsToAdd;
+        const newEnergyValue = Math.min(userData.energy - energyToDecrease, userData?.maxenergy ?? 0);
+
+        dispatch(updateUserScores(newScoresValue));
+        dispatch(updateUserEnergy(newEnergyValue));// Уменьшаем энергию, не превышая maxenergy
 
         const rect = coinRef.current?.getBoundingClientRect();
         if (rect) {
@@ -163,7 +170,7 @@ const CoinMania: React.FC = () => {
             handleButtonClickSpeed();
         }
 
-        throttledSyncWithDB(userData.scores + pointsToAdd, userData.energy - 1);
+        throttledSyncWithDB(newScoresValue, newEnergyValue);
 
         dispatch(updateIsRechargingEnergy(false));
 
