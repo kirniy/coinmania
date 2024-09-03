@@ -5,29 +5,28 @@ export default function Stub() {
     const startTime = new Date('2024-09-06T18:00:00Z');
     let time = new Date();
     let diffDays = Math.floor((startTime.getTime() - time.getTime()) / (1000 * 60 * 60 * 24));
-
-    let diff = new Date(startTime.getTime() - time.getTime()).toLocaleTimeString().split(":");
-    let diffHours = `${diff[0]}ч ${diff[1]}м ${diff[1]}с`;
+    let diffUTC = new Date(startTime.getTime() - time.getTime());
+    let diffHours = `${diffUTC.getUTCHours()}ч ${diffUTC.getUTCMinutes()}м ${diffUTC.getUTCSeconds()}с`;
 
     function refreshTime() {        
         time = new Date();
         diffDays = Math.floor((startTime.getTime() - time.getTime()) / (1000 * 60 * 60 * 24));
-        diff = new Date(startTime.getTime() - time.getTime()).toLocaleTimeString().split(":");
-        diffHours = `${diff[0]}ч ${diff[1]}м ${diff[2]}с`;
+        diffUTC = new Date(startTime.getTime() - time.getTime());
+        diffHours = `${diffUTC.getUTCHours()}ч ${diffUTC.getUTCMinutes()}м ${diffUTC.getUTCSeconds()}с`;
     }
 
     const [theTime, setTheTime] = useState(diffDays > 0 ? `${diffDays}д ${diffHours}` : diffHours)
 
-    const timer = setInterval(() => {
-        refreshTime();
-        setTheTime(diffDays > 0 ? `${diffDays}д ${diffHours}` : diffHours)
-    }, 1000);
-
     useEffect(() => {
+        const timer = setInterval(() => {
+            refreshTime();
+            setTheTime(diffDays > 0 ? `${diffDays}д ${diffHours}` : diffHours)
+        }, 1000);
+
         return () => {
             clearInterval(timer);
         };
-    }, []);
+    }, [theTime, setTheTime]);
 
   return (
       <div className="h-screen w-full bg-black text-center flex items-start justify-center pt-4">
