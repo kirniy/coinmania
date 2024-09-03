@@ -1,15 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 import { upgrade, upgradeLevel, UPGRADES, upgradeType } from "@/constants/upgrades";
 import styles from './Upgrades.module.css';
 
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/rootReducer";
 import { updateUserMaxEnergy, updateUserScores, updateUserUpgrades } from "@/store/userSlice";
+import { createPortal } from "react-dom";
+import { InnerModal } from "@/components/modal/InnerModal";
 
 export const Upgrades: React.FC = () => {
 
     const userData = useSelector((state: RootState) => state.user.data);
     const dispatch = useDispatch();
+
+    const [showUpgradeError, setShowUpgradeError] = useState([false, null] as [boolean, null | string]);
+
+    function handleCloseBoosterError() {
+        setShowUpgradeError([false, null])
+    }
 
     const handleBuyUpgradeClick = async (type: upgradeType, upgradeLevel: upgradeLevel) => {
         try {
@@ -33,7 +41,7 @@ export const Upgrades: React.FC = () => {
                 }
             }
         } catch (error: any) {
-            alert('Ошибка покупки улучшения: ' + error.message);
+            setShowUpgradeError([true, error.message] as [boolean, string])
             console.error(error);
         }
     }
@@ -83,6 +91,10 @@ export const Upgrades: React.FC = () => {
                     </div>
                 )
             })}
+            {showUpgradeError[0] && createPortal(
+                <InnerModal onClose={handleCloseBoosterError} type='confirm' title='Ошибка покупки улучшения' description={showUpgradeError[1]} />,
+                document.body,
+            )}
         </div>
     );
 }

@@ -1,5 +1,6 @@
+import { PropsWithChildren } from "react";
 
-export interface PopupProps {
+export interface PopupProps extends PropsWithChildren {
     text: string;
     pic: "info" | "attention" | "error" | "success" | "achivement" | "";
     type?: "modal" | "popup";

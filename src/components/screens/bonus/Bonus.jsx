@@ -3,7 +3,10 @@ import React, { useEffect, useState } from 'react'
 import styles from './CoinManiaBonusPage.module.css'; // Импортируем стили
 
 import InfoBox from "@/components/common/InfoBox"
+import { InnerModal } from '@/components/modal/InnerModal'
+import { Modal } from '@/components/modal/Modal'
 import { updateUserScores } from "@/store/userSlice"
+import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from "react-redux"
 import Boosters from './components/Boosters'
 import InstagramTask from './components/InstagramTask'
@@ -47,32 +50,62 @@ const handleButtonClick = async (setShowTasksModal) => {
     setShowTasksModal(true);
 };
 
-async function handleVerifyButtonClick(setShowTasksModal, userId, dispatch, task_id) {
-   try {
-    const req = await fetch(`/api/get_chat_member?id=${userId}&task_id=${task_id}`);
-    const res = await req.json();
-    if (res.ok) {
-        setShowTasksModal(false);
-        alert('Подписка успешно проверена');
-        dispatch(updateUserScores(res.scores))
-    } else {
-        if(res.error) alert(res.error)
-        else alert('Подписка не найдена');
-    }
-   } catch (error) {
-        alert(error)
-   }
-}
-
-function Task({task, index}) {
+function Task({task, index, isBoost = false}) {
     const userData = useSelector((state) => state.user.data);
     const userId = userData.id;
     const dispatch = useDispatch();
 
     const [showTasksModal, setShowTasksModal] = useState(false);
+    const [showSuccessAlert, setShowSuccessAlert] = useState([false, null]);
+    const [showAlertSubscrNotFound, setShowAlertSubscrNotFound] = useState([false, null]);
+    const [showErrorAlert, setShowErrorAlert] = useState([false, null]);
 
     const isMain = index === 0 || index === 3;
     const status = 'pending';
+
+    function handleCloseAlert() {
+        setShowSuccessAlert(false);
+        setShowAlertSubscrNotFound(false);
+        setShowErrorAlert([false, null]);
+    }
+    function handleModalClose() {
+        setShowTasksModal(false);
+    }
+
+    async function handleVerifyButtonClick(task_id) {
+        try {
+            const req = await fetch(`/api/get_chat_member?id=${userId}&task_id=${task_id}`);
+            const res = await req.json();
+            if (res.ok) {
+                setShowTasksModal(false);
+                setShowSuccessAlert([true, 'Подписка проверена']);
+                dispatch(updateUserScores(res.scores))
+            } else {
+                if(res.error) setShowErrorAlert([true, res.error])
+                else setShowAlertSubscrNotFound([true, 'Подписка не найдена']);
+            }
+        } catch (error) {
+            setShowErrorAlert([true, error])
+        }
+    }
+
+    async function handleVerifyBoostButtonClick(task_id) {
+        try {
+            const req = await fetch(`/api/get_chat_boost?id=${userId}&task_id=${task_id}`);
+            const res = await req.json();
+
+            if (res.ok) {
+                setShowTasksModal(false);
+                setShowSuccessAlert([true, 'Буст канала проверен']);
+                dispatch(updateUserScores(res.scores))
+            } else {
+                if(res.error) setShowErrorAlert([true, res.error])
+                else setShowAlertSubscrNotFound([true, 'Проверьте свои бусты, не все условия выполнены']);
+            }
+        } catch (error) {
+            setShowErrorAlert([true, error])
+        }
+    }
 
     return (
         <React.Fragment> 
@@ -89,16 +122,31 @@ function Task({task, index}) {
                     </>
                 )}
             </button>
-            {showTasksModal && (
-                <div className={styles.taskModal}>
-                    <div className={styles.taskModalContent}>
-                        <div className={styles.taskModalCloseContainer}>
-                            <button onClick={() => setShowTasksModal(false)} className={styles.closeButton}><XCircle size={30} /></button>
-                        </div>
-                        <a href={task.link} className={styles.taskModalButton}>Подписаться</a>
-                        <button onClick={() => handleVerifyButtonClick(setShowTasksModal, userId, dispatch, task.id)} className={styles.taskModalButton}>Проверить</button>
-                    </div>
-                </div>
+            {showTasksModal && 
+            createPortal(
+                <Modal onClose={handleModalClose}>
+                    <h3 className="text-yellow-500 text-xl font-bold mb-3">{task.platform}</h3>
+                    <p className="text-white mb-4">{task.name}</p>
+                    <a href={task.link} className="w-full bg-yellow-500 text-center text-gray-900 py-2 rounded-lg font-semibold">{isBoost ? 'Забустить' : 'Подписаться'}</a>
+                    {isBoost ? (
+                        <button onClick={() => handleVerifyBoostButtonClick(task.id)} className="w-full bg-gray-700 text-white py-2 rounded-lg font-semibold">Проверить</button>
+                    ) : (
+                        <button onClick={() => handleVerifyButtonClick(task.id)} className="w-full bg-gray-700 text-white py-2 rounded-lg font-semibold">Проверить</button>
+                    )}
+                </Modal>,
+                document.body
+            )}
+            {showSuccessAlert[0] && createPortal(
+                <InnerModal type='confirm' onClose={handleCloseAlert} title='Успех!' description={showSuccessAlert[1]} confirmMessage='Получить награду'/>,
+                document.body
+            )}
+            {showAlertSubscrNotFound[0] && createPortal(
+                <InnerModal type='confirm' onClose={handleCloseAlert} title='Ошибка' description={showAlertSubscrNotFound[1]} confirmMessage='Закрыть'/>,
+                document.body
+            )}
+            {showErrorAlert[0] && createPortal(
+                <InnerModal type='confirm' onClose={handleCloseAlert} title='Ошибка' description={showErrorAlert[1]} confirmMessage='Закрыть'/>,
+                document.body
             )}
         </React.Fragment>
     );
@@ -163,11 +211,11 @@ const CoinManiaBonusPage = () => {
                         <div style={infoBoxStyle}>
                             <p style={{fontSize: '0.9rem', lineHeight: '1.4'}}>Для проверки подписки на каждый аккаунт мы проведем проверку. Для Telegram это займет 15 минут. Для Instagram может потребоваться до 24 часов. Вернитесь в этот раздел позже, чтобы проверить прогресс верификации. В случае успеха вы получите награды на баланс Coinmania.</p>
                         </div>
-                        {tasks.find(task => task.platform === "Telegram") && (
+                        {tasks.find(task => task.platform === "Подписки Telegram") && (
                             <div style={{marginBottom: '25px'}}>
-                                <h3 className={styles.tasksPopupPlatform}>Telegram</h3>
+                                <h3 className={styles.tasksPopupPlatform}>Подписки Telegram</h3>
                                 <div className={styles.taskButtonGrid}>
-                                    {tasks.map((task, idx) => task.platform === "Telegram" &&  (
+                                    {tasks.map((task, idx) => task.platform === "Подписки Telegram" &&  (
                                         <Task task={task} key={task.platform + idx} index={idx}/>
                                     ))}
                                 </div>
@@ -179,6 +227,16 @@ const CoinManiaBonusPage = () => {
                                 <div className={styles.taskButtonGrid}>
                                     {tasks.map((task, idx) => task.platform === "Подписки Instagram" && (
                                         <InstagramTask task={task} key={task.platform + (idx * 3.1415)} index={idx}/>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                        {tasks.find(task => task.platform === "Буст Telegram Каналов") && (
+                            <div style={{marginBottom: '25px'}}>
+                                <h3 className={styles.tasksPopupPlatform}>Буст Telegram Каналов</h3>
+                                <div className={styles.taskButtonGrid}>
+                                    {tasks.map((task, idx) => task.platform === "Буст Telegram Каналов" && (
+                                        <Task task={task} key={task.platform + (idx * 1.1514)} index={idx} isBoost='true'/>
                                     ))}
                                 </div>
                             </div>
