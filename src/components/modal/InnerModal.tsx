@@ -7,7 +7,7 @@ import { ConfirmModal } from "./ConfirmModal";
 
 interface InnerModalProps extends ModalProps {
   type: "info" | "confirm" | "dialog";
-  description?: string;
+  description?: string | null;
   onConfirm?: () => void;
   title?: string;
   confirmMessage?: string;
