@@ -19,6 +19,8 @@ import { Booster } from '@/types/boosters';
 import { Popup } from '@/components/popup/Popup';
 import { PopupProps } from '@/types/popup';
 import { showPopup } from '@/utils/showPopup';
+import { createPortal } from 'react-dom';
+import { InnerModal } from '@/components/modal/InnerModal';
 
 const Boosters: React.FC = ({}) => {
     const dispatch = useDispatch<AppDispatch>();
@@ -27,6 +29,7 @@ const Boosters: React.FC = ({}) => {
     const [showPopupBooster, setShowPopupBooster] = React.useState([false, null] as [boolean, null | NodeJS.Timeout]);
     const [showPositivePopup, setShowPositivePopup] = React.useState([false, null] as [boolean, null | NodeJS.Timeout]);
     const [showNegativePopup, setShowNegativePopup] = React.useState([false, null] as [boolean, null | NodeJS.Timeout]);
+    const [showErrorEnergyModal, setShowErrorEnergyModal] = React.useState([false, null] as [boolean, null | string]);
     const popupEnegry: PopupProps = {
         pic: "attention",
         text: "У вас достаточно энергии",
@@ -42,6 +45,14 @@ const Boosters: React.FC = ({}) => {
     const popupNegative: PopupProps = {
         pic: "error",
         text: "Бустер закончился",
+    }
+    const popupErrorEnergy: PopupProps = {
+        pic: "error",
+        text: "Произошла ошибка при сбросе энергии",
+    }
+
+    function handleCloseEnergyModal() {
+        setShowErrorEnergyModal([false, null]);
     }
 
     const dynamicStyles = (booster: Booster, isAvailable: Boolean = true) => ({
@@ -68,7 +79,7 @@ const Boosters: React.FC = ({}) => {
             console.log(`Setting energy to ${data.data}`);
             dispatch(updateUserEnergy(data.data))
         } catch (error) {
-            alert("Произошла ошибка при сбросе энергии");
+            setShowErrorEnergyModal([true, error] as [boolean, string]);
             console.error('Failed to buy booster:', error)
         }
     };
@@ -100,7 +111,7 @@ const Boosters: React.FC = ({}) => {
         switch (booster.action) {
             case 'resetEnergy':
                 const energyBoostsRemainig = userData?.daily_full_tank_count;
-                if(userData?.energy && userData.energy > 100) {
+                if(userData?.energy && userData.energy > 100 && energyBoostsRemainig !== 0) {
                     showPopup({state: showPopupEnergy, setState: setShowPopupEnergy});
                 }  else if (energyBoostsRemainig === 0) {
                     showPopup({state: showNegativePopup, setState: setShowNegativePopup});
@@ -160,6 +171,10 @@ const Boosters: React.FC = ({}) => {
             )}
             {showNegativePopup[0] && (
                 <Popup popup={popupNegative}/>
+            )}
+            {showErrorEnergyModal[0] && createPortal(
+                <InnerModal onClose={handleCloseEnergyModal} type='confirm' title='Произошла ошибка при сбросе энергии' description={showErrorEnergyModal[1]} />,
+                document.body,
             )}
         </div>
     )
