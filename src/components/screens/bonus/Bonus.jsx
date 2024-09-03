@@ -106,7 +106,7 @@ function Task({task, index}) {
                 <Modal onClose={handleModalClose}>
                     <h3 className="text-yellow-500 text-xl font-bold mb-3">{task.platform}</h3>
                     <p className="text-white mb-4">{task.name}</p>
-                    <a href={task.link} className="w-full bg-yellow-500 text-center text-gray-900 py-2 rounded-lg font-semibold">Подписаться</a>
+                    <a href={task.link} className="w-full bg-yellow-500 text-center text-gray-900 py-2 rounded-lg font-semibold">{task.platform === "Подписки Telegram" || task.platform === "Подписки Instagram" ? "Подписаться" : "Забустить"}</a>
                     <button onClick={() => handleVerifyButtonClick( task.id)} className="w-full bg-gray-700 text-white py-2 rounded-lg font-semibold">Проверить</button>
                 </Modal>
             )}
