@@ -93,18 +93,22 @@ const CoinMania: React.FC = () => {
 
     const throttledSyncWithDB = useCallback(throttle(async (scores: number, energy: number) => {
         try {
-            const { error } = await supabase
-                .from('users')
-                .update({ scores: scores, energy: energy })
-                .eq('id', userData.id);
+            const response = await fetch(`/api/user/sync`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    id: userData.id,
+                    energy: energy,
+                    scores: scores,
+                })
+            })
+            
+            const data = await response.json();
 
-            if (error) {
-                throw error;
+            if (data.error) {
+                throw new Error('Error syncing data')
             }
         } catch (error: unknown) {
-            if (error instanceof Error) {
-                setError(error.message);
-            }
+            console.error('Error syncing data: ', error);
         }
     }, 2000), []);
 
