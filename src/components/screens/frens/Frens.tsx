@@ -65,13 +65,14 @@ const FriendsPage = () => {
 
     type ScoreboardDisplayProps = {
         icon: string,
+        iconType?: "img" | "emoji",
         value: number | string,
         color: string,
         fontSize: string,
         width: string,
     }
 
-    const ScoreboardDisplay = ({ icon, value, color, fontSize, width }: ScoreboardDisplayProps) => (
+    const ScoreboardDisplay = ({ icon, iconType = "emoji", value, color, fontSize, width }: ScoreboardDisplayProps) => (
         <div style={{
             fontSize: fontSize,
             fontWeight: 'bold',
@@ -88,7 +89,9 @@ const FriendsPage = () => {
             justifyContent: 'center',
             width: width,
         }}>
-            {icon} {value}
+            {iconType === 'img' && <img src={icon} width={28} style={{ marginRight: '5px' }} />}
+            {iconType === 'emoji' && icon}
+            {value}
         </div>
     );
 
@@ -129,12 +132,10 @@ const FriendsPage = () => {
                         <h3 className={styles.userName}>{app.initDataUnsafe.user?.first_name}</h3>
                         <span className={styles.userTitle}>Участник клуба VNVNC</span>
                     </div>
-                    <ScoreboardDisplay icon="⭐" value={userData?.scores || 0} color="#f8cc46" fontSize="1.8rem" width="100%" />
+                    <ScoreboardDisplay icon="/images/coin.png" iconType="img" value={userData?.scores || 0} color="#f8cc46" fontSize="1.8rem" width="100%" />
                     <ScoreboardDisplay icon="⚡️" value={userData?.energy + '/' + userData?.maxenergy } color="#ffffff" fontSize="1.2rem" width="60%" />
                     <h4 className={styles.statsTitle}>📊 Статистика:</h4>
                     <div className={styles.stats}>
-                        {/* <div>🪙 Всего нажатий: <span style={{ color: '#f8cc46' }}>{userData?.scores || 0}</span></div> */}
-                        {/* <div>🎰 Прокруток слота: <span style={{ color: '#f8cc46' }}>1000</span></div> */}
                         <div>📅 Количество дней в игре: <span style={{ color: '#f8cc46' }}>{differenceInDays === 0 ? 1 : differenceInDays}</span></div>
                         <div>👥 Приглашено друзей: <span style={{ color: '#f8cc46' }}>{userData?.referrals?.length ?? 0}</span></div>
                     </div>
