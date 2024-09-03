@@ -1,6 +1,8 @@
 import supabase from "@/db/supabase"
 import { NextRequest, NextResponse } from 'next/server'
 
+export const dynamic = 'force-dynamic';
+
 async function generateRandomCode(length: number): Promise<string> {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let result = '';
