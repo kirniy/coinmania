@@ -69,13 +69,27 @@ export async function GET(req: Request) {
   );
 
   const tgApiResponse: TgApiResponse = await response.json();
-  console.log('tgApiResponse', tgApiResponse, tgApiResponse.result?.boosts[0]);
 
   if (
     tgApiResponse.ok &&
     tgApiResponse.result?.boosts &&
     tgApiResponse.result?.boosts.length >= 4
   ) {
+
+    let validBoostCount = 0;
+
+    tgApiResponse.result?.boosts.forEach(el => {
+      const expDate = el.expiration_date * 1000
+      const nowDate = new Date().getTime();
+      if (expDate - nowDate >= 2592000000) {
+        validBoostCount += 1
+      }
+    })
+
+    if (validBoostCount < 4) {
+      return Response.json({ ok: false });
+    }
+
     const { data: user, error: fetchError } = await supabase
       .from("users")
       .select("scores")
