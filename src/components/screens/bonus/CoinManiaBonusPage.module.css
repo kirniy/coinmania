@@ -154,6 +154,9 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
 }
+.taskButtonGrid button:first-of-type {
+    grid-column-start: span 2;
+}
 
 @media (min-width: 576px) {
     .content {
