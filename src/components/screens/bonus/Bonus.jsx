@@ -34,7 +34,6 @@ const taskButtonStyle = (task, status, isMain = false) => ({
     background: status === 'completed' ? '#4a4a4a' : status === 'checking' ? `linear-gradient(145deg, ${task.color}dd, ${task.color})` : `linear-gradient(145deg, ${task.color}, ${task.color}dd)`,
     color: '#f0f0f0',
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-    gridColumn: isMain ? 'span 2' : 'span 1',
 });
 const infoBoxStyle = {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
@@ -51,6 +50,7 @@ const handleButtonClick = async (setShowTasksModal) => {
 };
 
 function Task({task, index, isBoost = false}) {
+    console.log('index', index, isBoost)
     const userData = useSelector((state) => state.user.data);
     const userId = userData.id;
     const dispatch = useDispatch();
@@ -236,7 +236,7 @@ const CoinManiaBonusPage = () => {
                                 <h3 className={styles.tasksPopupPlatform}>Буст Telegram Каналов</h3>
                                 <div className={styles.taskButtonGrid}>
                                     {tasks.map((task, idx) => task.platform === "Буст Telegram Каналов" && (
-                                        <Task task={task} key={task.platform + (idx * 1.1514)} index={idx} isBoost='true'/>
+                                        <Task task={task} key={task.platform + (idx * 1.1514)} index={idx} isBoost={true}/>
                                     ))}
                                 </div>
                             </div>

@@ -12,6 +12,9 @@ const buttonStyle = {
         transform: 'scale(0.98)',
     }
 };
+const disabledButtonStyle = () => ({
+    opacity: '0.5'
+})
 const taskButtonStyle = (task, status, isMain = false) => ({
     ...buttonStyle,
     width: '100%',
@@ -25,7 +28,6 @@ const taskButtonStyle = (task, status, isMain = false) => ({
     background: status === 'completed' ? '#4a4a4a' : status === 'checking' ? `linear-gradient(145deg, ${task.color}dd, ${task.color})` : `linear-gradient(145deg, ${task.color}, ${task.color}dd)`,
     color: '#f0f0f0',
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-    gridColumn: isMain ? 'span 2' : 'span 1',
 });
 const inputStyle = () => ({
     fontSize: '1.2rem',
@@ -106,7 +108,7 @@ const InstagramTask = ({task, index}) => {
     return (
         <React.Fragment> 
             <button 
-                onClick={() => handleButtonClick(setShowTasksModal, setUserKey, userId, task.id)} 
+                onClick={() => handleButtonClick(task.id)} 
                 style={taskButtonStyle(task, status, isMain)} 
                 disabled={status === 'completed' || status === 'checking'}
             >
@@ -126,7 +128,7 @@ const InstagramTask = ({task, index}) => {
 
                     <a href={task.link} className="w-full bg-yellow-500 text-center text-gray-900 py-2 rounded-lg font-semibold">Подписаться</a>
                     <input type="text" autoCapitalize="off" autoComplete="off" style={inputStyle()} onChange={(e)=>setInputValue(e.target.value)}/>
-                    <button disabled={inputValue?.length === 0} onClick={() => handleVerifyButtonClick(task.id)} className="w-full bg-gray-700 text-white py-2 rounded-lg font-semibold">Проверить</button>
+                    <button disabled={inputValue?.length === 0} onClick={() => handleVerifyButtonClick(task.id)} style={inputValue?.length === 0 ? disabledButtonStyle() : {}} className="w-full bg-gray-700 text-white py-2 rounded-lg font-semibold">Проверить</button>
                 </Modal>,
                 document.body
             )}
