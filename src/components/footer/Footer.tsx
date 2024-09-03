@@ -53,8 +53,7 @@ const Footer = () => {
                     <div className={styles.frostedGlass} />
 
                     <nav className={styles.nav}>
-                        {TABS.map((tab) => 
-                        (tab.name !== "Game") && (
+                        {TABS.map((tab) =>
                             <Link
                                 key={tab.name}
                                 href={tab.path}
@@ -94,46 +93,7 @@ const Footer = () => {
                                     />
                                 )}
                             </Link>
-                        ) || (tab.name === "Game") && (
-                            <button
-                                key={tab.name}
-                                className={styles.tabLink}
-                                style={{
-                                    background: activeTab === tab.name
-                                        ? `linear-gradient(145deg, ${tab.color}, ${tab.color}aa)`
-                                        : 'rgba(255, 255, 255, 0.05)',
-                                    boxShadow: activeTab === tab.name
-                                        ? `0 10px 20px rgba(0,0,0,0.2), 0 0 0 3px ${tab.color}55`
-                                        : '0 4px 6px rgba(0,0,0,0.1)',
-                                }}
-                                onClick={() => handleGameTap()}
-                            >
-                                <div
-                                    className={styles.tabIcon}
-                                    style={{
-                                        filter: activeTab === tab.name ? 'none' : 'grayscale(100%)',
-                                    }}
-                                >
-                                    {tab.icon}
-                                </div>
-                                <span
-                                    className={styles.tabText}
-                                    style={{
-                                        color: activeTab === tab.name ? 'white' : 'rgba(255,255,255,0.6)',
-                                    }}
-                                >
-                                    {tab.name}
-                                </span>
-                                {activeTab === tab.name && (
-                                    <div
-                                        className={styles.activeIndicator}
-                                        style={{
-                                            boxShadow: `0 0 10px ${tab.color}, 0 0 20px ${tab.color}`,
-                                        }}
-                                    />
-                                )}
-                            </button>
-                        ))}
+                        )}
                     </nav>
                 </div>
             </div>
