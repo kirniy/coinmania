@@ -160,17 +160,21 @@ const Boosters: React.FC = ({}) => {
                     </div>
                 )
             })}
-            {showPopupEnergy[0] && (
-                <Popup popup={popupEnegry}/>
+            {showPopupEnergy[0] && createPortal(
+                <Popup popup={popupEnegry}/>,
+                document.body
             )}
-            {showPopupBooster[0] && (
-                <Popup popup={popupBooster}/>
+            {showPopupBooster[0] && createPortal(
+                <Popup popup={popupBooster}/>,
+                document.body
             )}
-            {showPositivePopup[0] && (
-                <Popup popup={popupPositive}/>
+            {showPositivePopup[0] && createPortal(
+                <Popup popup={popupPositive}/>,
+                document.body
             )}
-            {showNegativePopup[0] && (
-                <Popup popup={popupNegative}/>
+            {showNegativePopup[0] && createPortal(
+                <Popup popup={popupNegative}/>,
+                document.body
             )}
             {showErrorEnergyModal[0] && createPortal(
                 <InnerModal onClose={handleCloseEnergyModal} type='confirm' title='Произошла ошибка при сбросе энергии' description={showErrorEnergyModal[1]} />,
