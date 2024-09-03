@@ -71,9 +71,9 @@ export async function GET(req: Request) {
       .single();
 
     if (fetchError) {
-      console.error("Failed to fetch user:", fetchError);
+      console.error("Не удалось получить данные пользователя:", fetchError);
       return NextResponse.json(
-        { error: "Failed to fetch user" },
+        { error: "Не удалось получить данные пользователя" },
         { status: 500 }
       );
     }
@@ -85,12 +85,12 @@ export async function GET(req: Request) {
         .eq("task_id", taskId);
         
     if (existingTaskError) {
-        console.error("Failed to fetch user task:", existingTaskError);
-        return NextResponse.json({ error: "Failed to fetch user task" }, { status: 500 });
+        console.error("Не удалось получить данные:", existingTaskError);
+        return NextResponse.json({ error: "Не удалось получить данные" }, { status: 500 });
     }
 
     if (existingCompletedTask.length > 0) {
-        return NextResponse.json({ error: "Task already completed" }, { status: 400 });
+        return NextResponse.json({ error: "Задание уже выполнено" }, { status: 400 });
     }
 
     interface Task {
