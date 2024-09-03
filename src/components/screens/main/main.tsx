@@ -144,8 +144,11 @@ const CoinMania: React.FC = () => {
 
         const pointsToAdd = 1 * tapValueMultiplier; // Значение с учетом бустера
 
-        dispatch(updateUserScores(userData.scores + pointsToAdd));
-        dispatch(updateUserEnergy(Math.min(userData.energy - energyToDecrease, userData?.maxenergy ?? 0)));// Уменьшаем энергию, не превышая maxenergy
+        const newScoresValue = userData.scores + pointsToAdd;
+        const newEnergyValue = Math.min(userData.energy - energyToDecrease, userData?.maxenergy ?? 0);
+
+        dispatch(updateUserScores(newScoresValue));
+        dispatch(updateUserEnergy(newEnergyValue));// Уменьшаем энергию, не превышая maxenergy
 
         const rect = coinRef.current?.getBoundingClientRect();
         if (rect) {
@@ -165,7 +168,7 @@ const CoinMania: React.FC = () => {
             handleButtonClickSpeed();
         }
 
-        throttledSyncWithDB(userData.scores + pointsToAdd, userData.energy - 1);
+        throttledSyncWithDB(newScoresValue, newEnergyValue);
     }
 
     const handleButtonClick = async (e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>) => {
