@@ -2,11 +2,12 @@ import { XCircle } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import styles from './CoinManiaBonusPage.module.css'; // Импортируем стили
 
-import Boosters from './components/Boosters';
-import InfoBox from "@/components/common/InfoBox";
-import { useDispatch, useSelector } from "react-redux";
-import { Upgrades } from "./components/Upgrades";
-import { updateUserScores } from "@/store/userSlice";
+import InfoBox from "@/components/common/InfoBox"
+import { updateUserScores } from "@/store/userSlice"
+import { useDispatch, useSelector } from "react-redux"
+import Boosters from './components/Boosters'
+import InstagramTask from './components/InstagramTask'
+import { Upgrades } from "./components/Upgrades"
 
 // STYLES
 
@@ -172,12 +173,12 @@ const CoinManiaBonusPage = () => {
                                 </div>
                             </div>
                         )}
-                        {tasks.find(task => task.platform === "Instagram") && (
+                        {tasks.find(task => task.platform === "Подписки Instagram") && (
                             <div style={{marginBottom: '25px'}}>
-                                <h3 className={styles.tasksPopupPlatform}>Instagram</h3>
+                                <h3 className={styles.tasksPopupPlatform}>Подписки Instagram</h3>
                                 <div className={styles.taskButtonGrid}>
-                                    {tasks.map((task, idx) => task.platform === "Instagram" && (
-                                        <Task task={task} key={task.platform + (idx * 3.1415)} index={idx}/>
+                                    {tasks.map((task, idx) => task.platform === "Подписки Instagram" && (
+                                        <InstagramTask task={task} key={task.platform + (idx * 3.1415)} index={idx}/>
                                     ))}
                                 </div>
                             </div>
