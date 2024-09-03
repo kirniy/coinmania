@@ -22,6 +22,7 @@ import { Prize, Rule } from "@/components/rule/Rule";
 import { Popup } from "@/components/popup/Popup";
 import { PopupProps } from "@/types/popup";
 import { showPopup } from "@/utils/showPopup";
+import { createPortal } from "react-dom";
 
 interface RootState {
     user: {
@@ -450,7 +451,10 @@ const CoinMania: React.FC = () => {
                 </div>
     
             </div>
-            {showLowEnergyPopup[0] && <Popup popup={popupNegative}/>}
+            {showLowEnergyPopup[0] && createPortal(
+                <Popup popup={popupNegative}/>, 
+                document.body
+            )}
         </div>
     );
 };
