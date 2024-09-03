@@ -10,6 +10,8 @@ import { updateUserReferred, updateUserScores } from "@/store/userSlice"
 import axios from "axios"
 import { RootState } from "@/store/rootReducer"
 import { referredUserRecord, UserData } from "@/types/user"
+import { createPortal } from "react-dom"
+import { InnerModal } from "@/components/modal/InnerModal"
 
 const FriendsPage = () => {
     const {app} = useContext(webAppContext);
@@ -19,6 +21,16 @@ const FriendsPage = () => {
     const [isInvitePressed, setIsInvitePressed] = useState(false);
     const [error, setError] = useState(null);
     const [users, setUsers] = useState<Pick<UserData, 'id' | 'first_name' | 'scores'>[]>([]);
+
+    const [showRewardSuccess, setShowRewardSuccess] = useState(false);
+    const [showRewardError, setShowRewardError] = useState(false)
+
+    function handleCloseRewardSuccess() {
+        setShowRewardSuccess(false)
+    }
+    function handleCloseRewardError() {
+        setShowRewardError(false)
+    }
 
     const dispatch = useDispatch();
 
@@ -108,10 +120,11 @@ const FriendsPage = () => {
             dispatch(updateUserScores(data.scores));
             fetchUsers();
 
-            alert('Награда получена!');
+            setShowRewardSuccess(true)
         } catch (error) {
             console.error('Error claiming reward:', error);
-            alert('Не удалось получить награду');
+            setShowRewardError(true)
+
         }
 
     }
@@ -252,6 +265,14 @@ const FriendsPage = () => {
                         </p>
                     </div>
                 </div>
+            )}
+            {showRewardSuccess && createPortal(
+                <InnerModal onClose={handleCloseRewardSuccess} type='confirm' title='Успех!' description="Награда получена" />,
+                document.body,
+            )}
+            {showRewardError && createPortal(
+                <InnerModal onClose={handleCloseRewardError} type='confirm' title='Ошибка' description="Не удалось получить награду" />,
+                document.body,
             )}
         </div>
     );
