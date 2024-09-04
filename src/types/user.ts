@@ -18,6 +18,7 @@ export interface UserData {
     tap_boost_remaining_time: number;
     referrals: referredUserRecord[];
     upgrades: userUpgrades,
+    isRechargingEnergy: boolean,
     created_at: string;
 };
 

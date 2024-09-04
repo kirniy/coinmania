@@ -9,7 +9,7 @@ import supabase from "@/db/supabase"
 import { AppDispatch } from '@/store/store'
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { updateUserEnergy, updateUserScores } from '../../../store/userSlice'
+import { updateUserEnergy, updateUserScores, updateIsRechargingEnergy } from '../../../store/userSlice'
 import Emoji from './Emoji'
 import styles from './Main.module.css'
 import CoinEmojis from "./CoinEmojis";
@@ -60,6 +60,8 @@ const CoinMania: React.FC = () => {
 
     const [openRules, setOpenRules] = useState(false);
     const [openPrizes, setOpenPrizes] = useState(false);
+
+    const energyRechargingTimeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const handleButtonClickSpeed = () => {
         setSpeed((prevSpeed) => (prevSpeed >= 5 ? 5 : prevSpeed + 1)); // Ограничиваем скорость до 5
@@ -163,6 +165,16 @@ const CoinMania: React.FC = () => {
         }
 
         throttledSyncWithDB(userData.scores + pointsToAdd, userData.energy - 1);
+
+        dispatch(updateIsRechargingEnergy(false));
+
+        if (energyRechargingTimeoutIdRef.current !== null) {
+            clearInterval(energyRechargingTimeoutIdRef.current);
+        }
+
+        energyRechargingTimeoutIdRef.current = setTimeout(() => {
+            dispatch(updateIsRechargingEnergy(true));
+        }, 1000)
     }
 
     const handleButtonClick = async (e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>) => {
@@ -265,7 +277,7 @@ const CoinMania: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        const intervalId = setInterval(() => {
+        const speedUpdatingIntervalId = setInterval(() => {
             const currentTime = Date.now();
             const timeSinceLastTap = currentTime - lastTapTimeRef.current;
 
@@ -276,10 +288,10 @@ const CoinMania: React.FC = () => {
                         : 1;
                 })
             }
-        }, 2000)
+        }, 2000);
 
         return () => {
-            clearInterval(intervalId)
+            clearInterval(speedUpdatingIntervalId);
         }
     }, [])
 
