@@ -122,7 +122,7 @@ const InstagramTask = ({task, index, isCompleted = false}) => {
             >
                 {task.name}
                 <br />
-                <span style={{fontSize: '0.8em'}}>{status === 'completed' ? `✅ ${task.reward / 1000}K⭐️` : `${task.reward / 1000}K⭐️`}</span>
+                <span style={{fontSize: '0.8em', display: 'inline-flex', lineHeight: '20px'}}>{status === 'completed' ? `✅ ${task.reward / 1000}K` : `${task.reward / 1000}K`}<img src='/images/coin.png' width={20} alt="Coin" style={{display: 'inline-flex', marginLeft: '5px'}}/></span>
             </button>
             {showTasksModal && 
             createPortal(
