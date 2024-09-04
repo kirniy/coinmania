@@ -1,7 +1,7 @@
 import { InnerModal } from '@/components/modal/InnerModal'
 import { Modal } from '@/components/modal/Modal'
-import { updateUserScores } from "@/store/userSlice"
-import React, { useState } from 'react'
+import { updateUserCompletedTasks, updateUserScores } from "@/store/userSlice"
+import React, { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from "react-redux"
 
@@ -46,7 +46,7 @@ const inputStyle = () => ({
     width: '100%',
 });
 
-const InstagramTask = ({task, index}) => {
+const InstagramTask = ({task, index, isCompleted = false}) => {
     const userData = useSelector((state) => state.user.data);
     const userId = userData.id;
     const dispatch = useDispatch();
@@ -58,9 +58,15 @@ const InstagramTask = ({task, index}) => {
     const [showSuccessAlert, setShowSuccessAlert] = useState([false, null]);
     const [showAlertSubscrNotFound, setShowAlertSubscrNotFound] = useState([false, null]);
     const [showErrorAlert, setShowErrorAlert] = useState([false, null]);
+    const [status, setStatus] = useState('pending');
 
     const isMain = index === 0 || index === 3;
-    const status = 'pending';
+    
+    useEffect(() => {
+        if (isCompleted) {
+            setStatus('completed');
+        }
+    }, [])
 
     function handleCloseAlert() {
         setShowSuccessAlert(false);
@@ -96,6 +102,8 @@ const InstagramTask = ({task, index}) => {
                 setShowTasksModal(false);
                 setShowSuccessAlert([true, 'Подписка успешно проверена']);
                 dispatch(updateUserScores(res.scores))
+                setStatus('completed');
+                dispatch(updateUserCompletedTasks([taskId]))
             } else {
                 if(res.error) setShowErrorAlert([true, res.error])
                 else setShowAlertSubscrNotFound([true, 'Код подтверждения неверен']);
@@ -112,13 +120,9 @@ const InstagramTask = ({task, index}) => {
                 style={taskButtonStyle(task, status, isMain)} 
                 disabled={status === 'completed' || status === 'checking'}
             >
-                {status === 'completed' ? `✅ ${task.reward / 1000}K⭐️` : (
-                    <>
-                        {task.name}
-                        <br />
-                        <span style={{fontSize: '0.8em'}}>{task.reward / 1000}K⭐️</span>
-                    </>
-                )}
+                {task.name}
+                <br />
+                <span style={{fontSize: '0.8em'}}>{status === 'completed' ? `✅ ${task.reward / 1000}K⭐️` : `${task.reward / 1000}K⭐️`}</span>
             </button>
             {showTasksModal && 
             createPortal(

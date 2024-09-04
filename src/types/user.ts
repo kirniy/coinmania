@@ -16,6 +16,7 @@ export interface UserData {
     last_full_tank_time: string | null;
     referal_id: string | null;
     tap_boost_remaining_time: number;
+    completedTasks: number[];
     referrals: referredUserRecord[];
     upgrades: userUpgrades,
     created_at: string;
