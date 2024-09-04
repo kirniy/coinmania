@@ -116,6 +116,23 @@ const CoinMania: React.FC = () => {
         setIsTouchDevice(isTouch);
     }, [])
 
+    const [showTimer, setShowTimer] = useState(false);
+    const [timer, setTimer] = useState("0");
+
+    useEffect(() => {
+        const tapBoostRemainingTime = userData.tap_boost_remaining_time / 1000
+        
+        if(tapBoostRemainingTime > 0) {
+            setShowTimer(true);
+            setTimer(tapBoostRemainingTime.toString().slice(0,2));
+        }
+        
+        return () => {
+            setShowTimer(false);
+            setTimer("0");
+        }
+    }, [userData.tap_boost_remaining_time, timer, setTimer])
+
     const handleCoinTap = async (e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>) => {
         let tapValueMultiplier = 1;
         let energyToDecrease = 1;
@@ -461,6 +478,13 @@ const CoinMania: React.FC = () => {
                         </div>
                     
                 </div>
+
+                {/** Timer section */}
+                {showTimer && (
+                    <div className="fixed bottom-32 z-50">
+                        Tap Boost: {timer} секунд
+                    </div>
+                )}
     
             </div>
             {showLowEnergyPopup[0] && createPortal(
