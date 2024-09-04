@@ -4,6 +4,8 @@ export interface PopupProps extends PropsWithChildren {
     text: string;
     pic: "info" | "attention" | "error" | "success" | "achivement" | "";
     type?: "modal" | "popup";
+    duration?: number;
+    setState: React.Dispatch<React.SetStateAction<[boolean, null | NodeJS.Timeout]>>;
 }
 
 export type PopupType = {

@@ -1,10 +1,21 @@
 import { popupBgStyle } from "@/constants/styles";
 import { PopupType } from "@/types/popup";
-import React from "react";
+import React, { use, useEffect } from "react";
 
 export function Popup({ popup }: PopupType) {
+  popup.duration = popup.duration || 2000;
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      popup.setState([false, null]);
+    }, popup.duration);
+
+    return () => {      
+      clearTimeout(timeout);
+    };
+  }, []);
   return (
-    <div className="fixed w-[calc(100%-64px)] top-0 left-8 right-8 min-h-fit flex justify-center z-50">
+    <div className="popup-active fixed w-[calc(100%-64px)] top-0 left-8 right-8 min-h-fit flex justify-center z-50">
       <div className="mt-2 p-2 flex gap-2 text-sm rounded-lg border border-yellow-500 relative">
         <div style={popupBgStyle}></div>
         {popup.pic === "info" && (

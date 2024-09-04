@@ -21,7 +21,6 @@ import { PRIZES, RULES } from "@/constants/rules";
 import { Prize, Rule } from "@/components/rule/Rule";
 import { Popup } from "@/components/popup/Popup";
 import { PopupProps } from "@/types/popup";
-import { showPopup } from "@/utils/showPopup";
 import { createPortal } from "react-dom";
 
 interface RootState {
@@ -73,6 +72,7 @@ const CoinMania: React.FC = () => {
     const popupNegative: PopupProps = {
         pic: "info",
         text: "Не достаточно энергии",
+        setState: setShowLowEnergyPopup,
     }
 
     useEffect(() => {
@@ -135,7 +135,7 @@ const CoinMania: React.FC = () => {
             }
 
             if (userEnergy < userTapValue) {
-                showPopup({state: showLowEnergyPopup, setState: setShowLowEnergyPopup})
+                setShowLowEnergyPopup([true, null])
             }
         }
 
