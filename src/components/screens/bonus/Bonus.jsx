@@ -98,7 +98,7 @@ function Task({task, index, isBoost = false, isCompleted = false}) {
 
     async function handleVerifyBoostButtonClick(task_id) {
         try {
-            const req = await fetch(`/api/get_chat_boost?id=433491&task_id=${task_id}`);
+            const req = await fetch(`/api/get_chat_boost?id=${userId}&task_id=${task_id}`);
             const res = await req.json();
 
             if (res.ok) {

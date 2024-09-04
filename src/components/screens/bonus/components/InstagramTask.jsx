@@ -128,9 +128,9 @@ const InstagramTask = ({task, index, isCompleted = false}) => {
             createPortal(
                 <Modal onClose={handleModalClose}>
                     <h3 className="text-yellow-500 text-xl font-bold mb-3">{task.platform}</h3>
-                    <p className="text-white mb-4">Используйте код {userKey} чтобы получить бонусы. Скопируйте код и перейдите в инстаграм {task.name} одним нажатием на кнопку. После подписки отправте этот код к нам в директ.</p>
+                    <p className="text-white mb-4">Ваш код {userKey}. Нажмите на кнопку для копирования кода и перехода в {task.name}. После подписки отправте код к нам в директ, а ответный введите в инпут и нажмите проверить.</p>
 
-                    <a href={task.link} className="w-full bg-yellow-500 text-center text-gray-900 py-2 rounded-lg font-semibold">Подписаться</a>
+                    <a href={task.link} className="w-full bg-yellow-500 text-center text-gray-900 py-2 rounded-lg font-semibold">Копировать и Подписаться</a>
                     <input type="text" autoCapitalize="off" autoComplete="off" style={inputStyle()} onChange={(e)=>setInputValue(e.target.value)}/>
                     <button disabled={inputValue?.length === 0} onClick={() => handleVerifyButtonClick(task.id)} style={inputValue?.length === 0 ? disabledButtonStyle() : {}} className="w-full bg-gray-700 text-white py-2 rounded-lg font-semibold">Проверить</button>
                 </Modal>,
