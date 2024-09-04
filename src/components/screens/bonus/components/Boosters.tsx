@@ -33,22 +33,29 @@ const Boosters: React.FC = ({}) => {
     const popupEnegry: PopupProps = {
         pic: "attention",
         text: "У вас достаточно энергии",
+        setState: setShowPopupEnergy,
     }
     const popupBooster: PopupProps = {
         pic: "attention",
         text: "Бустер сейчас активен",
+        setState: setShowPopupBooster,
     }
     const popupPositive: PopupProps = {
         pic: "info",
         text: "Бустер применён",
+        setState: setShowPositivePopup,
     }
     const popupNegative: PopupProps = {
         pic: "error",
         text: "Бустер закончился",
+        setState: setShowNegativePopup,
     }
-    const popupErrorEnergy: PopupProps = {
-        pic: "error",
-        text: "Произошла ошибка при сбросе энергии",
+
+    function hideAllPopups() {
+        setShowPopupEnergy([false, null]);
+        setShowPopupBooster([false, null]);
+        setShowPositivePopup([false, null]);
+        setShowNegativePopup([false, null]);
     }
 
     function handleCloseEnergyModal() {
@@ -108,15 +115,16 @@ const Boosters: React.FC = ({}) => {
     };
 
     const handleBoosterClick = (booster: Booster, e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        hideAllPopups();
         switch (booster.action) {
             case 'resetEnergy':
                 const energyBoostsRemainig = userData?.daily_full_tank_count;
                 if(userData?.energy && userData.energy > 100 && energyBoostsRemainig !== 0) {
-                    showPopup({state: showPopupEnergy, setState: setShowPopupEnergy});
+                    setShowPopupEnergy([true, null])
                 }  else if (energyBoostsRemainig === 0) {
-                    showPopup({state: showNegativePopup, setState: setShowNegativePopup});
+                    setShowNegativePopup([true, null])
                 } else {
-                    showPopup({state: showPositivePopup, setState: setShowPositivePopup});
+                    setShowPositivePopup([true, null])
                     resetEnergy(booster);
                 }
                 break;
@@ -126,11 +134,11 @@ const Boosters: React.FC = ({}) => {
                 const tapBoostsRemainig = userData?.daily_tap_boost_count;
                 
                 if (isBoosterActive) {
-                    showPopup({state: showPopupBooster, setState: setShowPopupBooster});
+                    setShowPopupBooster([true, null])
                 } else if (tapBoostsRemainig === 0) {
-                    showPopup({state: showNegativePopup, setState: setShowNegativePopup});
+                    setShowNegativePopup([true, null])
                 } else {
-                    showPopup({state: showPositivePopup, setState: setShowPositivePopup});
+                    setShowPositivePopup([true, null])
                     activateBooster(booster);    
                 }
                 break;
@@ -153,7 +161,6 @@ const Boosters: React.FC = ({}) => {
                             onClick={(e) => {handleBoosterClick(booster, e)}}
                             className={styles.button}
                             style={dynamicStyles(booster, isAvailable)}
-                            // disabled={!isAvailable}
                         >
                             {booster.name} ({(userData && userData[`daily_${booster.slug}_count`]) ?? booster.maxUsePerDay} / {booster.maxUsePerDay})
                         </button>

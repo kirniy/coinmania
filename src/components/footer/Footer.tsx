@@ -29,23 +29,6 @@ const Footer = () => {
         dispatch(setActiveTab(tab));
     };
 
-    const [showPopup, setShowPopup] = useState([false, null] as [boolean, null | NodeJS.Timeout])
-    const popup: PopupProps = {
-        text: "Чуть-чуть терпения, как раз готовим что-то новенькое для вас!",
-        pic: "info",
-        type: "popup"
-    }
-
-    function handleGameTap() {
-        if(showPopup[1] !== null) {
-            clearTimeout(showPopup[1])
-        }
-        const timeout = setTimeout(() => {
-            setShowPopup([false, null])
-        }, 5000);
-        setShowPopup([true, timeout])
-    }
-
     return (
         <div className={'z-30 w-full fixed bottom-0'}>
             <div className={styles.footerContainer}>
@@ -97,9 +80,6 @@ const Footer = () => {
                     </nav>
                 </div>
             </div>
-            {showPopup[0] && 
-                <Popup popup={popup}/>
-            }
         </div>
     );
 };

@@ -9,6 +9,7 @@ export function showPopup({state, setState, duration = 2000}: ShowPopupProps) {
     const timeout = setTimeout(() => {
         setState([false, null])
     }, duration);
+    
     // Показываем попап
     setState([true, timeout])
 }
