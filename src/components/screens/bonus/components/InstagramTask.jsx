@@ -1,7 +1,7 @@
 import { InnerModal } from '@/components/modal/InnerModal'
 import { Modal } from '@/components/modal/Modal'
-import { updateUserScores } from "@/store/userSlice"
-import React, { useState } from 'react'
+import { updateUserCompletedTasks, updateUserScores } from "@/store/userSlice"
+import React, { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from "react-redux"
 
@@ -46,7 +46,7 @@ const inputStyle = () => ({
     width: '100%',
 });
 
-const InstagramTask = ({task, index}) => {
+const InstagramTask = ({task, index, isCompleted = false}) => {
     const userData = useSelector((state) => state.user.data);
     const userId = userData.id;
     const dispatch = useDispatch();
@@ -58,9 +58,15 @@ const InstagramTask = ({task, index}) => {
     const [showSuccessAlert, setShowSuccessAlert] = useState([false, null]);
     const [showAlertSubscrNotFound, setShowAlertSubscrNotFound] = useState([false, null]);
     const [showErrorAlert, setShowErrorAlert] = useState([false, null]);
+    const [status, setStatus] = useState('pending');
 
     const isMain = index === 0 || index === 3;
-    const status = 'pending';
+    
+    useEffect(() => {
+        if (isCompleted) {
+            setStatus('completed');
+        }
+    }, [])
 
     function handleCloseAlert() {
         setShowSuccessAlert(false);
@@ -96,6 +102,8 @@ const InstagramTask = ({task, index}) => {
                 setShowTasksModal(false);
                 setShowSuccessAlert([true, 'Подписка успешно проверена']);
                 dispatch(updateUserScores(res.scores))
+                setStatus('completed');
+                dispatch(updateUserCompletedTasks([taskId]))
             } else {
                 if(res.error) setShowErrorAlert([true, res.error])
                 else setShowAlertSubscrNotFound([true, 'Код подтверждения неверен']);
@@ -112,21 +120,17 @@ const InstagramTask = ({task, index}) => {
                 style={taskButtonStyle(task, status, isMain)} 
                 disabled={status === 'completed' || status === 'checking'}
             >
-                {status === 'completed' ? `✅ ${task.reward / 1000}K⭐️` : (
-                    <>
-                        {task.name}
-                        <br />
-                        <span style={{fontSize: '0.8em'}}>{task.reward / 1000}K⭐️</span>
-                    </>
-                )}
+                {task.name}
+                <br />
+                <span style={{fontSize: '0.8em'}}>{status === 'completed' ? `✅ ${task.reward / 1000}K⭐️` : `${task.reward / 1000}K⭐️`}</span>
             </button>
             {showTasksModal && 
             createPortal(
                 <Modal onClose={handleModalClose}>
                     <h3 className="text-yellow-500 text-xl font-bold mb-3">{task.platform}</h3>
-                    <p className="text-white mb-4">Используйте код {userKey} чтобы получить бонусы. Скопируйте код и перейдите в инстаграм {task.name} одним нажатием на кнопку. После подписки отправте этот код к нам в директ.</p>
+                    <p className="text-white mb-4">Ваш код {userKey}. Нажмите на кнопку для копирования кода и перехода в {task.name}. После подписки отправте код к нам в директ, а ответный введите в инпут и нажмите проверить.</p>
 
-                    <a href={task.link} className="w-full bg-yellow-500 text-center text-gray-900 py-2 rounded-lg font-semibold">Подписаться</a>
+                    <a href={task.link} className="w-full bg-yellow-500 text-center text-gray-900 py-2 rounded-lg font-semibold">Копировать и Подписаться</a>
                     <input type="text" autoCapitalize="off" autoComplete="off" style={inputStyle()} onChange={(e)=>setInputValue(e.target.value)}/>
                     <button disabled={inputValue?.length === 0} onClick={() => handleVerifyButtonClick(task.id)} style={inputValue?.length === 0 ? disabledButtonStyle() : {}} className="w-full bg-gray-700 text-white py-2 rounded-lg font-semibold">Проверить</button>
                 </Modal>,

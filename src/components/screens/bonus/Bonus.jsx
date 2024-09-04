@@ -5,7 +5,7 @@ import styles from './CoinManiaBonusPage.module.css'; // Импортируем 
 import InfoBox from "@/components/common/InfoBox"
 import { InnerModal } from '@/components/modal/InnerModal'
 import { Modal } from '@/components/modal/Modal'
-import { updateUserScores } from "@/store/userSlice"
+import { updateUserCompletedTasks, updateUserScores } from "@/store/userSlice"
 import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from "react-redux"
 import Boosters from './components/Boosters'
@@ -49,8 +49,7 @@ const handleButtonClick = async (setShowTasksModal) => {
     setShowTasksModal(true);
 };
 
-function Task({task, index, isBoost = false}) {
-    console.log('index', index, isBoost)
+function Task({task, index, isBoost = false, isCompleted = false}) {
     const userData = useSelector((state) => state.user.data);
     const userId = userData.id;
     const dispatch = useDispatch();
@@ -59,9 +58,15 @@ function Task({task, index, isBoost = false}) {
     const [showSuccessAlert, setShowSuccessAlert] = useState([false, null]);
     const [showAlertSubscrNotFound, setShowAlertSubscrNotFound] = useState([false, null]);
     const [showErrorAlert, setShowErrorAlert] = useState([false, null]);
+    const [status, setStatus] = useState('pending');
 
     const isMain = index === 0 || index === 3;
-    const status = 'pending';
+
+    useEffect(() => {
+        if (isCompleted) {
+            setStatus('completed')
+        }
+    }, [])
 
     function handleCloseAlert() {
         setShowSuccessAlert(false);
@@ -80,6 +85,8 @@ function Task({task, index, isBoost = false}) {
                 setShowTasksModal(false);
                 setShowSuccessAlert([true, 'Подписка проверена']);
                 dispatch(updateUserScores(res.scores))
+                setStatus('completed');
+                dispatch(updateUserCompletedTasks([task_id]))
             } else {
                 if(res.error) setShowErrorAlert([true, res.error])
                 else setShowAlertSubscrNotFound([true, 'Подписка не найдена']);
@@ -97,6 +104,8 @@ function Task({task, index, isBoost = false}) {
             if (res.ok) {
                 setShowTasksModal(false);
                 setShowSuccessAlert([true, 'Буст канала проверен']);
+                setStatus('completed');
+                dispatch(updateUserCompletedTasks([task_id]))
                 dispatch(updateUserScores(res.scores))
             } else {
                 if(res.error) setShowErrorAlert([true, res.error])
@@ -114,13 +123,9 @@ function Task({task, index, isBoost = false}) {
                 style={taskButtonStyle(task, status, isMain)} 
                 disabled={status === 'completed' || status === 'checking'}
             >
-                {status === 'completed' ? `✅ ${task.reward / 1000}K⭐️` : (
-                    <>
-                        {task.name}
-                        <br />
-                        <span style={{fontSize: '0.8em'}}>{task.reward / 1000}K⭐️</span>
-                    </>
-                )}
+                {task.name}
+                <br />
+                <span style={{fontSize: '0.8em'}}>{status === 'completed' ? `✅ ${task.reward / 1000}K⭐️` : `${task.reward / 1000}K⭐️`}</span>
             </button>
             {showTasksModal && 
             createPortal(
@@ -153,8 +158,13 @@ function Task({task, index, isBoost = false}) {
 }
 
 const CoinManiaBonusPage = () => {
+    const userData = useSelector((state) => state.user.data);
+    const userId = userData.id;
+    const dispatch = useDispatch();
+
     const [showTasks, setShowTasks] = useState(false);
     const [tasks, setTasks] = useState([]);
+    const [completedTasks, setCompletedTasks] = useState([]);
 
     useEffect(() => {
         async function fetchTasks() {
@@ -163,8 +173,26 @@ const CoinManiaBonusPage = () => {
             setTasks(res.data);
         }
 
+        async function fetchCompletedTasks() {
+            const req = await fetch(`/api/tasks/completed?id=${userId}`, { cache: 'no-store' });
+            const res = await req.json();
+            if (res.result) {
+                dispatch(updateUserCompletedTasks(res.data))
+                setCompletedTasks(res.data)
+            }
+        }
+
+        fetchCompletedTasks();
         fetchTasks();
     }, []);
+
+    const checkIsCompleted = (taskId) => {
+        const found = completedTasks.find(el => {
+            return el === taskId
+        })
+
+        return found
+    }
 
     return (
         <div className={styles.container}>
@@ -216,7 +244,7 @@ const CoinManiaBonusPage = () => {
                                 <h3 className={styles.tasksPopupPlatform}>Подписки Telegram</h3>
                                 <div className={styles.taskButtonGrid}>
                                     {tasks.map((task, idx) => task.platform === "Подписки Telegram" &&  (
-                                        <Task task={task} key={task.platform + idx} index={idx}/>
+                                        <Task task={task} key={task.platform + idx} index={idx} isCompleted={checkIsCompleted(task.id)}/>
                                     ))}
                                 </div>
                             </div>
@@ -226,7 +254,7 @@ const CoinManiaBonusPage = () => {
                                 <h3 className={styles.tasksPopupPlatform}>Подписки Instagram</h3>
                                 <div className={styles.taskButtonGrid}>
                                     {tasks.map((task, idx) => task.platform === "Подписки Instagram" && (
-                                        <InstagramTask task={task} key={task.platform + (idx * 3.1415)} index={idx}/>
+                                        <InstagramTask task={task} key={task.platform + (idx * 3.1415)} index={idx} isCompleted={checkIsCompleted(task.id)}/>
                                     ))}
                                 </div>
                             </div>
@@ -236,7 +264,7 @@ const CoinManiaBonusPage = () => {
                                 <h3 className={styles.tasksPopupPlatform}>Буст Telegram Каналов</h3>
                                 <div className={styles.taskButtonGrid}>
                                     {tasks.map((task, idx) => task.platform === "Буст Telegram Каналов" && (
-                                        <Task task={task} key={task.platform + (idx * 1.1514)} index={idx} isBoost={true}/>
+                                        <Task task={task} key={task.platform + (idx * 1.1514)} index={idx} isBoost={true} isCompleted={checkIsCompleted(task.id)}/>
                                     ))}
                                 </div>
                             </div>

@@ -1,10 +1,10 @@
+import { BOOSTERS } from '@/constants/earn'
 import { MAX_SPINS_PER_DAY } from '@/constants/game.js'
-import { BOOSTERS } from '@/constants/earn';
+import { referredUserRecord, UserData, userUpgrades } from '@/types/user'
+import { checkIsSameDay } from '@/utils/dates'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { referredUserRecord, UserData, userUpgrades } from '@/types/user';
-import { AppThunk } from './store';
-import { checkIsSameDay } from '@/utils/dates';
-import axios from 'axios';
+import axios from 'axios'
+import { AppThunk } from './store'
 
 interface UserState {
   data: UserData | null;
@@ -95,6 +95,11 @@ const userSlice = createSlice({
       if (state.data) {
         state.data.isRechargingEnergy = action.payload;
       }
+    },
+    updateUserCompletedTasks: (state, action: PayloadAction<number>) => {
+      if (state.data) {
+        state.data.completedTasks.concat(action.payload);
+      }
     }
   },
   extraReducers: (builder) => {
@@ -143,6 +148,21 @@ const userSlice = createSlice({
         })
 
         state.data.isRechargingEnergy = true;
+        // Upgrades
+
+        const defaultUserUpgrades: userUpgrades = {
+          tap_value: 1,
+          energy_limit: 1,
+          recharging_speed: 1,
+        };
+
+        if (!userData.upgrades) {
+          state.data.upgrades = defaultUserUpgrades;
+        } else {
+          state.data.upgrades = userData.upgrades;
+        }
+
+        state.data.completedTasks = []
       })
       .addCase(fetchUserData.rejected, (state, action) => {
         console.log('action', action)
@@ -165,6 +185,7 @@ export const {
   updateUserReferred,
   updateUserUpgrades,
   updateIsRechargingEnergy,
+  updateUserCompletedTasks,
 } = userSlice.actions;
 
 export const startCountdown = (): AppThunk => (dispatch, getState) => {
