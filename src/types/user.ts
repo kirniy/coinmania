@@ -19,7 +19,8 @@ export interface UserData {
     referrals: referredUserRecord[];
     upgrades: userUpgrades,
     isRechargingEnergy: boolean,
-    created_at: string;
+    created_at: string,
+    is_tester: boolean,
 };
 
 export type referredUserRecord = {

@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import supabase from "@/db/supabase";
+import supabase from "@/db/supabase"
+import { NextRequest, NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic';
 
@@ -8,7 +8,8 @@ export async function GET(req: NextRequest) {
         // Получение всех пользователей из базы данных
         const { data: users, error: fetchError } = await supabase
             .from('users')
-            .select('*');
+            .select('*')
+            .eq('is_tester', false)
 
         if (fetchError) {
             console.error("Failed to fetch users:", fetchError);
