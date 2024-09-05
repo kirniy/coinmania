@@ -281,17 +281,17 @@ const CoinMania: React.FC = () => {
         return emojis[Math.floor(Math.random() * emojis.length)];
     };
 
-    const addCoinEmojis = useCallback((x: number, y: number) => {
+    const addCoinEmojis = useCallback((x: number, y: number) => {        
         const currentTime = Date.now();
         if (currentTime - lastTapTimeRef.current > 1000) {
             consecutiveTapsRef.current = 0;
         }
         consecutiveTapsRef.current++;
 
-        if (consecutiveTapsRef.current >= 16 && consecutiveTapsRef.current % 16 === 0) {
+        if (consecutiveTapsRef.current >= 16 && consecutiveTapsRef.current % 16 === 0) {            
             const newEmojis = Array(8).fill(null).map(() => ({
                 id: String(Date.now()) + String(Math.random()),
-                emoji: getRandomEmoji(),
+                emoji: userData?.tap_boost_remaining_time > 0 ? "⚡️" : getRandomEmoji(),
                 x: x + (Math.random() - 0.5) * 60,
                 y: y + (Math.random() - 0.5) * 60,
                 size: Math.random() * 24 + 14,
