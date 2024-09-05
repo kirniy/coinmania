@@ -66,7 +66,6 @@ const CoinMania: React.FC = () => {
         setSpeed((prevSpeed) => (prevSpeed >= 5 ? 5 : prevSpeed + 1)); // Ограничиваем скорость до 5
       };
 
-    const [coinSize, setCoinSize] = useState(360); // Добавляем состояние для размера монеты
     const [showLowEnergyPopup, setShowLowEnergyPopup] = useState([false, null] as [boolean, null | NodeJS.Timeout])
 
     const popupNegative: PopupProps = {
@@ -74,25 +73,6 @@ const CoinMania: React.FC = () => {
         text: "Не достаточно энергии",
         setState: setShowLowEnergyPopup,
     }
-
-    useEffect(() => {
-        const updateCoinSize = () => {
-            if (window.innerWidth <= 375) { // Размер для iPhone SE
-                setCoinSize(200);
-            } else { // Размер для всех других устройств
-                setCoinSize(360);
-            }
-        };
-
-        // Устанавливаем размер монеты при загрузке страницы
-        updateCoinSize();
-
-        // Обновляем размер монеты при изменении размера окна
-        window.addEventListener('resize', updateCoinSize);
-        return () => {
-            window.removeEventListener('resize', updateCoinSize);
-        };
-    }, []);
 
     const throttledSyncWithDB = useCallback(throttle(async (scores: number, energy: number) => {
         try {
@@ -419,7 +399,7 @@ const CoinMania: React.FC = () => {
                 <div className={styles.mainCoin}>
                     <div
                         ref={coinRef}
-                        className="relative select-none touch-none"
+                        className="relative select-none touch-none -translate-y-8"
                         onClick={handleButtonClick}
                         onMouseDown={handleMouseDown}
                         onMouseUp={handleMouseUp}
@@ -436,14 +416,14 @@ const CoinMania: React.FC = () => {
                             src='/images/notcoin.png'
                             alt="notcoin"
                             draggable="false"
-                            width={coinSize} // Замените статическое значение на динамическое
+                            width="65%" // Замените статическое значение на динамическое
                             style={{
                                 pointerEvents: 'auto',
                                 userSelect: 'none',
                                 transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) ${isPressed ? 'scale(0.95)' : 'scale(1)'}`,
                                 transition: 'transform 0.1s',
                             }}
-                            className={`${styles.coinImage} select-none`}
+                            className={`${styles.coinImage} select-none mx-auto`}
                         />
     
                         {coinEmojis.length > 0 &&
