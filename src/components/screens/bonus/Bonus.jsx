@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux"
 import Boosters from './components/Boosters'
 import InstagramTask from './components/InstagramTask'
 import { Upgrades } from "./components/Upgrades"
+import { ReferralRewards } from './components/ReferralRewards';
 
 // STYLES
 
@@ -163,6 +164,7 @@ const CoinManiaBonusPage = () => {
     const dispatch = useDispatch();
 
     const [showTasks, setShowTasks] = useState(false);
+    const [showRewards, setShowRewards] = useState(false);
     const [tasks, setTasks] = useState([]);
     const [completedTasks, setCompletedTasks] = useState([]);
 
@@ -226,6 +228,10 @@ const CoinManiaBonusPage = () => {
                 <button onClick={() => setShowTasks(true)} className={styles.tasksButton}>
                     ✅ Задания
                 </button>
+
+                <button onClick={() => setShowRewards(true)} className={styles.tasksButton}>
+                    🎁 Награды
+                </button>
             </div>
 
             {/* Tasks Pop-up */}
@@ -271,6 +277,13 @@ const CoinManiaBonusPage = () => {
                         )}
                     </div>
                 </div>
+            )}
+
+            {/* Rewards Pop-up */}
+            {showRewards && (
+                <ReferralRewards
+                    setShowRewards={setShowRewards}
+                />
             )}
         </div>
     );
