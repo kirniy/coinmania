@@ -26,6 +26,7 @@ export const fetchUserData = createAsyncThunk<{user: UserData, serverTime: Date}
       throw new Error('Network response was not ok');
     }
     const data = await response.json();
+    console.log('Front user', data)
     return data;
   }
 );

@@ -1,6 +1,6 @@
 import supabase from "@/db/supabase"
+import type { userUpgrades } from "@/types/user"
 import { NextRequest, NextResponse } from 'next/server'
-import type { userUpgrades } from "@/types/user";
 
 export const dynamic = "force-dynamic"
 
@@ -90,6 +90,8 @@ export async function GET(req: NextRequest) {
 
             user.energy = Math.min(user.energy + energyToIncrease, user.maxenergy);
         }
+
+        console.log('Supabase user', new Date(), user)
 
         return NextResponse.json({ user, serverTime }, { status: 200 });
     } catch (error) {
