@@ -41,7 +41,6 @@ const CoinMania: React.FC = () => {
     const {app} = useContext(webAppContext);
     const userData = useSelector((state: RootState) => state.user.data);
     const { isLoading, setLoading } = useContext(LoadingContext);
-    const [error, setError] = useState<string | null>(null);
 
     const [isTouchDevice, setIsTouchDevice] = useState<boolean>(false);
 
@@ -59,6 +58,7 @@ const CoinMania: React.FC = () => {
 
     const [openRules, setOpenRules] = useState(false);
     const [openPrizes, setOpenPrizes] = useState(false);
+    const [lightningsRemainig, setLightningsRemainig] = useState(0)
 
     const energyRechargingTimeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -165,7 +165,7 @@ const CoinMania: React.FC = () => {
                 clientY = e.clientY;
             }
             const x = clientX - rect.left;
-            const y = clientY - rect.top;
+            const y = clientY - rect.top;            
             addCoinEmojis(x, y);
             setClicks(prev => [...prev, { id: Date.now(), x, y, value: pointsToAdd }]); // Добавляем значение
 
@@ -268,7 +268,7 @@ const CoinMania: React.FC = () => {
         }
         consecutiveTapsRef.current++;
 
-        if (consecutiveTapsRef.current >= 16 && consecutiveTapsRef.current % 16 === 0) {            
+        if (consecutiveTapsRef.current >= 16 && consecutiveTapsRef.current % 16 === 0) {   
             const newEmojis = Array(8).fill(null).map(() => ({
                 id: String(Date.now()) + String(Math.random()),
                 emoji: userData?.tap_boost_remaining_time > 0 ? "⚡️" : getRandomEmoji(),
@@ -282,7 +282,7 @@ const CoinMania: React.FC = () => {
             setCoinEmojis(prev => [...prev, ...newEmojis]);
         }
         lastTapTimeRef.current = currentTime;
-    }, []);
+    }, [lightningsRemainig, setLightningsRemainig, userData.tap_boost_remaining_time]);
 
     useEffect(() => {
         const speedUpdatingIntervalId = setInterval(() => {
