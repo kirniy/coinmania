@@ -129,7 +129,11 @@ const CoinMania: React.FC = () => {
         if(tapBoostRemainingTime > 0) {
             setShowTimer(true);
             setTimer(tapBoostRemainingTime.toString().slice(0,2));
+            setEmogis(['⚡️','⚡️','⚡️','⚡️','⚡️','⚡️','⚡️','⚡️','⚡️','⚡️']);
+        } else {
+            getRandomBgEmoji();
         }
+        
         
         return () => {
             setShowTimer(false);
