@@ -5,6 +5,7 @@ import { checkIsSameDay } from '@/utils/dates'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import axios from 'axios'
 import { AppThunk } from './store'
+import type { userReferralReward } from '@/types/referralReward';
 
 interface UserState {
   data: UserData | null;
@@ -101,7 +102,12 @@ const userSlice = createSlice({
       if (state.data) {
         state.data.completedTasks.concat(action.payload);
       }
-    }
+    },
+    updateUserReferralReward: (state, action: PayloadAction<userReferralReward[]>) => {
+      if (state.data) {
+        state.data.referral_rewards = action.payload;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -187,6 +193,7 @@ export const {
   updateUserUpgrades,
   updateIsRechargingEnergy,
   updateUserCompletedTasks,
+  updateUserReferralReward,
 } = userSlice.actions;
 
 export const startCountdown = (): AppThunk => (dispatch, getState) => {

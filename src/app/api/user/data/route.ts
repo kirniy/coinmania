@@ -32,6 +32,11 @@ export async function GET(req: NextRequest) {
                     tap_value,
                     energy_limit,
                     recharging_speed
+                ),
+                referral_rewards:user_rewards (
+                    reward_level,
+                    claimed,
+                    claimed_at
                 )
             `)
             .eq('id', id)
