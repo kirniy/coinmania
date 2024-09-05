@@ -92,7 +92,7 @@ const ReferralRewards: React.FC<ReferralRewardsProps> = ({ setShowRewards }) => 
                                 </span>
                                 {claimed ? (
                                 <span>✔️ Получено</span>
-                                ) : userReferralsCount+25 >= task.goal ? (
+                                ) : userReferralsCount >= task.goal ? (
                                 <GetRewardButton onClick={() => handleClaimReward(task.goal)}>Получить</GetRewardButton>
                                 ) : (
                                 <span>Прогресс: {userReferralsCount} / {task.goal}</span>
