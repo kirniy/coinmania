@@ -423,6 +423,7 @@ const CoinMania: React.FC = () => {
                                 transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) ${isPressed ? 'scale(0.95)' : 'scale(1)'}`,
                                 transition: 'transform 0.1s',
                             }}
+                            onContextMenu={(e) => {e.preventDefault(); return false;}}
                             className={`${styles.coinImage} select-none mx-auto`}
                         />
     
