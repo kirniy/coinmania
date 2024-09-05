@@ -22,7 +22,7 @@ const ReferralRewards: React.FC<ReferralRewardsProps> = ({ setShowRewards }) => 
 
     const userData = useSelector((state: RootState) => state.user.data);
     const userReferralsCount = userData?.referrals.length || 0;
-    const [showSuccessAlert, setShowSuccessAlert] = useState<[boolean, null | NodeJS.Timeout]>([false, null]);
+    const [showSuccessAlert, setShowSuccessAlert] = useState<[boolean, null | string]>([false, null]);
     const [showErrorAlert, setShowErrorAlert] = useState<[boolean, null | string]>([false, null]);
 
     const handleClaimReward = async (level: userReferralReward['reward_level']) => {
@@ -49,7 +49,7 @@ const ReferralRewards: React.FC<ReferralRewardsProps> = ({ setShowRewards }) => 
                 ));
                 dispatch(updateUserScores(result.scores));
 
-                setShowSuccessAlert([true, null])
+                setShowSuccessAlert([true, 'Награда успешно получена!'])
             } else {
                 if (result.error) {
                     setShowErrorAlert([true, result.error])
@@ -92,7 +92,7 @@ const ReferralRewards: React.FC<ReferralRewardsProps> = ({ setShowRewards }) => 
                                 </span>
                                 {claimed ? (
                                 <span>✔️ Получено</span>
-                                ) : userReferralsCount >= task.goal ? (
+                                ) : userReferralsCount+25 >= task.goal ? (
                                 <GetRewardButton onClick={() => handleClaimReward(task.goal)}>Получить</GetRewardButton>
                                 ) : (
                                 <span>Прогресс: {userReferralsCount} / {task.goal}</span>
@@ -110,19 +110,21 @@ const ReferralRewards: React.FC<ReferralRewardsProps> = ({ setShowRewards }) => 
             </div>
 
             {showSuccessAlert[0] && createPortal(
-                <Popup popup={
-                    {
-                        pic: 'success',
-                        text: 'Награда успешно получена!',
-                        setState: setShowSuccessAlert,
-                    }
-                } />,
+                <InnerModal
+                    type='confirm'
+                    title='Успех!'
+                    onClose={() => {setShowSuccessAlert([false, null])}}
+                    description={showSuccessAlert[1]}
+                    confirmMessage='Отлично!'
+                >
+                </InnerModal>,
                 document.body
             )}
 
             {showErrorAlert[0] && createPortal(
                 <InnerModal
                     type='confirm'
+                    title='Награда не получена'
                     onClose={() => {setShowErrorAlert([false, null])}}
                     description={showErrorAlert[1]}
                 >
