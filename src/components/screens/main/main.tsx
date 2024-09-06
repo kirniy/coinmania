@@ -432,12 +432,17 @@ const CoinMania: React.FC = () => {
                             pointerEvents: 'none',
                         }}
                     >
-                        <div className="mx-auto pointer-events-auto">
+                        <div 
+                            className="mx-auto pointer-events-auto"
+                            style={{
+                                width: '65%',
+                            }}
+                        >
                             <img
                                 src='/images/notcoin.png'
                                 alt="notcoin"
                                 draggable="false"
-                                width={coinSize} // Замените статическое значение на динамическое
+                                width="100%"
                                 style={{
                                     userSelect: 'none',
                                     transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) ${isPressed ? 'scale(0.95)' : 'scale(1)'}`,
