@@ -1,3 +1,5 @@
+import { userReferralReward } from "@/types/referralReward";
+
 export interface UserData {
     id: string;
     first_name: string;
@@ -18,6 +20,7 @@ export interface UserData {
     tap_boost_remaining_time: number;
     completedTasks: number[];
     referrals: referredUserRecord[];
+    referral_rewards: userReferralReward[];
     upgrades: userUpgrades,
     isRechargingEnergy: boolean,
     created_at: string,
