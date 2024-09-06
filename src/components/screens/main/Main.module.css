@@ -91,7 +91,6 @@
   overflow: hidden;
 }
 .coinImage {
-  pointer-events: auto;
   user-select: none;
   transition: transform 0.1s;
 }
