@@ -3,11 +3,9 @@
 import { Tab, TABS } from '@/constants/tabs'
 import { RootState } from '@/store/rootReducer'
 import { setActiveTab } from '@/store/tabSlice'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styles from './Footer.module.css'
-import { PopupProps } from '@/types/popup';
-import { Popup } from '../popup/Popup';
 import { useRouter } from 'next/navigation';
 
 
