@@ -1,14 +1,14 @@
 "use client";
 
-import { TABS } from '@/constants/tabs.js'
+import { Tab, TABS } from '@/constants/tabs'
 import { RootState } from '@/store/rootReducer'
 import { setActiveTab } from '@/store/tabSlice'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styles from './Footer.module.css'
 import { PopupProps } from '@/types/popup';
 import { Popup } from '../popup/Popup';
+import { useRouter } from 'next/navigation';
 
 
 const Footer = () => {
@@ -25,8 +25,11 @@ const Footer = () => {
     const activeTab = useSelector((state: RootState) => state.tab.activeTab);
     const dispatch = useDispatch();
 
-    const handleTabChange = (tab: string) => {
-        dispatch(setActiveTab(tab));
+    const router = useRouter();
+
+    const handleTabChange = (tab: Tab) => {
+        router.push(tab.path);
+        dispatch(setActiveTab(tab.name));
     };
 
     return (
@@ -37,9 +40,8 @@ const Footer = () => {
 
                     <nav className={styles.nav}>
                         {TABS.map((tab) =>
-                            <Link
+                            <button
                                 key={tab.name}
-                                href={tab.path}
                                 className={styles.tabLink}
                                 style={{
                                     background: activeTab === tab.name
@@ -49,7 +51,7 @@ const Footer = () => {
                                         ? `0 10px 20px rgba(0,0,0,0.2), 0 0 0 3px ${tab.color}55`
                                         : '0 4px 6px rgba(0,0,0,0.1)',
                                 }}
-                                onClick={() => handleTabChange(tab.name)}
+                                onClick={() => handleTabChange(tab)}
                             >
                                 <div
                                     className={styles.tabIcon}
@@ -75,7 +77,7 @@ const Footer = () => {
                                         }}
                                     />
                                 )}
-                            </Link>
+                            </button>
                         )}
                     </nav>
                 </div>
