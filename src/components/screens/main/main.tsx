@@ -41,7 +41,6 @@ const CoinMania: React.FC = () => {
     const {app} = useContext(webAppContext);
     const userData = useSelector((state: RootState) => state.user.data);
     const { isLoading, setLoading } = useContext(LoadingContext);
-    const [error, setError] = useState<string | null>(null);
 
     const [isTouchDevice, setIsTouchDevice] = useState<boolean>(false);
 
@@ -59,6 +58,7 @@ const CoinMania: React.FC = () => {
 
     const [openRules, setOpenRules] = useState(false);
     const [openPrizes, setOpenPrizes] = useState(false);
+    const [lightningsRemainig, setLightningsRemainig] = useState(0)
 
     const energyRechargingTimeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -66,7 +66,6 @@ const CoinMania: React.FC = () => {
         setSpeed((prevSpeed) => (prevSpeed >= 5 ? 5 : prevSpeed + 1)); // Ограничиваем скорость до 5
       };
 
-    const [coinSize, setCoinSize] = useState(360); // Добавляем состояние для размера монеты
     const [showLowEnergyPopup, setShowLowEnergyPopup] = useState([false, null] as [boolean, null | NodeJS.Timeout])
 
     const popupNegative: PopupProps = {
@@ -74,25 +73,6 @@ const CoinMania: React.FC = () => {
         text: "Не достаточно энергии",
         setState: setShowLowEnergyPopup,
     }
-
-    useEffect(() => {
-        const updateCoinSize = () => {
-            if (window.innerWidth <= 375) { // Размер для iPhone SE
-                setCoinSize(200);
-            } else { // Размер для всех других устройств
-                setCoinSize(360);
-            }
-        };
-
-        // Устанавливаем размер монеты при загрузке страницы
-        updateCoinSize();
-
-        // Обновляем размер монеты при изменении размера окна
-        window.addEventListener('resize', updateCoinSize);
-        return () => {
-            window.removeEventListener('resize', updateCoinSize);
-        };
-    }, []);
 
     const throttledSyncWithDB = useCallback(throttle(async (scores: number, energy: number) => {
         try {
@@ -185,7 +165,7 @@ const CoinMania: React.FC = () => {
                 clientY = e.clientY;
             }
             const x = clientX - rect.left;
-            const y = clientY - rect.top;
+            const y = clientY - rect.top;            
             addCoinEmojis(x, y);
             setClicks(prev => [...prev, { id: Date.now(), x, y, value: pointsToAdd }]); // Добавляем значение
 
@@ -288,7 +268,7 @@ const CoinMania: React.FC = () => {
         }
         consecutiveTapsRef.current++;
 
-        if (consecutiveTapsRef.current >= 16 && consecutiveTapsRef.current % 16 === 0) {            
+        if (consecutiveTapsRef.current >= 16 && consecutiveTapsRef.current % 16 === 0) {   
             const newEmojis = Array(8).fill(null).map(() => ({
                 id: String(Date.now()) + String(Math.random()),
                 emoji: userData?.tap_boost_remaining_time > 0 ? "⚡️" : getRandomEmoji(),
@@ -302,7 +282,7 @@ const CoinMania: React.FC = () => {
             setCoinEmojis(prev => [...prev, ...newEmojis]);
         }
         lastTapTimeRef.current = currentTime;
-    }, []);
+    }, [lightningsRemainig, setLightningsRemainig, userData.tap_boost_remaining_time]);
 
     useEffect(() => {
         const speedUpdatingIntervalId = setInterval(() => {
@@ -419,7 +399,7 @@ const CoinMania: React.FC = () => {
                 <div className={styles.mainCoin}>
                     <div
                         ref={coinRef}
-                        className="relative select-none touch-none"
+                        className="relative select-none touch-none -translate-y-8"
                         onClick={handleButtonClick}
                         onMouseDown={handleMouseDown}
                         onMouseUp={handleMouseUp}
