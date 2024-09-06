@@ -4,4 +4,4 @@ export const PAYOUTS = { "🪩🪩🪩": 50000, "🍹🍹🍹": 20000, "🎁🎁
 export const REEL_SIZE = 20;
 export const MAX_SPINS_PER_DAY = 2;
 
-export const GAME_START_DATE = new Date('2024-09-06T11:32:30Z');
+export const GAME_START_DATE = new Date('2024-09-13T21:00:00Z');
