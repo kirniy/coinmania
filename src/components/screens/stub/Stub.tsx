@@ -1,3 +1,4 @@
+import { GAME_START_DATE } from '@/constants/game';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 
@@ -6,13 +7,11 @@ export default function Stub({ serverTime }: { serverTime: number | null }) {
   const [theTime, setTheTime] = useState<string | undefined>('...');
   const time = useRef<number | null>(null);
   
-  const startTime = new Date('2024-09-14T18:00:00Z');
-
   // Обновляем время и форматируем вывод
   const refreshTime = () => {
     if (time.current === null) return;
 
-    const remainingTime = startTime.getTime() - time.current;
+    const remainingTime = GAME_START_DATE.getTime() - time.current;
     const diffDays = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
     const diffUTC = new Date(remainingTime);
     const diffHours = `${diffUTC.getUTCHours()}ч ${diffUTC.getUTCMinutes()}м ${diffUTC.getUTCSeconds()}с`;
