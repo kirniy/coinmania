@@ -3,3 +3,5 @@ export const SYMBOLS = Object.entries(SYMBOL_WEIGHTS).flatMap(([s, w]) => Array(
 export const PAYOUTS = { "🪩🪩🪩": 50000, "🍹🍹🍹": 20000, "🎁🎁🎁": 10000, "🎉🎉🎉": 2500, "💃💃💃": 1000, "🪩🪩": 500, "🍹🍹": 400, "🎁🎁": 200, "🎉🎉": 100, "💃💃": 50 };
 export const REEL_SIZE = 20;
 export const MAX_SPINS_PER_DAY = 2;
+
+export const GAME_START_DATE = new Date('2024-09-13T21:00:00Z');
