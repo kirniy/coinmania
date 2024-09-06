@@ -2,7 +2,7 @@
 
 import Loader from "@/components/loader/loader"
 import Slots from "@/components/screens/game/Slots"
-import { useContext } from "react"
+import { useContext, useEffect, useState } from "react"
 import { webAppContext } from "../context"
 import { LoadingContext } from '../context/LoaderContext'
 import Stub from "@/components/screens/stub/Stub";
@@ -10,6 +10,14 @@ import Stub from "@/components/screens/stub/Stub";
 export default function Home() {
     const {app} = useContext(webAppContext);
     const { isLoading, setLoading } = useContext(LoadingContext);
+    const [time, setTime] = useState<number | null>(null)
+
+    useEffect(() => {
+        fetch('/api/get_server_time').then(res => res.json()).then(data => {
+            const date = new Date(data.time).getTime();
+            setTime(date)
+        })
+    }, [])
 
     if (isLoading) {
         return <Loader loading={isLoading} />;
@@ -30,7 +38,7 @@ export default function Home() {
 
             <>
                 {app.version ? (
-                    <Stub />
+                    <Stub serverTime={time}/>
                 ) : (
                     <Loader loading={isLoading} />
                 )}
