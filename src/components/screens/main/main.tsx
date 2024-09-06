@@ -412,19 +412,26 @@ const CoinMania: React.FC = () => {
                             pointerEvents: 'none',
                         }}
                     >
-                        <img
-                            src='/images/notcoin.png'
-                            alt="notcoin"
-                            draggable="false"
-                            width="65%" // Замените статическое значение на динамическое
+                        <div 
+                            className="mx-auto pointer-events-auto"
                             style={{
-                                pointerEvents: 'auto',
-                                userSelect: 'none',
-                                transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) ${isPressed ? 'scale(0.95)' : 'scale(1)'}`,
-                                transition: 'transform 0.1s',
+                                width: '65%',
                             }}
-                            className={`${styles.coinImage} select-none mx-auto`}
-                        />
+                        >
+                            <img
+                                src='/images/notcoin.png'
+                                alt="notcoin"
+                                draggable="false"
+                                width="100%"
+                                style={{
+                                    userSelect: 'none',
+                                    transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) ${isPressed ? 'scale(0.95)' : 'scale(1)'}`,
+                                    transition: 'transform 0.1s',
+                                }}
+                                className={`${styles.coinImage} select-none pointer-events-none`}
+                            />
+                        </div>
+
     
                         {coinEmojis.length > 0 &&
                             <CoinEmojis
