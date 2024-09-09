@@ -6,11 +6,12 @@ import { XCircle } from 'lucide-react'
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store/rootReducer';
 import { updateUserReferralReward, updateUserScores } from '@/store/userSlice';
-import { referralReward, userReferralReward } from '@/types/referralReward';
+import { userReferralReward } from '@/types/referralReward';
 import { createPortal } from 'react-dom';
 import { useState } from 'react';
 import { InnerModal } from '@/components/modal/InnerModal';
-import { Popup } from '@/components/popup/Popup';
+import { ProgressBar } from '@/components/common/ProgressBar';
+import { getFormattedNumber } from '@/utils/getFormattedNumber';
 
 type ReferralRewardsProps = {
     setShowRewards: (state: boolean) => void,
@@ -69,10 +70,7 @@ const ReferralRewards: React.FC<ReferralRewardsProps> = ({ setShowRewards }) => 
                     <button onClick={() => setShowRewards(false)} className={styles.closeButton}><XCircle size={30} /></button>
                 </div>
                 <InfoBox>
-                    <p style={{fontSize: '0.9rem', lineHeight: '1.4'}}>
-                        Вы можете получить награды за определённое количество приглашённых друзей.
-                        Пришлашённый пользователь должен хотя бы раз зайти в игру.
-                    </p>
+                    Вы получите награды за количество приглашённых друзей, если они зайдут в игру хотя бы один раз.
                 </InfoBox>
 
                 <div className='flex flex-col gap-4'>
@@ -81,27 +79,29 @@ const ReferralRewards: React.FC<ReferralRewardsProps> = ({ setShowRewards }) => 
                         
                         return (
                             <div key={task.goal} className='text-white flex flex-col gap-1 p-2 border-white border-opacity-80 border rounded-xl relative overflow-hidden'>
-                                <span>
-                                    {`Цель: пригласить ${task.goal} друзей`}
-                                </span>
-                                <span>
-                                    {`Награда: ${task.reward.toLocaleString()} `}
-                                    <span className="inline-flex items-center">
-                                        <img src='/images/coin.png' width={10} alt="Coin" className="mx-1 inline" />
+                                <span className='flex gap-4 justify-between flex-wrap'>
+                                    <span>
+                                        { getFormattedNumber(task.reward).toLocaleString() }
+                                        <span className="inline-flex items-center">
+                                            <img src='/images/coin.png' width={10} alt="Coin" className="mx-1 inline" />
+                                        </span>
+                                    </span>
+
+                                    <span>
+                                        {`${userReferralsCount} / ${task.goal}`}
                                     </span>
                                 </span>
                                 {claimed ? (
-                                <span>✔️ Получено</span>
+                                <GetRewardButton isReceived={true}>
+                                    Получено
+                                </GetRewardButton>
                                 ) : userReferralsCount >= task.goal ? (
-                                <GetRewardButton onClick={() => handleClaimReward(task.goal)}>Получить</GetRewardButton>
+                                    <GetRewardButton onClick={() => handleClaimReward(task.goal)}>Получить</GetRewardButton>
                                 ) : (
-                                <span>Прогресс: {userReferralsCount} / {task.goal}</span>
+                                    <ProgressBar
+                                        progress={Math.min((userReferralsCount)/task.goal * 100, 100)}
+                                    />
                                 )}
-
-                                <div
-                                    style={{width: `${Math.min((userReferralsCount)/task.goal * 100, 100)}%`}}
-                                    className='absolute top-0 left-0 w-full h-full bg-yellow-200 bg-opacity-30 -z-10'
-                                ></div>
                             </div>
                         );
                     })}

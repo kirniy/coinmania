@@ -8,7 +8,7 @@ const InfoBox: React.FC<InfoBoxProps> = ({ children }) => {
     const infoBoxStyle = {
         backgroundColor: 'rgba(255, 255, 255, 0.1)',
         borderLeft: '4px solid #f8cc46',
-        padding: '15px',
+        padding: '8px 12px',
         marginBottom: '25px',
         borderRadius: '0 10px 10px 0',
     };
