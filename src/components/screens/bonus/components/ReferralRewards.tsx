@@ -6,11 +6,10 @@ import { XCircle } from 'lucide-react'
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store/rootReducer';
 import { updateUserReferralReward, updateUserScores } from '@/store/userSlice';
-import { referralReward, userReferralReward } from '@/types/referralReward';
+import { userReferralReward } from '@/types/referralReward';
 import { createPortal } from 'react-dom';
 import { useState } from 'react';
 import { InnerModal } from '@/components/modal/InnerModal';
-import { Popup } from '@/components/popup/Popup';
 import { ProgressBar } from '@/components/common/ProgressBar';
 import { getFormattedNumber } from '@/utils/getFormattedNumber';
 
