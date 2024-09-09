@@ -1,7 +1,7 @@
 import { webAppContext } from "@/app/context"
 import { LoadingContext } from '@/app/context/LoaderContext'
 import Loader from "@/components/loader/loader"
-import { Users, XCircle } from 'lucide-react'
+import { Users, XCircle, ChevronDown, ChevronUp } from 'lucide-react'
 import { useContext, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import styles from './FriendsPage.module.css'; // Импортируем стили
@@ -54,6 +54,11 @@ const FriendsPage = () => {
 
         }
     };
+
+    const [showClaimedReferrals, setShowClaimedReferrals] = useState(false);
+
+    const unclaimedReferrals = userData?.referrals.filter(referral => !referral.reward_claimed);
+    const claimedReferrals = userData?.referrals.filter(referral => referral.reward_claimed);
 
     useEffect(() => {
         fetchUsers();
@@ -194,8 +199,9 @@ const FriendsPage = () => {
                         </h2>
 
                         <div className="flex flex-col gap-4">
-                            {userData.referrals.map(referral => {
-                                return (
+                            {unclaimedReferrals
+                                && unclaimedReferrals.length > 0
+                                && unclaimedReferrals.map(referral => (
                                     <div
                                         key={referral.id}
                                         className="text-white flex items-center gap-2 p-2 border-white border-opacity-80 border rounded-xl"
@@ -203,28 +209,62 @@ const FriendsPage = () => {
                                         <span className="text-sm text-ellipsis overflow-hidden max-w-[55%] whitespace-nowrap">
                                             {referral.user.first_name}
                                         </span>
+                                        <button
+                                            type="button"
+                                            className={styles.getRewardButton}
+                                            onClick={() => handleGetRewardClick(referral)}
+                                        >
+                                            20,000
+                                            <img src='/images/coin.png' width={15} alt="Coin" className='ml-1' />
+                                        </button>
+                                    </div>
+                            ))}
 
-                                        {referral.reward_claimed &&
+                            {!unclaimedReferrals
+                                || unclaimedReferrals.length === 0
+                                && (
+                                    <span className="text-white text-[0.8rem]">Ты уже собрал все награды за своих друзей! Пригласи ещё, чтобы получить новые бонусы.</span>
+                                )
+                            }
+
+                            {/* Кнопка для раскрытия/скрытия списка с полученными наградами */}
+                            {claimedReferrals
+                                && claimedReferrals.length > 0
+                                && (
+                                <button
+                                    type="button"
+                                    className="mt-4 text-white flex gap-2 mx-auto"
+                                    onClick={() => setShowClaimedReferrals(!showClaimedReferrals)}
+                                >
+                                    {showClaimedReferrals ? 'Скрыть полученные награды' : 'Показать полученные награды'}
+                                    {showClaimedReferrals ? <ChevronUp /> : <ChevronDown />}
+                                </button>
+                                )
+                            }
+
+                            {/* Список приглашенных, за которых награда уже получена */}
+                            {showClaimedReferrals
+                                && claimedReferrals
+                                && claimedReferrals.length > 0
+                                && (
+                                <div className="mt-2 flex flex-col gap-4">
+                                    {claimedReferrals.map(referral => (
+                                        <div
+                                            key={referral.id}
+                                            className="text-white flex items-center gap-2 p-2 border-white border-opacity-80 border rounded-xl"
+                                        >
+                                            <span className="text-sm text-ellipsis overflow-hidden max-w-[55%] whitespace-nowrap">
+                                                {referral.user.first_name}
+                                            </span>
                                             <span
                                                 className="py-2 px-4 bg-[#00b600] text-white rounded-[25px] text-[0.8rem] ml-auto"
                                             >
                                                 Получено!
                                             </span>
-                                        }
-
-                                        {!referral.reward_claimed &&
-                                            <button
-                                                type="button"
-                                                className={styles.getRewardButton}
-                                                onClick={() => {handleGetRewardClick(referral)}}
-                                            >
-                                                20, 000
-                                                <img src='/images/coin.png' width={15} alt="Coin" className='ml-1' />
-                                            </button>
-                                        }
-                                    </div>
-                                )
-                            })}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 }
