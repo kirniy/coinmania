@@ -14,10 +14,11 @@ const Loader: React.FC<LoaderProps> = ({ loading }) => {
     useEffect(() => {
         lockScroll()
         
-        app?.setHeaderColor("#822826");
-
-        return () => {
-            app?.setHeaderColor("#1a1a1a");
+        if (app.setHeaderColor !== undefined) {
+            app?.setHeaderColor("#822826");
+            return () => {
+                app?.setHeaderColor("#1a1a1a");
+            }
         }
     })
 
