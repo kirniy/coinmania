@@ -1,4 +1,5 @@
 import { lockBrowserEvents } from '@/helpers/lockBrowserEvents'
+import { lockScroll } from '@/helpers/lockScroll'
 import React, { createContext, useEffect, useState } from 'react'
 import type { TelegramWebApps } from 'telegram-webapps-types-new'
 
@@ -32,6 +33,7 @@ export const WebAppProvider = ({ children }: IProps) => {
     app.expand();
 
     lockBrowserEvents();
+    lockScroll();
 
     const addUserToContext = async () => {
       const userId = app.initDataUnsafe?.user?.id;
