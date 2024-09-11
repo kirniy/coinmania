@@ -1,5 +1,4 @@
 import { lockBrowserEvents } from '@/helpers/lockBrowserEvents'
-import { lockScroll } from '@/helpers/manageScroll'
 import { createContext, ReactNode, useEffect, useState } from 'react'
 
 type LoadingContextType = {
@@ -21,7 +20,6 @@ const LoadingProvider = ({ children }: Props) => {
 
   useEffect(()=> {
     lockBrowserEvents();
-    lockScroll();
   }, [])
 
   return (

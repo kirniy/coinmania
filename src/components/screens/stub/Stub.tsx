@@ -1,6 +1,7 @@
-import { GAME_START_DATE } from '@/constants/game';
-import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { GAME_START_DATE } from '@/constants/game'
+import { lockScroll } from '@/helpers/manageScroll'
+import Image from 'next/image'
+import { useEffect, useRef, useState } from 'react'
 
 export default function Stub({ serverTime }: { serverTime: number | null }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -30,6 +31,7 @@ export default function Stub({ serverTime }: { serverTime: number | null }) {
 
   // Запускаем таймер
   useEffect(() => {
+    lockScroll()
     const timer = setInterval(() => {
       if (time.current === null) return;
       time.current += 1000;
