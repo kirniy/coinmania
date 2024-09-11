@@ -1,5 +1,6 @@
 import { webAppContext } from "@/app/context"
 import { PAYOUTS, REEL_SIZE, SYMBOLS } from '@/constants/game.js'
+import { lockScroll } from '@/helpers/manageScroll'
 import { ArrowLeft } from 'lucide-react'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -34,6 +35,10 @@ const BonusPage = () => {
 
         return () => window.removeEventListener('resize', handleResize);
     }, [app.initDataUnsafe.user?.id]);
+
+    useEffect(() => {
+        lockScroll()
+    }, [])
 
     const createBackgroundEmoji = useCallback(() => ({
         id: Math.random(),

@@ -5,13 +5,14 @@ import styles from './CoinManiaBonusPage.module.css'; // Импортируем 
 import InfoBox from "@/components/common/InfoBox"
 import { InnerModal } from '@/components/modal/InnerModal'
 import { Modal } from '@/components/modal/Modal'
+import { lockScroll } from '@/helpers/manageScroll'
 import { updateUserCompletedTasks, updateUserScores } from "@/store/userSlice"
 import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from "react-redux"
 import Boosters from './components/Boosters'
 import InstagramTask from './components/InstagramTask'
+import { ReferralRewards } from './components/ReferralRewards'
 import { Upgrades } from "./components/Upgrades"
-import { ReferralRewards } from './components/ReferralRewards';
 
 // STYLES
 
@@ -64,6 +65,7 @@ function Task({task, index, isBoost = false, isCompleted = false}) {
     const isMain = index === 0 || index === 3;
 
     useEffect(() => {
+        lockScroll()
         if (isCompleted) {
             setStatus('completed')
         }

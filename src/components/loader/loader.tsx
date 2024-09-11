@@ -1,4 +1,5 @@
-import React from 'react'
+import { lockScroll } from '@/helpers/manageScroll'
+import React, { useEffect } from 'react'
 
 interface LoaderProps {
     loading: boolean;
@@ -6,6 +7,10 @@ interface LoaderProps {
 
 const Loader: React.FC<LoaderProps> = ({ loading }) => {
     if (!loading) return null;
+
+    useEffect(() => {
+        lockScroll()
+    }, [])
 
     return (
         <div style={{

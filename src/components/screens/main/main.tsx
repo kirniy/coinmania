@@ -19,6 +19,7 @@ import { throttle } from "@/utils/throttle"
 import { Popup } from "@/components/popup/Popup"
 import { Prize, Rule } from "@/components/rule/Rule"
 import { PRIZES, RULES } from "@/constants/rules"
+import { lockScroll } from '@/helpers/manageScroll'
 import { PopupProps } from "@/types/popup"
 import { createPortal } from "react-dom"
 
@@ -305,6 +306,7 @@ const CoinMania: React.FC = () => {
     }, [])
 
     useEffect(() => {
+        lockScroll()
         getRandomBgEmoji()
     }, []);
 
