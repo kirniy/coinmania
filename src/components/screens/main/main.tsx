@@ -305,14 +305,7 @@ const CoinMania: React.FC = () => {
     }, [])
 
     useEffect(() => {
-        const preventDefault = (e: Event) => e.preventDefault();
-        document.body.style.overflow = 'hidden';
-        document.addEventListener('touchmove', preventDefault, { passive: false });
         getRandomBgEmoji()
-        return () => {
-            document.body.style.overflow = 'auto';
-            document.removeEventListener('touchmove', preventDefault);
-        };
     }, []);
 
     const id = app.initDataUnsafe.user?.id
