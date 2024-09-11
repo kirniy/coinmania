@@ -1,27 +1,26 @@
 "use client";
 
-import { CoinEmoji as EmojiType } from "@/types/coinEmoji";
+import { CoinEmoji as EmojiType } from "@/types/coinEmoji"
 
 import { webAppContext } from "@/app/context"
 import { LoadingContext } from '@/app/context/LoaderContext'
 import Loader from '@/components/loader/loader'
-import supabase from "@/db/supabase"
 import { AppDispatch } from '@/store/store'
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { updateUserEnergy, updateUserScores, updateIsRechargingEnergy } from '../../../store/userSlice'
+import { updateIsRechargingEnergy, updateUserEnergy, updateUserScores } from '../../../store/userSlice'
+import CoinEmojis from "./CoinEmojis"
 import Emoji from './Emoji'
 import styles from './Main.module.css'
-import CoinEmojis from "./CoinEmojis";
 
-import { throttle } from "@/utils/throttle";
-import { Modal } from "@/components/modal/Modal";
+import { Modal } from "@/components/modal/Modal"
+import { throttle } from "@/utils/throttle"
 
-import { PRIZES, RULES } from "@/constants/rules";
-import { Prize, Rule } from "@/components/rule/Rule";
-import { Popup } from "@/components/popup/Popup";
-import { PopupProps } from "@/types/popup";
-import { createPortal } from "react-dom";
+import { Popup } from "@/components/popup/Popup"
+import { Prize, Rule } from "@/components/rule/Rule"
+import { PRIZES, RULES } from "@/constants/rules"
+import { PopupProps } from "@/types/popup"
+import { createPortal } from "react-dom"
 
 interface RootState {
     user: {
@@ -186,6 +185,12 @@ const CoinMania: React.FC = () => {
     }
 
     const handleButtonClick = async (e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>) => {
+        if ('vibrate' in navigator) {
+            // Вибрация на 200 миллисекунд
+            navigator.vibrate(100);
+        } else {
+            console.log('Вибрация не поддерживается этим устройством');
+        }
         if (!isTouchDevice) {
             handleCoinTap(e);
         }
