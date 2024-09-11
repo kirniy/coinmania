@@ -1,4 +1,5 @@
 import { webAppContext } from '@/app/context';
+import { lockScroll } from '@/helpers/manageScroll'
 import React, { useContext, useEffect } from 'react'
 
 interface LoaderProps {
@@ -6,22 +7,10 @@ interface LoaderProps {
 }
 
 const Loader: React.FC<LoaderProps> = ({ loading }) => {
-    const {app} = useContext(webAppContext)
-
-    if (!loading)  {
-        app?.setHeaderColor("#1a1a1a");
-        return null;
-    }
+    if (!loading) return null;
 
     useEffect(() => {
         lockScroll()
-        
-        if (app.setHeaderColor !== undefined) {
-            app?.setHeaderColor("#822826");
-            return () => {
-                app?.setHeaderColor("#1a1a1a");
-            }
-        }
     }, [])
 
     return (

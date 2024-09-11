@@ -2,7 +2,7 @@
 
 import Loader from '@/components/loader/loader'
 import CoinMania from '@/components/screens/main/main'
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import { webAppContext } from './context'
 import { LoadingContext } from './context/LoaderContext'
 
