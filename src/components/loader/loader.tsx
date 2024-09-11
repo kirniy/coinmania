@@ -24,7 +24,7 @@ const Loader: React.FC<LoaderProps> = ({ loading }) => {
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 100 150"
                 preserveAspectRatio="xMidYMid meet"
-                style={{ width: '100%', height: '100%', maxWidth: '100vh', maxHeight: '100vw' }}
+                style={{ width: '100%', height: '100%', maxWidth: '100vw', maxHeight: '100vh' }}
             >
                 <defs>
                     <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
