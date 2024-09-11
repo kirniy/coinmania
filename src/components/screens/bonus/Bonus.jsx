@@ -65,7 +65,6 @@ function Task({task, index, isBoost = false, isCompleted = false}) {
     const isMain = index === 0 || index === 3;
 
     useEffect(() => {
-        lockScroll()
         if (isCompleted) {
             setStatus('completed')
         }
@@ -171,6 +170,8 @@ const CoinManiaBonusPage = () => {
     const [completedTasks, setCompletedTasks] = useState([]);
 
     useEffect(() => {
+        lockScroll()
+
         async function fetchTasks() {
             const req = await fetch('/api/tasks/get', { cache: 'no-store' });
             const res = await req.json();
