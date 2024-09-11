@@ -1,5 +1,5 @@
 import { lockBrowserEvents } from '@/helpers/lockBrowserEvents'
-import { lockScroll } from '@/helpers/lockScroll'
+import { lockScroll } from '@/helpers/manageScroll'
 import React, { createContext, useEffect, useState } from 'react'
 import type { TelegramWebApps } from 'telegram-webapps-types-new'
 
