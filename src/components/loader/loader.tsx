@@ -60,11 +60,11 @@ const Loader: React.FC<LoaderProps> = ({ loading }) => {
                 </defs>
 
                 <g fontSize="20">
-                    <text x="10%" y="-10" filter="url(#glow)">⭐️<animate attributeName="y" from="-10" to="160" dur="4s" repeatCount="indefinite"/></text>
-                    <text x="30%" y="-10" filter="url(#glow)">🎁<animate attributeName="y" from="-10" to="160" dur="3.5s" repeatCount="indefinite"/></text>
-                    <text x="50%" y="-10" filter="url(#glow)">🤑<animate attributeName="y" from="-10" to="160" dur="4.5s" repeatCount="indefinite"/></text>
-                    <text x="70%" y="-10" filter="url(#glow)">💎<animate attributeName="y" from="-10" to="160" dur="4s" repeatCount="indefinite"/></text>
-                    <text x="90%" y="-10" filter="url(#glow)">⭐️<animate attributeName="y" from="-10" to="160" dur="3.8s" repeatCount="indefinite"/></text>
+                    <text x="0%" y="-30" filter="url(#glow)">⭐️<animate attributeName="y" from="-30" to="190" dur="4s" repeatCount="indefinite"/></text>
+                    <text x="20%" y="-30" filter="url(#glow)">🎁<animate attributeName="y" from="-30" to="190" dur="3.5s" repeatCount="indefinite"/></text>
+                    <text x="40%" y="-30" filter="url(#glow)">🤑<animate attributeName="y" from="-30" to="190" dur="4.5s" repeatCount="indefinite"/></text>
+                    <text x="60%" y="-30" filter="url(#glow)">💎<animate attributeName="y" from="-30" to="190" dur="4s" repeatCount="indefinite"/></text>
+                    <text x="80%" y="-30" filter="url(#glow)">⭐️<animate attributeName="y" from="-30" to="190" dur="3.8s" repeatCount="indefinite"/></text>
                 </g>
 
                 <image href="https://od.lk/s/NTlfOTQyOTA1Mzhf/vnvnc%20logo.svg" x="10" y="30" width="80" height="63.58" preserveAspectRatio="xMidYMid meet">
