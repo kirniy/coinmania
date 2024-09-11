@@ -124,6 +124,8 @@ const CoinMania: React.FC = () => {
         let tapValueMultiplier = 1;
         let energyToDecrease = 1;
 
+        app.HapticFeedback.impactOccurred('soft');
+
         if (userData) {
             const userTapValue = userData.upgrades.tap_value || 1;
             const userEnergy = userData.energy;
@@ -185,12 +187,6 @@ const CoinMania: React.FC = () => {
     }
 
     const handleButtonClick = async (e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>) => {
-        if ('vibrate' in navigator) {
-            // Вибрация на 200 миллисекунд
-            navigator.vibrate(100);
-        } else {
-            console.log('Вибрация не поддерживается этим устройством');
-        }
         if (!isTouchDevice) {
             handleCoinTap(e);
         }
