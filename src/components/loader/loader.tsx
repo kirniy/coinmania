@@ -1,5 +1,5 @@
 import { webAppContext } from '@/app/context';
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 
 interface LoaderProps {
     loading: boolean;
@@ -7,10 +7,18 @@ interface LoaderProps {
 
 const Loader: React.FC<LoaderProps> = ({ loading }) => {
     const {app} = useContext(webAppContext)
+
     if (!loading)  {
         app?.setHeaderColor("#1a1a1a");
         return null;
     }
+
+    useEffect(() => {
+        app?.setHeaderColor("#822826");
+        return () => {
+            app?.setHeaderColor("#1a1a1a");
+        }
+    })
 
     return (
         <div style={{
