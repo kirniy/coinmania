@@ -1,5 +1,5 @@
 import { lockBrowserEvents } from '@/helpers/lockBrowserEvents'
-import { lockScroll } from '@/helpers/lockScroll'
+import { lockScroll } from '@/helpers/manageScroll'
 import { createContext, ReactNode, useEffect, useState } from 'react'
 
 type LoadingContextType = {
