@@ -8,11 +8,10 @@ interface LoaderProps {
 const Loader: React.FC<LoaderProps> = ({ loading }) => {
     const {app} = useContext(webAppContext)
     if (!loading)  {
-        app.setHeaderColor("#1a1a1a");
+        app?.setHeaderColor("#1a1a1a");
         return null;
     }
 
-    app.setHeaderColor("#822826");
     return (
         <div style={{
             position: 'fixed',
