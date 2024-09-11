@@ -30,21 +30,7 @@ export const WebAppProvider = ({ children }: IProps) => {
     app.ready();
     app.disableVerticalSwipes();
     app.expand();
-
-    app.setHeaderColor("#00ff00");
-    app.themeParams.header_bg_color = "#ff0000";
-    app.themeParams.bg_color = "#0000ff";
-    app.themeParams.secondary_bg_color = "#ffff00";
-
-    console.log(app);
-    
-
-    console.log("Aasdapisdpadpasdpaspidpasijqiojdqpidjpqijdip",app.headerColor);
-    console.log(app.themeParams.header_bg_color);
-    console.log(app.themeParams.bg_color);
-    console.log(app.themeParams.secondary_bg_color);
-    
-    
+    app.setHeaderColor("#000000");
 
     lockBrowserEvents();
 
