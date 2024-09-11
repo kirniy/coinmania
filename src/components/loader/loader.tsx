@@ -1,12 +1,18 @@
-import React from 'react'
+import { webAppContext } from '@/app/context';
+import React, { useContext } from 'react'
 
 interface LoaderProps {
     loading: boolean;
 }
 
 const Loader: React.FC<LoaderProps> = ({ loading }) => {
-    if (!loading) return null;
+    const {app} = useContext(webAppContext)
+    if (!loading)  {
+        app.setHeaderColor("#1a1a1a");
+        return null;
+    }
 
+    app.setHeaderColor("#822826");
     return (
         <div style={{
             position: 'fixed',
