@@ -363,14 +363,20 @@ const CoinMania: React.FC = () => {
 
                 {/* Rules and prizes */}
                 <div className="fixed w-full mx-auto top-20 px-4 z-[100] flex justify-between items-center">
-                    <button onClick={handleRulesButtonClick} className="w-16 h-16 flex justify-center items-center rounded-full relative">
-                        <div className="rounded-full" style={{position: "absolute",top: 0,left: 0,right: 0,bottom: 0,backgroundColor: "rgba(255, 255, 255, 0.1)",backdropFilter: "blur(10px)",WebkitBackdropFilter: "blur(10px)",boxShadow: "rgba(255, 255, 255, 0.2) 0px 0px 10px, rgba(255, 255, 255, 0.1) 0px 0px 15px inset",zIndex: -1}}></div>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-book"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>
-                    </button>
-                    <button onClick={handlePrizesButtonClick} className="w-16 h-16 flex justify-center items-center rounded-full relative">
-                        <div className="rounded-full" style={{position: "absolute",top: 0,left: 0,right: 0,bottom: 0,backgroundColor: "rgba(255, 255, 255, 0.1)",backdropFilter: "blur(10px)",WebkitBackdropFilter: "blur(10px)",boxShadow: "rgba(255, 255, 255, 0.2) 0px 0px 10px, rgba(255, 255, 255, 0.1) 0px 0px 15px inset",zIndex: -1}}></div>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-gift"><rect x="3" y="8" width="18" height="4" rx="1"></rect><path d="M12 8v13"></path><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"></path><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"></path></svg>
-                    </button>
+                    <div className="flex flex-col gap-1">
+                        <button onClick={handleRulesButtonClick} className="w-16 h-16 flex justify-center items-center rounded-full relative">
+                            <div className="rounded-full" style={{position: "absolute",top: 0,left: 0,right: 0,bottom: 0,backgroundColor: "rgba(255, 255, 255, 0.1)",backdropFilter: "blur(10px)",WebkitBackdropFilter: "blur(10px)",boxShadow: "rgba(255, 255, 255, 0.2) 0px 0px 10px, rgba(255, 255, 255, 0.1) 0px 0px 15px inset",zIndex: -1}}></div>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-book"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>
+                        </button>
+                        <span className="text-center text-xs">Правила</span>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <button onClick={handlePrizesButtonClick} className="w-16 h-16 flex justify-center items-center rounded-full relative">
+                            <div className="rounded-full" style={{position: "absolute",top: 0,left: 0,right: 0,bottom: 0,backgroundColor: "rgba(255, 255, 255, 0.1)",backdropFilter: "blur(10px)",WebkitBackdropFilter: "blur(10px)",boxShadow: "rgba(255, 255, 255, 0.2) 0px 0px 10px, rgba(255, 255, 255, 0.1) 0px 0px 15px inset",zIndex: -1}}></div>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-gift"><rect x="3" y="8" width="18" height="4" rx="1"></rect><path d="M12 8v13"></path><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"></path><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"></path></svg>
+                        </button>
+                        <span className="text-center text-xs">Призы</span>
+                    </div>
                     {openRules && 
                         <Modal onClose={handleCloseRules}>
                             <div className="">
