@@ -325,7 +325,7 @@ const CoinMania: React.FC = () => {
             {/* Gradient background */}
             <div className={styles.gradientBackground}></div>
             <div className={styles.radialGradientOverlay}>
-                <div className="radial-gradient-overlay"></div>
+                <div className="absolute w-full h-full" style={{background: 'radial-gradient(circle,#ff540080,#ffa50000 60%)'}}></div>
             </div>
     
             {/* Emoji animation layer */}
