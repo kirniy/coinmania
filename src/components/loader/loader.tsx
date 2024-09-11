@@ -22,7 +22,7 @@ const Loader: React.FC<LoaderProps> = ({ loading }) => {
                 app?.setHeaderColor("#1a1a1a");
             }
         }
-    })
+    }, [])
 
     return (
         <div style={{
