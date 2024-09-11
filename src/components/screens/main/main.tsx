@@ -185,7 +185,8 @@ const CoinMania: React.FC = () => {
     }
 
     const handleButtonClick = async (e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>) => {
-        if ('vibrate' in navigator) {
+        console.log('navigator', navigator)
+        if (navigator.vibrate) {
             // Вибрация на 200 миллисекунд
             navigator.vibrate(100);
         } else {
