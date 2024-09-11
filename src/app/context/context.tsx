@@ -30,7 +30,7 @@ export const WebAppProvider = ({ children }: IProps) => {
     app.ready();
     app.disableVerticalSwipes();
     app.expand();
-    app.setHeaderColor("#000000");
+    app.setHeaderColor("#1a1a1a");
 
     lockBrowserEvents();
 
