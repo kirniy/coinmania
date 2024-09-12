@@ -154,7 +154,7 @@ const Boosters: React.FC = ({}) => {
                 return (
                     <BoosterButton 
                         key={booster.name}
-                        description={booster.description}
+                        description={booster.description || ''}
                         title={booster.name}
                         isAvailable={isAvailable}
                         icon={booster.icon}
