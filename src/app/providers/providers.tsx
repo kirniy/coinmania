@@ -21,6 +21,7 @@ const AppInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) =
     if (isMounted && app.initDataUnsafe?.user?.id) {
       dispatch(fetchUserData(app.initDataUnsafe.user.id)).then(() => {
         setTimeout(() => {
+          app.setHeaderColor("#000000");
           setLoading(false);
         }, 3000) // Визуальная задержка
       });
