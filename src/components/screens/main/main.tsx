@@ -1,27 +1,27 @@
 "use client";
 
-import { CoinEmoji as EmojiType } from "@/types/coinEmoji";
+import { CoinEmoji as EmojiType } from "@/types/coinEmoji"
 
 import { webAppContext } from "@/app/context"
 import { LoadingContext } from '@/app/context/LoaderContext'
 import Loader from '@/components/loader/loader'
-import supabase from "@/db/supabase"
 import { AppDispatch } from '@/store/store'
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { updateUserEnergy, updateUserScores, updateIsRechargingEnergy } from '../../../store/userSlice'
+import { updateIsRechargingEnergy, updateUserEnergy, updateUserScores } from '../../../store/userSlice'
+import CoinEmojis from "./CoinEmojis"
 import Emoji from './Emoji'
 import styles from './Main.module.css'
-import CoinEmojis from "./CoinEmojis";
 
-import { throttle } from "@/utils/throttle";
-import { Modal } from "@/components/modal/Modal";
+import { Modal } from "@/components/modal/Modal"
+import { throttle } from "@/utils/throttle"
 
-import { PRIZES, RULES } from "@/constants/rules";
-import { Prize, Rule } from "@/components/rule/Rule";
-import { Popup } from "@/components/popup/Popup";
-import { PopupProps } from "@/types/popup";
-import { createPortal } from "react-dom";
+import { Popup } from "@/components/popup/Popup"
+import { Prize, Rule } from "@/components/rule/Rule"
+import { PRIZES, RULES } from "@/constants/rules"
+import { lockScroll } from '@/helpers/manageScroll'
+import { PopupProps } from "@/types/popup"
+import { createPortal } from "react-dom"
 
 interface RootState {
     user: {
@@ -124,6 +124,8 @@ const CoinMania: React.FC = () => {
     const handleCoinTap = async (e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>) => {
         let tapValueMultiplier = 1;
         let energyToDecrease = 1;
+
+        app.HapticFeedback.impactOccurred('soft');
 
         if (userData) {
             const userTapValue = userData.upgrades.tap_value || 1;
@@ -304,14 +306,8 @@ const CoinMania: React.FC = () => {
     }, [])
 
     useEffect(() => {
-        const preventDefault = (e: Event) => e.preventDefault();
-        document.body.style.overflow = 'hidden';
-        document.addEventListener('touchmove', preventDefault, { passive: false });
+        lockScroll()
         getRandomBgEmoji()
-        return () => {
-            document.body.style.overflow = 'auto';
-            document.removeEventListener('touchmove', preventDefault);
-        };
     }, []);
 
     const id = app.initDataUnsafe.user?.id

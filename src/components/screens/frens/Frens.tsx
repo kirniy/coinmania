@@ -1,17 +1,17 @@
 import { webAppContext } from "@/app/context"
 import { LoadingContext } from '@/app/context/LoaderContext'
 import Loader from "@/components/loader/loader"
-import { Users, XCircle, ChevronDown, ChevronUp } from 'lucide-react'
-import { useContext, useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
-import styles from './FriendsPage.module.css'; // Импортируем стили
-import { useDispatch } from "react-redux"
-import { updateUserReferred, updateUserScores } from "@/store/userSlice"
-import axios from "axios"
-import { RootState } from "@/store/rootReducer"
-import { referredUserRecord, UserData } from "@/types/user"
-import { createPortal } from "react-dom"
 import { InnerModal } from "@/components/modal/InnerModal"
+import { unlockScroll } from '@/helpers/manageScroll'
+import { RootState } from "@/store/rootReducer"
+import { updateUserReferred, updateUserScores } from "@/store/userSlice"
+import { referredUserRecord, UserData } from "@/types/user"
+import axios from "axios"
+import { ChevronDown, ChevronUp, Users, XCircle } from 'lucide-react'
+import { useContext, useEffect, useState } from 'react'
+import { createPortal } from "react-dom"
+import { useDispatch, useSelector } from 'react-redux'
+import styles from './FriendsPage.module.css'; // Импортируем стили
 
 const FriendsPage = () => {
     const {app} = useContext(webAppContext);
@@ -61,6 +61,7 @@ const FriendsPage = () => {
     const claimedReferrals = userData?.referrals.filter(referral => referral.reward_claimed);
 
     useEffect(() => {
+        unlockScroll();
         fetchUsers();
     }, []);
 

@@ -1,19 +1,18 @@
-import { Check, Instagram, Rocket, RocketIcon, Send, SquarePlus, Trophy, XCircle } from 'lucide-react'
+import { Check, ChevronRight, Coins, Instagram, Rocket, RocketIcon, Send, SquarePlus, Trophy, XCircle } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import styles from './CoinManiaBonusPage.module.css'; // Импортируем стили
 
 import { InnerModal } from '@/components/modal/InnerModal'
 import { Modal } from '@/components/modal/Modal'
+import { lockScroll } from '@/helpers/manageScroll'
 import { updateUserCompletedTasks, updateUserScores } from "@/store/userSlice"
 import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from "react-redux"
+import ActionButton from './components/ActionButton'
 import Boosters from './components/Boosters'
 import InstagramTask from './components/InstagramTask'
 import { ReferralRewards } from './components/ReferralRewards'
 import { Upgrades } from './components/Upgrades'
-
-import { ChevronRight, Coins } from 'lucide-react'
-import ActionButton from './components/ActionButton'
 
 // STYLES
 
@@ -185,6 +184,8 @@ const CoinManiaBonusPage = () => {
     const [completedTasks, setCompletedTasks] = useState([]);
 
     useEffect(() => {
+        lockScroll()
+
         async function fetchTasks() {
             const req = await fetch('/api/tasks/get', { cache: 'no-store' });
             const res = await req.json();
