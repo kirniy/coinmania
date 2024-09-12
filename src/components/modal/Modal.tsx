@@ -1,4 +1,5 @@
-import React, { PropsWithChildren, useEffect } from "react";
+import { X } from 'lucide-react'
+import { PropsWithChildren, useEffect } from "react"
 
 export interface ModalProps extends PropsWithChildren {
     onClose: () => void;
@@ -22,15 +23,13 @@ export function Modal({ children, onClose }: ModalProps) {
         };
     })
   return (
-    <div className="fixed top-0 bottom-0 left-0 right-0 w-full h-full bg-black bg-opacity-80 modal_window text-center" style={{zIndex: 200}}>
-        <div className="relative left-[50%] top-[43%] translate-x-[-50%] translate-y-[-50%] px-4 text-white">
-            <div className="fixed right-6 -top-6">
-                <button className="" onClick={onClose}>✕</button>
-            </div>
-            <div style={{zIndex: 100}} className="bg-background w-full gap-4 mx-auto p-6 shadow-lg duration-200 sm:rounded-lg bg-gradient-to-b from-gray-900 to-black border-2 border-yellow-500 text-white max-w-[23rem] max-h-[75vh] overflow-y-scroll scrollbar-hide flex flex-col rounded-2xl">
-                {children}
-            </div>
-        </div>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" onClick={onClose} style={{zIndex: 200}}>
+    <div className="bg-gray-800 rounded-xl p-6 w-full max-w-sm max-h-[70vh] overflow-y-auto relative" onClick={e => e.stopPropagation()}>
+      <button className="absolute top-2 right-2 text-gray-400 hover:text-white" onClick={onClose}>
+        <X size={24} />
+      </button>
+      {children}
     </div>
+  </div>
   );
 }
