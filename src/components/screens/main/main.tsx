@@ -125,6 +125,8 @@ const CoinMania: React.FC = () => {
         let tapValueMultiplier = 1;
         let energyToDecrease = 1;
 
+        app.HapticFeedback.impactOccurred('soft');
+
         if (userData) {
             const userTapValue = userData.upgrades.tap_value || 1;
             const userEnergy = userData.energy;
