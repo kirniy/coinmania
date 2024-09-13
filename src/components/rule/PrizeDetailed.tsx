@@ -3,7 +3,7 @@ import React from "react";
 
 export function PrizeDetailed(props: PrizeProps) {
   return (
-    <div className="flex flex-col space-y-1.5 text-center sm:text-left gap-4">
+    <div className="flex flex-col space-y-1.5 text-center sm:text-left gap-4 text-white">
       <h2 className="text-lg font-semibold leading-none tracking-tight text-center text-yellow-400">
         {props.title}
       </h2>
