@@ -368,27 +368,31 @@ const CoinMania: React.FC = () => {
                         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-gift"><rect x="3" y="8" width="18" height="4" rx="1"></rect><path d="M12 8v13"></path><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"></path><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"></path></svg>
                     </button>
                     {openRules && 
-                        <Modal onClose={handleCloseRules}>
+                        createPortal(
+                            <Modal onClose={handleCloseRules}>
                             <div className="">
                                 <h2 className="text-lg font-semibold leading-none tracking-tight text-center text-yellow-400">Правила игры</h2>
                             </div>
                             {RULES.map((rule, idx) => (
                                 <Rule key={idx * 0.8829} text={rule.text} icon={rule.icon} />
                             ))}
-                        </Modal>
-                    }
+                        </Modal>,
+                        document.body
+                        )}
                     {openPrizes &&
-                        <Modal onClose={handleClosePrizes}>
-                            <div className="">
-                                <h2 className="text-lg font-semibold leading-none tracking-tight text-center text-yellow-400">Призы</h2>
-                            </div>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                                {PRIZES.map((prize, idx) => (
-                                    <Prize key={idx * 0.12829} {...prize} />
-                                ))}
-                            </div>
-                        </Modal>
-                    }
+                        createPortal(
+                            <Modal onClose={handleClosePrizes}>
+                                <div className="">
+                                    <h2 className="text-lg font-semibold leading-none tracking-tight text-center text-yellow-400">Призы</h2>
+                                </div>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                                    {PRIZES.map((prize, idx) => (
+                                        <Prize key={idx * 0.12829} {...prize} />
+                                    ))}
+                                </div>
+                            </Modal>,
+                            document.body
+                        )}
                 </div>
     
                 {/* Main coin */}
