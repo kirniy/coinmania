@@ -15,8 +15,8 @@ interface InnerModalProps extends ModalProps {
 
 export function InnerModal(props: InnerModalProps) {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" onClick={props.onClose} style={{zIndex: 300}}>
-    <div className="bg-gray-800 rounded-xl p-6 w-full max-w-sm max-h-[70vh] overflow-y-auto relative" onClick={e => e.stopPropagation()}>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 backdrop-blur-[5px]" onClick={props.onClose} style={{zIndex: 300}}>
+    <div className="bg-gray-800 rounded-xl p-6 w-full max-w-sm max-h-[80vh] overflow-y-auto relative scrollbar-hide" onClick={e => e.stopPropagation()}>
       <button className="absolute top-2 right-2 text-gray-400 hover:text-white" onClick={props.onClose}>
         <X size={24} />
       </button>
