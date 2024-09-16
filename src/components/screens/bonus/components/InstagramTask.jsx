@@ -122,7 +122,7 @@ const InstagramTask = ({task, index, isCompleted = false}) => {
         <React.Fragment> 
             <button 
                 className="bg-gradient-to-r from-gray-700 to-gray-600 text-white p-2 rounded-lg shadow-lg text-left w-full mb-2 flex items-center justify-between transition-all hover:from-gray-600 hover:to-gray-500"
-                onClick={() => handleButtonClick(setShowTasksModal)}
+                onClick={() => handleButtonClick(task.id)}
                 disabled={status === 'completed' || status === 'checking'}
                 style={status === 'completed' || status === 'checking' ? {opacity: 0.5} : {}}
             >
