@@ -15,5 +15,4 @@ export default function Home() {
   }
 
   return <>{app.version ? <CoinMania /> : <Loader loading={isLoading} />}</>;
-  // return <>{<Loader loading={!isLoading} />}</>;
 }
