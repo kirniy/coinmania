@@ -1,27 +1,27 @@
 "use client";
 
-import { CoinEmoji as EmojiType } from "@/types/coinEmoji";
+import { CoinEmoji as EmojiType } from "@/types/coinEmoji"
 
 import { webAppContext } from "@/app/context"
 import { LoadingContext } from '@/app/context/LoaderContext'
 import Loader from '@/components/loader/loader'
-import supabase from "@/db/supabase"
 import { AppDispatch } from '@/store/store'
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { updateUserEnergy, updateUserScores, updateIsRechargingEnergy } from '../../../store/userSlice'
+import { updateIsRechargingEnergy, updateUserEnergy, updateUserScores } from '../../../store/userSlice'
+import CoinEmojis from "./CoinEmojis"
 import Emoji from './Emoji'
 import styles from './Main.module.css'
-import CoinEmojis from "./CoinEmojis";
 
-import { throttle } from "@/utils/throttle";
-import { Modal } from "@/components/modal/Modal";
+import { Modal } from "@/components/modal/Modal"
+import { throttle } from "@/utils/throttle"
 
-import { PRIZES, RULES } from "@/constants/rules";
-import { Prize, Rule } from "@/components/rule/Rule";
-import { Popup } from "@/components/popup/Popup";
-import { PopupProps } from "@/types/popup";
-import { createPortal } from "react-dom";
+import { Popup } from "@/components/popup/Popup"
+import { Prize, Rule } from "@/components/rule/Rule"
+import { PRIZES, RULES } from "@/constants/rules"
+import { lockScroll } from '@/helpers/manageScroll'
+import { PopupProps } from "@/types/popup"
+import { createPortal } from "react-dom"
 
 interface RootState {
     user: {
@@ -128,6 +128,8 @@ const CoinMania: React.FC = () => {
     const handleCoinTap = async (e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>) => {
         let tapValueMultiplier = 1;
         let energyToDecrease = 1;
+
+        app.HapticFeedback.impactOccurred('soft');
 
         if (userData) {
             const userTapValue = userData.upgrades.tap_value || 1;
@@ -308,14 +310,8 @@ const CoinMania: React.FC = () => {
     }, [])
 
     useEffect(() => {
-        const preventDefault = (e: Event) => e.preventDefault();
-        document.body.style.overflow = 'hidden';
-        document.addEventListener('touchmove', preventDefault, { passive: false });
+        lockScroll()
         getRandomBgEmoji()
-        return () => {
-            document.body.style.overflow = 'auto';
-            document.removeEventListener('touchmove', preventDefault);
-        };
     }, []);
 
     const id = app.initDataUnsafe.user?.id
@@ -376,27 +372,31 @@ const CoinMania: React.FC = () => {
                         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-gift"><rect x="3" y="8" width="18" height="4" rx="1"></rect><path d="M12 8v13"></path><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"></path><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"></path></svg>
                     </button>
                     {openRules && 
-                        <Modal onClose={handleCloseRules}>
+                        createPortal(
+                            <Modal onClose={handleCloseRules}>
                             <div className="">
                                 <h2 className="text-lg font-semibold leading-none tracking-tight text-center text-yellow-400">Правила игры</h2>
                             </div>
                             {RULES.map((rule, idx) => (
                                 <Rule key={idx * 0.8829} text={rule.text} icon={rule.icon} />
                             ))}
-                        </Modal>
-                    }
+                        </Modal>,
+                        document.body
+                        )}
                     {openPrizes &&
-                        <Modal onClose={handleClosePrizes}>
-                            <div className="">
-                                <h2 className="text-lg font-semibold leading-none tracking-tight text-center text-yellow-400">Призы</h2>
-                            </div>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                                {PRIZES.map((prize, idx) => (
-                                    <Prize key={idx * 0.12829} {...prize} />
-                                ))}
-                            </div>
-                        </Modal>
-                    }
+                        createPortal(
+                            <Modal onClose={handleClosePrizes}>
+                                <div className="">
+                                    <h2 className="text-lg font-semibold leading-none tracking-tight text-center text-yellow-400">Призы</h2>
+                                </div>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                                    {PRIZES.map((prize, idx) => (
+                                        <Prize key={idx * 0.12829} {...prize} />
+                                    ))}
+                                </div>
+                            </Modal>,
+                            document.body
+                        )}
                 </div>
     
                 {/* Main coin */}

@@ -1,6 +1,13 @@
+import { lockScroll } from '@/helpers/manageScroll'
 import Image from 'next/image'
+import { useEffect } from 'react'
 
 export default function LockDesktop() {
+
+    useEffect(() => {
+        lockScroll()
+    }, [])
+
   return (
       <div className="h-screen w-full bg-black text-center flex items-center justify-center pt-4">
           <div className="flex flex-col items-center justify-center">

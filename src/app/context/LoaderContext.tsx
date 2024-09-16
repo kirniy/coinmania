@@ -1,4 +1,5 @@
-import { createContext, ReactNode, useState } from 'react';
+import { lockBrowserEvents } from '@/helpers/lockBrowserEvents'
+import { createContext, ReactNode, useEffect, useState } from 'react'
 
 type LoadingContextType = {
   isLoading: boolean;
@@ -16,6 +17,10 @@ type Props = { children: ReactNode };
 
 const LoadingProvider = ({ children }: Props) => {
   const [isLoading, setLoading] = useState(true);
+
+  useEffect(()=> {
+    lockBrowserEvents();
+  }, [])
 
   return (
     <LoadingContext.Provider value={{ isLoading, setLoading }}>
