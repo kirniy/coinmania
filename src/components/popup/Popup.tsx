@@ -15,7 +15,7 @@ export function Popup({ popup }: PopupType) {
     };
   }, []);
   return (
-    <div className="popup-active fixed w-[calc(100%-64px)] top-0 left-8 right-8 min-h-fit flex justify-center z-[150]">
+    <div className="popup-active fixed w-[calc(100%-64px)] top-0 left-8 right-8 min-h-fit flex justify-center z-[350]">
       <div className="mt-2 p-2 flex gap-2 text-sm rounded-lg border border-yellow-500 relative">
         <div style={popupBgStyle}></div>
         {popup.pic === "info" && (
