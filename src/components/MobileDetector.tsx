@@ -17,14 +17,12 @@ const useIsMobile = () => {
       /Windows Phone/i
     ];
 
-    setIsMobile(true);
-
-    // if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'development') {
-    //   setIsMobile(true);
-    // } else {
-    //   const userAgent = navigator.userAgent || navigator.vendor;
-    //   setIsMobile(toMatch.some((toMatchItem) => userAgent.match(toMatchItem)));
-    // }
+    if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'development') {
+      setIsMobile(true);
+    } else {
+      const userAgent = navigator.userAgent || navigator.vendor;
+      setIsMobile(toMatch.some((toMatchItem) => userAgent.match(toMatchItem)));
+    }
   }, []);
 
   return isMobile;
