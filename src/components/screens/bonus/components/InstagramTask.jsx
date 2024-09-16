@@ -1,9 +1,12 @@
 import { InnerModal } from '@/components/modal/InnerModal'
 import { Modal } from '@/components/modal/Modal'
 import { updateUserCompletedTasks, updateUserScores } from "@/store/userSlice"
+import { Check, Coins, Rocket } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from "react-redux"
+import ActionButton from './ActionButton'
+import { Popup } from '@/components/popup/Popup'
 
 const buttonStyle = {
     transition: 'all 0.3s ease',
@@ -38,7 +41,6 @@ const inputStyle = () => ({
     background: 'rgba(0, 0, 0, 0.3)',
     borderRadius: '10px',
     padding: '5px 10px',
-    margin: '5px auto',
     border: '2px solid rgb(255, 255, 255)',
     display: 'flex',
     alignItems: 'center',
@@ -58,6 +60,9 @@ const InstagramTask = ({task, index, isCompleted = false}) => {
     const [showSuccessAlert, setShowSuccessAlert] = useState([false, null]);
     const [showAlertSubscrNotFound, setShowAlertSubscrNotFound] = useState([false, null]);
     const [showErrorAlert, setShowErrorAlert] = useState([false, null]);
+
+    const [showSuccessCopiedMessage, setShowSuccessCopiedMessage] = useState([false, null]);
+
     const [status, setStatus] = useState('pending');
 
     const isMain = index === 0 || index === 3;
@@ -116,23 +121,46 @@ const InstagramTask = ({task, index, isCompleted = false}) => {
     return (
         <React.Fragment> 
             <button 
-                onClick={() => handleButtonClick(task.id)} 
-                style={taskButtonStyle(task, status, isMain)} 
+                className="bg-gradient-to-r from-gray-700 to-gray-600 text-white p-2 rounded-lg shadow-lg text-left w-full mb-2 flex items-center justify-between transition-all hover:from-gray-600 hover:to-gray-500"
+                onClick={() => handleButtonClick(task.id)}
                 disabled={status === 'completed' || status === 'checking'}
+                style={status === 'completed' || status === 'checking' ? {opacity: 0.5} : {}}
             >
-                {task.name}
-                <br />
-                <span style={{fontSize: '0.8em', display: 'inline-flex', lineHeight: '20px'}}>{status === 'completed' ? `✅ ${task.reward / 1000}K` : `${task.reward / 1000}K`}<img src='/images/coin.png' width={20} alt="Coin" style={{display: 'inline-flex', marginLeft: '5px'}}/></span>
-            </button>
+                <span className="text-sm font-bold truncate mr-2">{task.name}</span>
+                {status === 'completed' ? (
+                    <div className="flex items-center bg-yellow-400 text-black px-2 py-1 rounded-full">
+                        <span className="text-xs font-bold">Завершено</span>
+                    </div>
+                ) : (
+                    <div className="flex items-center bg-yellow-400 text-black px-2 py-1 rounded-full">
+                        <Coins size={14} className="mr-1" />
+                        <span className="text-xs font-bold">{task.reward}</span>
+                    </div>
+                )}
+            </button> 
             {showTasksModal && 
             createPortal(
                 <Modal onClose={handleModalClose}>
-                    <h3 className="text-yellow-500 text-xl font-bold mb-3">{task.platform}</h3>
-                    <p className="text-white mb-4">Ваш код {userKey}. Нажмите на кнопку для копирования кода и перехода в {task.name}. После подписки отправте код к нам в директ, а ответный введите в инпут и нажмите проверить.</p>
+                    <div className="flex items-center mb-4">
+                        <h3 className="text-white text-xl font-bold">{task.name}</h3>
+                    </div>
+                    <p className="text-white text-sm mb-4">Награда: {task.reward} 🪙</p>
+                    <ActionButton
+                        icon={Rocket}
+                        label="Копировать и Подписаться"
+                        primary
+                        large
+                        onClick={() => {
+                            navigator?.clipboard?.writeText(userKey);
+                            setShowSuccessCopiedMessage([true, null]);
 
-                    <a href={task.link} className="w-full bg-yellow-500 text-center text-gray-900 py-2 rounded-lg font-semibold">Копировать и Подписаться</a>
-                    <input type="text" autoCapitalize="off" autoComplete="off" style={inputStyle()} onChange={(e)=>setInputValue(e.target.value)}/>
-                    <button disabled={inputValue?.length === 0} onClick={() => handleVerifyButtonClick(task.id)} style={inputValue?.length === 0 ? disabledButtonStyle() : {}} className="w-full bg-gray-700 text-white py-2 rounded-lg font-semibold">Проверить</button>
+                            setTimeout(() => {
+                                window.open(task.link);
+                            }, 3000)
+                        }}
+                    />
+                    <input className='mb-3' type="text" autoCapitalize="off" autoComplete="off" style={inputStyle()} onChange={(e)=>setInputValue(e.target.value)}/>
+                    <ActionButton icon={Check} label="Проверить" disabled={inputValue?.length === 0} onClick={() => handleVerifyButtonClick(task.id)} style={inputValue?.length === 0 ? disabledButtonStyle() : {}} large />
                 </Modal>,
                 document.body
             )}
@@ -146,6 +174,17 @@ const InstagramTask = ({task, index, isCompleted = false}) => {
             )}
             {showErrorAlert[0] && createPortal(
                 <InnerModal type='confirm' onClose={handleCloseAlert} title='Ошибка' description={showErrorAlert[1]} confirmMessage='Закрыть'/>,
+                document.body
+            )}
+            {showSuccessCopiedMessage[0] && createPortal(
+                <Popup
+                    popup={{
+                        text: 'Код скопирован в буфер обемна! Сейчас вы будете перенаправлены в Instagram',
+                        pic: 'success',
+                        duration: 3000,
+                        setState: setShowSuccessCopiedMessage,
+                    }}
+                />,
                 document.body
             )}
         </React.Fragment>

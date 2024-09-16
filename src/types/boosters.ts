@@ -5,5 +5,6 @@ export type Booster = {
     duration: number,
     maxUsePerDay: number,
     action: string,
+    icon: any,
     bgColor: string,
 };

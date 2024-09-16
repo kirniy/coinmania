@@ -1,26 +1,24 @@
-import { BOOSTERS } from '@/constants/earn';
-import React from 'react';
-import axios from 'axios';
-import { useSelector, useDispatch } from 'react-redux';
-import { AppDispatch } from '@/store/store';
-import { updateUserEnergy } from '@/store/userSlice';
+import { BOOSTERS } from '@/constants/earn'
 import { RootState } from '@/store/rootReducer'
-import styles from './Boosters.module.css';
-import { startCountdown } from '@/store/userSlice';
+import { AppDispatch } from '@/store/store'
+import { startCountdown, updateUserEnergy } from '@/store/userSlice'
+import axios from 'axios'
+import React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
+import { InnerModal } from '@/components/modal/InnerModal'
+import { Popup } from '@/components/popup/Popup'
 import {
-    updateUserTapBoosterCount,
-    updateUserTapBoosterLastTime,
     updateUserFullTankCount,
     updateUserFullTankLastTime,
+    updateUserTapBoosterCount,
+    updateUserTapBoosterLastTime,
     updateUserTapBoostRemainingTime,
-} from "@/store/userSlice";
-import { Booster } from '@/types/boosters';
-import { Popup } from '@/components/popup/Popup';
-import { PopupProps } from '@/types/popup';
-import { showPopup } from '@/utils/showPopup';
-import { createPortal } from 'react-dom';
-import { InnerModal } from '@/components/modal/InnerModal';
+} from "@/store/userSlice"
+import { Booster } from '@/types/boosters'
+import { PopupProps } from '@/types/popup'
+import { createPortal } from 'react-dom'
+import BoosterButton from './BoosterButton'
 
 const Boosters: React.FC = ({}) => {
     const dispatch = useDispatch<AppDispatch>();
@@ -151,20 +149,18 @@ const Boosters: React.FC = ({}) => {
         <div className="flex flex-col gap-4">
             {BOOSTERS.map(booster => {
                 const isAvailable = ((userData && userData[`daily_${booster.slug}_count`]) ?? booster.maxUsePerDay) > 0;
+                const count = ((userData && userData[`daily_${booster.slug}_count`]) ?? booster.maxUsePerDay) + '/' + booster.maxUsePerDay
+
                 return (
-                    <div className="flex flex-col gap-1" key={booster.name}>
-                        <span className="text-white">
-                            {booster.description}
-                        </span>
-                        <button
-                            key={booster.name}
-                            onClick={(e) => {handleBoosterClick(booster, e)}}
-                            className={styles.button}
-                            style={dynamicStyles(booster, isAvailable)}
-                        >
-                            {booster.name} ({(userData && userData[`daily_${booster.slug}_count`]) ?? booster.maxUsePerDay} / {booster.maxUsePerDay})
-                        </button>
-                    </div>
+                    <BoosterButton 
+                        key={booster.name}
+                        description={booster.description || ''}
+                        title={booster.name}
+                        isAvailable={isAvailable}
+                        icon={booster.icon}
+                        count={count}
+                        onClick={(e) => {handleBoosterClick(booster, e)}}
+                    />
                 )
             })}
             {showPopupEnergy[0] && createPortal(

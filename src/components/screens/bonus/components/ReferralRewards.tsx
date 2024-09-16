@@ -1,17 +1,17 @@
-import styles from '../CoinManiaBonusPage.module.css';
-import { REFERRAL_TASKS } from '@/constants/earn';
-import GetRewardButton from '@/components/common/GetRewardButton';
-import InfoBox from '@/components/common/InfoBox';
+import GetRewardButton from '@/components/common/GetRewardButton'
+import InfoBox from '@/components/common/InfoBox'
+import { ProgressBar } from '@/components/common/ProgressBar'
+import { InnerModal } from '@/components/modal/InnerModal'
+import { REFERRAL_TASKS } from '@/constants/earn'
+import { RootState } from '@/store/rootReducer'
+import { updateUserReferralReward, updateUserScores } from '@/store/userSlice'
+import { userReferralReward } from '@/types/referralReward'
+import { getFormattedNumber } from '@/utils/getFormattedNumber'
 import { XCircle } from 'lucide-react'
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '@/store/rootReducer';
-import { updateUserReferralReward, updateUserScores } from '@/store/userSlice';
-import { userReferralReward } from '@/types/referralReward';
-import { createPortal } from 'react-dom';
-import { useState } from 'react';
-import { InnerModal } from '@/components/modal/InnerModal';
-import { ProgressBar } from '@/components/common/ProgressBar';
-import { getFormattedNumber } from '@/utils/getFormattedNumber';
+import { useState } from 'react'
+import { createPortal } from 'react-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import styles from '../CoinManiaBonusPage.module.css'
 
 type ReferralRewardsProps = {
     setShowRewards: (state: boolean) => void,
@@ -66,7 +66,7 @@ const ReferralRewards: React.FC<ReferralRewardsProps> = ({ setShowRewards }) => 
         <div className={styles.tasksPopup}>
             <div className={styles.tasksPopupContent}>
                 <div className={styles.tasksPopupHeader}>
-                    <h2 className={styles.tasksPopupTitle}>🎁 Награды</h2>
+                    <h2 className={styles.tasksPopupTitle}>Награды</h2>
                     <button onClick={() => setShowRewards(false)} className={styles.closeButton}><XCircle size={30} /></button>
                 </div>
                 <InfoBox>

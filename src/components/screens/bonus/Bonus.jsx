@@ -1,18 +1,18 @@
-import { XCircle } from 'lucide-react'
+import { Check, ChevronRight, Coins, Instagram, Rocket, RocketIcon, Send, SquarePlus, Trophy, XCircle } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import styles from './CoinManiaBonusPage.module.css'; // Импортируем стили
 
-import InfoBox from "@/components/common/InfoBox"
 import { InnerModal } from '@/components/modal/InnerModal'
 import { Modal } from '@/components/modal/Modal'
 import { lockScroll } from '@/helpers/manageScroll'
 import { updateUserCompletedTasks, updateUserScores } from "@/store/userSlice"
 import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from "react-redux"
+import ActionButton from './components/ActionButton'
 import Boosters from './components/Boosters'
 import InstagramTask from './components/InstagramTask'
 import { ReferralRewards } from './components/ReferralRewards'
-import { Upgrades } from "./components/Upgrades"
+import { Upgrades } from './components/Upgrades'
 
 // STYLES
 
@@ -119,26 +119,38 @@ function Task({task, index, isBoost = false, isCompleted = false}) {
     }
 
     return (
-        <React.Fragment> 
+        <React.Fragment>
             <button 
-                onClick={() => handleButtonClick(setShowTasksModal)} 
-                style={taskButtonStyle(task, status, isMain)} 
+                className="bg-gradient-to-r from-gray-700 to-gray-600 text-white p-2 rounded-lg shadow-lg text-left w-full mb-2 flex items-center justify-between transition-all hover:from-gray-600 hover:to-gray-500"
+                onClick={() => handleButtonClick(setShowTasksModal)}
                 disabled={status === 'completed' || status === 'checking'}
+                style={status === 'completed' || status === 'checking' ? {opacity: 0.5} : {}}
             >
-                {task.name}
-                <br />
-                <span style={{fontSize: '0.8em', display: 'inline-flex', lineHeight: '20px'}}>{status === 'completed' ? `✅ ${task.reward / 1000}K` : `${task.reward / 1000}K`}<img src='/images/coin.png' width={20} alt="Coin" style={{display: 'inline-flex', marginLeft: '5px'}}/></span>
-            </button>
+                <span className="text-sm font-bold truncate mr-2">{task.name}</span>
+                {status === 'completed' ? (
+                    <div className="flex items-center bg-yellow-400 text-black px-2 py-1 rounded-full">
+                        <span className="text-xs font-bold">Завершено</span>
+                    </div>
+                ) : (
+                    <div className="flex items-center bg-yellow-400 text-black px-2 py-1 rounded-full">
+                        <Coins size={14} className="mr-1" />
+                        <span className="text-xs font-bold">{task.reward}</span>
+                    </div>
+                )}
+            </button> 
             {showTasksModal && 
             createPortal(
                 <Modal onClose={handleModalClose}>
-                    <h3 className="text-yellow-500 text-xl font-bold mb-3">{task.platform}</h3>
-                    <p className="text-white mb-4">{task.name}</p>
-                    <a href={task.link} className="w-full bg-yellow-500 text-center text-gray-900 py-2 rounded-lg font-semibold">{isBoost ? 'Забустить' : 'Подписаться'}</a>
+                    <div className="flex items-center mb-4">
+                        <h3 className="text-white text-xl font-bold">{task.name}</h3>
+                    </div>
+                    <p className="text-white text-sm mb-4">Награда: {task.reward} 🪙</p>
+                    <ActionButton icon={Rocket} label={isBoost ? 'Забустить' : 'Подписаться'} primary large isLink={true} link={task.link} />
+                    
                     {isBoost ? (
-                        <button onClick={() => handleVerifyBoostButtonClick(task.id)} className="w-full bg-gray-700 text-white py-2 rounded-lg font-semibold">Проверить</button>
+                        <ActionButton icon={Check} label="Проверить" onClick={() => handleVerifyBoostButtonClick(task.id)} large />
                     ) : (
-                        <button onClick={() => handleVerifyButtonClick(task.id)} className="w-full bg-gray-700 text-white py-2 rounded-lg font-semibold">Проверить</button>
+                        <ActionButton icon={Check} label="Проверить" onClick={() => handleVerifyButtonClick(task.id)} large />
                     )}
                 </Modal>,
                 document.body
@@ -165,6 +177,8 @@ const CoinManiaBonusPage = () => {
     const dispatch = useDispatch();
 
     const [showTasks, setShowTasks] = useState(false);
+    const [showBusters, setShowBusters] = useState(false);
+    const [showUpgrades, setShowUpgrades] = useState(false);
     const [showRewards, setShowRewards] = useState(false);
     const [tasks, setTasks] = useState([]);
     const [completedTasks, setCompletedTasks] = useState([]);
@@ -202,56 +216,101 @@ const CoinManiaBonusPage = () => {
     return (
         <div className={styles.container}>
             <div className={styles.content}>
-                <div className={styles.bonusSection}>
-
-                    <div className="flex flex-col gap-4">
-                        <h2 className={styles.title}>🚀 Бустеры</h2>
-                        <Boosters>
-                        </Boosters>
-
-                        <InfoBox>
-                            Каждый бустер можно использовать только 3 раза в день, после истечения 24-х часов их можно будет использовать снова.
-                        </InfoBox>
+                <button 
+                    className="w-full p-4 flex justify-between items-center bg-gray-700 rounded-xl mb-6"
+                    onClick={() => setShowBusters(true)}
+                >
+                    <div className="flex items-center">
+                    <Rocket size={24} className="mr-2 text-white"/>
+                    <h2 className="text-lg font-bold text-white">Бустеры</h2>
                     </div>
-                </div>
-
-                <div className={styles.bonusSection}>
-
-                    <div className="flex flex-col gap-4">
-                        <h2 className={styles.title}>🚀 Улучшения</h2>
-                        <Upgrades>
-                        </Upgrades>
-
-                        <InfoBox>
-                            Улучшения можно купить за коины и они будут действовать постоянно.
-                        </InfoBox>
-                    </div>
-                </div>
-
-                <button onClick={() => setShowTasks(true)} className={styles.tasksButton}>
-                    ✅ Задания
+                    <ChevronRight size={24} className='text-white'/>
                 </button>
 
-                <button onClick={() => setShowRewards(true)} className={styles.tasksButton}>
-                    🎁 Награды
+                <button 
+                    className="w-full p-4 flex justify-between items-center bg-gray-700 rounded-xl mb-6"
+                    onClick={() => setShowUpgrades(true)}
+                >
+                    <div className="flex items-center">
+                    <SquarePlus size={24} className="mr-2 text-white"/>
+                    <h2 className="text-lg font-bold text-white">Улучшения</h2>
+                    </div>
+                    <ChevronRight size={24} className='text-white'/>
+                </button>
+
+                <button 
+                    className="w-full p-4 flex justify-between items-center bg-gray-700 rounded-xl mb-6"
+                    onClick={() => setShowTasks(true)}
+                >
+                    <div className="flex items-center">
+                    <Coins size={24} className="mr-2 text-white" />
+                    <h2 className="text-lg font-bold text-white">Задания</h2>
+                    </div>
+                    <ChevronRight size={24} className='text-white'/>
+                </button>
+
+                <button 
+                    className="w-full p-4 flex justify-between items-center bg-gray-700 rounded-xl mb-6"
+                    onClick={() => setShowRewards(true)}
+                >
+                    <div className="flex items-center">
+                    <Trophy size={24} className="mr-2 text-white"/>
+                    <h2 className="text-lg font-bold text-white">Награды</h2>
+                    </div>
+                    <ChevronRight size={24} className='text-white'/>
                 </button>
             </div>
+
+            {showBusters && (
+                <div className={styles.tasksPopup}>
+                    <div className={styles.tasksPopupContent}>
+                        <div className={styles.tasksPopupHeader}>
+                            <h2 className={styles.tasksPopupTitle}>Бустеры</h2>
+                            <button onClick={() => setShowBusters(false)} className={styles.closeButton}><XCircle size={30} /></button>
+                        </div>
+                        <div style={infoBoxStyle}>
+                            <p style={{fontSize: '0.9rem', lineHeight: '1.4'}}>Бустеры дают быстрый разовый эффект Каждый бустер доступен 3 раза в сутки, бесплатно</p>
+                        </div>
+
+                        <Boosters/>
+                    </div>
+                </div>
+            )}
+
+            {showUpgrades && (
+                <div className={styles.tasksPopup}>
+                    <div className={styles.tasksPopupContent}>
+                        <div className={styles.tasksPopupHeader}>
+                            <h2 className={styles.tasksPopupTitle}>Бустеры</h2>
+                            <button onClick={() => setShowUpgrades(false)} className={styles.closeButton}><XCircle size={30} /></button>
+                        </div>
+                        <div style={infoBoxStyle}>
+                            <p style={{fontSize: '0.9rem', lineHeight: '1.4'}}>Улучшения дают постоянный эффект и прокачивают ваши возможности с каждым новым купленным левелом</p>
+                        </div>
+
+                        <Upgrades />
+                    </div>
+                </div>
+            )}
 
             {/* Tasks Pop-up */}
             {showTasks && (
                 <div className={styles.tasksPopup}>
                     <div className={styles.tasksPopupContent}>
                         <div className={styles.tasksPopupHeader}>
-                            <h2 className={styles.tasksPopupTitle}>✅ Задания</h2>
+                            <h2 className={styles.tasksPopupTitle}>Задания</h2>
                             <button onClick={() => setShowTasks(false)} className={styles.closeButton}><XCircle size={30} /></button>
                         </div>
                         <div style={infoBoxStyle}>
-                            <p style={{fontSize: '0.9rem', lineHeight: '1.4'}}>Для проверки подписки на каждый аккаунт мы проведем проверку. Для Telegram это займет 15 минут. Для Instagram может потребоваться до 24 часов. Вернитесь в этот раздел позже, чтобы проверить прогресс верификации. В случае успеха вы получите награды на баланс Coinmania.</p>
+                            <p style={{fontSize: '0.9rem', lineHeight: '1.4'}}>Подпишись на нас в соцсетях, выполни другие задания, и быстро получи крупные бонусы на баланс VNVNC</p>
                         </div>
                         {tasks.find(task => task.platform === "Подписки Telegram") && (
-                            <div style={{marginBottom: '25px'}}>
-                                <h3 className={styles.tasksPopupPlatform}>Подписки Telegram</h3>
-                                <div className={styles.taskButtonGrid}>
+                            <div className={`bg-blue-700 rounded-xl overflow-hidden shadow-lg mb-5`}>
+                                <div className={`p-3 flex items-center`}>
+                                    <Send size={20} className="mr-2" />
+                                    <h3 className="text-lg font-bold">Подписки Telegram</h3>
+                                </div>
+                                <div className="p-2 bg-gray-800 bg-opacity-30">
                                     {tasks.map((task, idx) => task.platform === "Подписки Telegram" &&  (
                                         <Task task={task} key={task.platform + idx} index={idx} isCompleted={checkIsCompleted(task.id)}/>
                                     ))}
@@ -259,9 +318,12 @@ const CoinManiaBonusPage = () => {
                             </div>
                         )}
                         {tasks.find(task => task.platform === "Подписки Instagram") && (
-                            <div style={{marginBottom: '25px'}}>
-                                <h3 className={styles.tasksPopupPlatform}>Подписки Instagram</h3>
-                                <div className={styles.taskButtonGrid}>
+                            <div className={`bg-purple-700 rounded-xl overflow-hidden shadow-lg mb-5`}>
+                                <div className={`p-3 flex items-center`}>
+                                    <Instagram size={20} className="mr-2" />
+                                    <h3 className="text-lg font-bold">Подписки Instagram</h3>
+                                </div>
+                                <div className="p-2 bg-gray-800 bg-opacity-30">
                                     {tasks.map((task, idx) => task.platform === "Подписки Instagram" && (
                                         <InstagramTask task={task} key={task.platform + (idx * 3.1415)} index={idx} isCompleted={checkIsCompleted(task.id)}/>
                                     ))}
@@ -269,9 +331,12 @@ const CoinManiaBonusPage = () => {
                             </div>
                         )}
                         {tasks.find(task => task.platform === "Буст Telegram Каналов") && (
-                            <div style={{marginBottom: '25px'}}>
-                                <h3 className={styles.tasksPopupPlatform}>Буст Telegram Каналов</h3>
-                                <div className={styles.taskButtonGrid}>
+                            <div className={`bg-teal-700 rounded-xl overflow-hidden shadow-lg mb-5`}>
+                                <div className={`p-3 flex items-center`}>
+                                    <RocketIcon size={20} className="mr-2" />
+                                    <h3 className="text-lg font-bold">Буст Telegram Каналов</h3>
+                                </div>
+                                <div className="p-2 bg-gray-800 bg-opacity-30">
                                     {tasks.map((task, idx) => task.platform === "Буст Telegram Каналов" && (
                                         <Task task={task} key={task.platform + (idx * 1.1514)} index={idx} isBoost={true} isCompleted={checkIsCompleted(task.id)}/>
                                     ))}
