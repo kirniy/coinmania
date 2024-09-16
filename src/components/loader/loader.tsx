@@ -1,5 +1,6 @@
+import { webAppContext } from '@/app/context';
 import { lockScroll } from '@/helpers/manageScroll'
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 
 interface LoaderProps {
     loading: boolean;

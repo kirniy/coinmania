@@ -98,6 +98,10 @@ const CoinMania: React.FC = () => {
     useEffect(() => {
         const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
         setIsTouchDevice(isTouch);
+        app.setHeaderColor("#1a1a1a");
+        return () => {
+            app.setHeaderColor("#000000");
+        }
     }, [])
 
     const [showTimer, setShowTimer] = useState(false);
