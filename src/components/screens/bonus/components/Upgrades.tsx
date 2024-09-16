@@ -1,12 +1,12 @@
-import React, { useState } from "react";
-import { upgrade, upgradeLevel, UPGRADES, upgradeType } from "@/constants/upgrades";
-import styles from './Upgrades.module.css';
+import { upgradeLevel, UPGRADES, upgradeType } from "@/constants/upgrades"
+import React, { useState } from "react"
 
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "@/store/rootReducer";
-import { updateUserMaxEnergy, updateUserScores, updateUserUpgrades } from "@/store/userSlice";
-import { createPortal } from "react-dom";
-import { InnerModal } from "@/components/modal/InnerModal";
+import { InnerModal } from "@/components/modal/InnerModal"
+import { RootState } from "@/store/rootReducer"
+import { updateUserMaxEnergy, updateUserScores, updateUserUpgrades } from "@/store/userSlice"
+import { createPortal } from "react-dom"
+import { useDispatch, useSelector } from "react-redux"
+import UpgradeItem from './UpgradeItem'
 
 export const Upgrades: React.FC = () => {
 
@@ -51,44 +51,21 @@ export const Upgrades: React.FC = () => {
             {UPGRADES.map(upgrade => {
                 const currentLevel = userData?.upgrades[upgrade.type] ?? 1;
                 const availableLevel = Math.min(currentLevel + 1, upgrade.maxLevel);
+                const nextLevelType = upgrade.levels.filter(upgradeLevel => upgradeLevel.level === availableLevel)
+                const currentLevelType = upgrade.levels.filter(upgradeLevel => upgradeLevel.level === currentLevel)
 
                 return (
-                    <div key={upgrade.name} className="w-full">
-                        <h2 className="text-title text-large">{upgrade.name}</h2>
-                        <div className="flex flex-col gap-2">
-                            Текущий уровень: {currentLevel} / {upgrade.maxLevel}
-                            {upgrade.levels
-                                .filter(upgradeLevel => upgradeLevel.level === availableLevel)
-                                .map(upgradeLevel => {
-                                    return (
-                                        <div className="flex gap-2 items-center w-full" key={upgradeLevel.level}>
-                                            {currentLevel < upgrade.maxLevel &&
-                                                <div className="flex items-center justify-between gap-2">
-                                                    <span>Купить {availableLevel}-й уровень</span>
-
-                                                    <button
-                                                        className={styles.buyUpgradeButton}
-                                                        onClick={() => {handleBuyUpgradeClick(upgrade.type, upgradeLevel)}}
-                                                    >
-                                                        {upgradeLevel.cost.toLocaleString()}
-                                                        <img src='/images/coin.png' width={15} alt="Coin" className='ml-1' />
-                                                    </button>
-                                                </div>
-                                            }
-
-                                            {currentLevel === upgrade.maxLevel &&
-                                                <div>
-                                                    <span>Достигнут максимальный уровень!</span>
-                                                </div>
-                                            }
-
-                                        </div>
-                                    )
-                                })
-                            }
-                        </div>
-
-                    </div>
+                    <UpgradeItem
+                        key={upgrade.name}
+                        title={upgrade.name}
+                        level={currentLevel}
+                        maxLevel={upgrade.maxLevel}
+                        icon={upgrade.icon}
+                        cost={nextLevelType[0].cost}
+                        effect={currentLevelType[0].effect}
+                        onClick={() => {handleBuyUpgradeClick(upgrade.type, nextLevelType[0])}}
+                        isMax={currentLevel === upgrade.maxLevel}
+                    />
                 )
             })}
             {showUpgradeError[0] && createPortal(

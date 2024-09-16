@@ -1,9 +1,8 @@
-import { popupBgStyle } from "@/constants/styles";
-import React from "react";
-import { InfoModal } from "./InfoModal";
-import { DialogModal } from "./DialogModal";
-import { ModalProps } from "./Modal";
-import { ConfirmModal } from "./ConfirmModal";
+import { X } from 'lucide-react'
+import { ConfirmModal } from "./ConfirmModal"
+import { DialogModal } from "./DialogModal"
+import { InfoModal } from "./InfoModal"
+import { ModalProps } from "./Modal"
 
 interface InnerModalProps extends ModalProps {
   type: "info" | "confirm" | "dialog";
@@ -16,14 +15,12 @@ interface InnerModalProps extends ModalProps {
 
 export function InnerModal(props: InnerModalProps) {
   return (
-    <div className="fixed top-0 left-0 right-0 bottom-0 bg-black/80 px-10" style={{zIndex: 300}}>
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 min-w-[calc(100%-72px)] text-white">
-        <div className="w-full flex justify-end">
-          <button className="" onClick={props.onClose}>
-            ✕
-          </button>
-        </div>
-        {props.type === "info" && (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 backdrop-blur-[5px]" onClick={props.onClose} style={{zIndex: 300}}>
+    <div className="bg-gray-800 rounded-xl p-6 w-full max-w-sm max-h-[80vh] overflow-y-auto relative scrollbar-hide" onClick={e => e.stopPropagation()}>
+      <button className="absolute top-2 right-2 text-gray-400 hover:text-white" onClick={props.onClose}>
+        <X size={24} />
+      </button>
+      {props.type === "info" && (
           <InfoModal onClose={props.onClose}>{props.children}</InfoModal>
         )}
         {props.type === "confirm" && (
@@ -49,7 +46,8 @@ export function InnerModal(props: InnerModalProps) {
             {props.children}
           </DialogModal>
         )}
-      </div>
     </div>
+  </div>
+    
   );
 }

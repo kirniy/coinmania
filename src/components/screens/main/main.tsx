@@ -374,25 +374,30 @@ const CoinMania: React.FC = () => {
                     {openRules && 
                         createPortal(
                             <Modal onClose={handleCloseRules}>
-                            <div className="">
-                                <h2 className="text-lg font-semibold leading-none tracking-tight text-center text-yellow-400">Правила игры</h2>
-                            </div>
-                            {RULES.map((rule, idx) => (
-                                <Rule key={idx * 0.8829} text={rule.text} icon={rule.icon} />
-                            ))}
+                                <div className="flex flex-col gap-4">
+                                    <h2 className="text-lg font-semibold leading-none tracking-tight text-center text-yellow-400">
+                                        Правила игры
+                                    </h2>
+                                    <div className="text-white flex flex-col gap-4">
+                                        {RULES.map((rule, idx) => (
+                                            <Rule key={idx * 0.8829} text={rule.text} icon={rule.icon} />
+                                        ))}
+                                    </div>
+                                </div>
+
                         </Modal>,
                         document.body
                         )}
                     {openPrizes &&
                         createPortal(
                             <Modal onClose={handleClosePrizes}>
-                                <div className="">
+                                <div className="flex flex-col gap-4">
                                     <h2 className="text-lg font-semibold leading-none tracking-tight text-center text-yellow-400">Призы</h2>
-                                </div>
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                                    {PRIZES.map((prize, idx) => (
-                                        <Prize key={idx * 0.12829} {...prize} />
-                                    ))}
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 text-white">
+                                        {PRIZES.map((prize, idx) => (
+                                            <Prize key={idx * 0.12829} {...prize} />
+                                        ))}
+                                    </div>
                                 </div>
                             </Modal>,
                             document.body

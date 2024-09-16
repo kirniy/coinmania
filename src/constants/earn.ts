@@ -1,25 +1,28 @@
-import type { Booster } from "@/types/boosters";
-import { referralReward } from "@/types/referralReward";
+import type { Booster } from "@/types/boosters"
+import { referralReward } from "@/types/referralReward"
+import { Battery, Zap } from 'lucide-react'
 
 export const BOOSTERS: Booster[] = [
   {
     name: "Full Tank",
     slug: "full_tank",
-    description: "Восстановление полной энергии",
+    description: "Мгновенно заполняет Energy bar до максимума",
     duration: 0,
     maxUsePerDay: 3,
     action: "resetEnergy",
+    icon: Battery,
     bgColor: "#f8cc46",
   },
   {
     name: "Tap Boost",
     slug: "tap_boost",
-    description: "Множитель x5 на 20 секунд",
+    description: "Каждый тап дает в 5 раз больше коинов в течение 20 секунд",
     duration: 20,
     maxUsePerDay: 3,
     action: "tapBoost",
+    icon: Zap, 
     bgColor: "#ff7f50",
-  },
+  }
 ];
 
 export const REFERRAL_TASKS: referralReward[] = [
