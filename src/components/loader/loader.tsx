@@ -30,7 +30,7 @@ const Loader: React.FC<LoaderProps> = ({ loading }) => {
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 100 150"
                 preserveAspectRatio="xMidYMid meet"
-                style={{ width: '100%', height: '100%', maxWidth: '100vh', maxHeight: '100vw' }}
+                style={{ width: '100%', height: '100%', maxWidth: '100vw', maxHeight: '100vh' }}
             >
                 <defs>
                     <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
@@ -61,11 +61,11 @@ const Loader: React.FC<LoaderProps> = ({ loading }) => {
                 </defs>
 
                 <g fontSize="20">
-                    <text x="10%" y="-10" filter="url(#glow)">⭐️<animate attributeName="y" from="-10" to="160" dur="4s" repeatCount="indefinite"/></text>
-                    <text x="30%" y="-10" filter="url(#glow)">🎁<animate attributeName="y" from="-10" to="160" dur="3.5s" repeatCount="indefinite"/></text>
-                    <text x="50%" y="-10" filter="url(#glow)">🤑<animate attributeName="y" from="-10" to="160" dur="4.5s" repeatCount="indefinite"/></text>
-                    <text x="70%" y="-10" filter="url(#glow)">💎<animate attributeName="y" from="-10" to="160" dur="4s" repeatCount="indefinite"/></text>
-                    <text x="90%" y="-10" filter="url(#glow)">⭐️<animate attributeName="y" from="-10" to="160" dur="3.8s" repeatCount="indefinite"/></text>
+                    <text x="0%" y="-30" filter="url(#glow)">⭐️<animate attributeName="y" from="-30" to="190" dur="4s" repeatCount="indefinite"/></text>
+                    <text x="20%" y="-30" filter="url(#glow)">🎁<animate attributeName="y" from="-30" to="190" dur="3.5s" repeatCount="indefinite"/></text>
+                    <text x="40%" y="-30" filter="url(#glow)">🤑<animate attributeName="y" from="-30" to="190" dur="4.5s" repeatCount="indefinite"/></text>
+                    <text x="60%" y="-30" filter="url(#glow)">💎<animate attributeName="y" from="-30" to="190" dur="4s" repeatCount="indefinite"/></text>
+                    <text x="80%" y="-30" filter="url(#glow)">⭐️<animate attributeName="y" from="-30" to="190" dur="3.8s" repeatCount="indefinite"/></text>
                 </g>
 
                 <image href="https://od.lk/s/NTlfOTQyOTA1Mzhf/vnvnc%20logo.svg" x="10" y="30" width="80" height="63.58" preserveAspectRatio="xMidYMid meet">
