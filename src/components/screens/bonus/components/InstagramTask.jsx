@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from "react-redux"
 import ActionButton from './ActionButton'
+import { Popup } from '@/components/popup/Popup'
 
 const buttonStyle = {
     transition: 'all 0.3s ease',
@@ -59,6 +60,9 @@ const InstagramTask = ({task, index, isCompleted = false}) => {
     const [showSuccessAlert, setShowSuccessAlert] = useState([false, null]);
     const [showAlertSubscrNotFound, setShowAlertSubscrNotFound] = useState([false, null]);
     const [showErrorAlert, setShowErrorAlert] = useState([false, null]);
+
+    const [showSuccessCopiedMessage, setShowSuccessCopiedMessage] = useState([false, null]);
+
     const [status, setStatus] = useState('pending');
 
     const isMain = index === 0 || index === 3;
@@ -141,7 +145,20 @@ const InstagramTask = ({task, index, isCompleted = false}) => {
                         <h3 className="text-white text-xl font-bold">{task.name}</h3>
                     </div>
                     <p className="text-white text-sm mb-4">Награда: {task.reward} 🪙</p>
-                    <ActionButton icon={Rocket} label="Копировать и Подписаться" primary large isLink={true} link={task.link} />
+                    <ActionButton
+                        icon={Rocket}
+                        label="Копировать и Подписаться"
+                        primary
+                        large
+                        onClick={() => {
+                            navigator?.clipboard?.writeText(userKey);
+                            setShowSuccessCopiedMessage([true, null]);
+
+                            setTimeout(() => {
+                                window.open(task.link);
+                            }, 3000)
+                        }}
+                    />
                     <input className='mb-3' type="text" autoCapitalize="off" autoComplete="off" style={inputStyle()} onChange={(e)=>setInputValue(e.target.value)}/>
                     <ActionButton icon={Check} label="Проверить" disabled={inputValue?.length === 0} onClick={() => handleVerifyButtonClick(task.id)} style={inputValue?.length === 0 ? disabledButtonStyle() : {}} large />
                 </Modal>,
@@ -157,6 +174,17 @@ const InstagramTask = ({task, index, isCompleted = false}) => {
             )}
             {showErrorAlert[0] && createPortal(
                 <InnerModal type='confirm' onClose={handleCloseAlert} title='Ошибка' description={showErrorAlert[1]} confirmMessage='Закрыть'/>,
+                document.body
+            )}
+            {showSuccessCopiedMessage[0] && createPortal(
+                <Popup
+                    popup={{
+                        text: 'Код скопирован в буфер обемна! Сейчас вы будете перенаправлены в Instagram',
+                        pic: 'success',
+                        duration: 3000,
+                        setState: setShowSuccessCopiedMessage,
+                    }}
+                />,
                 document.body
             )}
         </React.Fragment>
