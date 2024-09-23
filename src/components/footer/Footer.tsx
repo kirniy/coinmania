@@ -6,7 +6,7 @@ import { setActiveTab } from '@/store/tabSlice'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styles from './Footer.module.css'
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 
 const Footer = () => {
@@ -24,6 +24,12 @@ const Footer = () => {
     const dispatch = useDispatch();
 
     const router = useRouter();
+    const pathname = usePathname();
+
+    useEffect(() => {
+        // Prefetch tabs that are not active
+        TABS.filter(tab => tab.path !== pathname).forEach(tab => router.prefetch(tab.path));
+    }, [router])
 
     const handleTabChange = (tab: Tab) => {
         router.push(tab.path);
