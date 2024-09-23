@@ -6,14 +6,15 @@ import { unlockScroll } from '@/helpers/manageScroll'
 import { RootState } from "@/store/rootReducer"
 import { updateUserReferred, updateUserScores } from "@/store/userSlice"
 import { referredUserRecord, UserData } from "@/types/user"
-import axios from "axios"
+import axios from "axios" 
 import { ChevronDown, ChevronUp, Users, XCircle } from 'lucide-react'
 import { useContext, useEffect, useState } from 'react'
 import { createPortal } from "react-dom"
 import { useDispatch, useSelector } from 'react-redux'
-import styles from './FriendsPage.module.css'; // Импортируем стили
+import styles from './ProfilePage.module.css'; // Импортируем стили
 
-const FriendsPage = () => {
+const ProfilePage = () => {
+    document.body.classList.add('!overflow-hidden')
     const {app} = useContext(webAppContext);
     const userData = useSelector((state: RootState) => state.user.data);
     const { isLoading, setLoading } = useContext(LoadingContext);
@@ -302,9 +303,9 @@ const FriendsPage = () => {
                                 </div>
                             )})}
                         </div>
-                        <p className={styles.leaderboardFooterText}>
+                        {/* <p className={styles.leaderboardFooterText}>
                             В полной версии отображается топ-30 игроков
-                        </p>
+                        </p> */}
                     </div>
                 </div>
             )}
@@ -320,4 +321,4 @@ const FriendsPage = () => {
     );
 };
 
-export default FriendsPage;
+export default ProfilePage;
