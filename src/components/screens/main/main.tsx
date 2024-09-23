@@ -23,6 +23,11 @@ import { lockScroll } from '@/helpers/manageScroll'
 import { PopupProps } from "@/types/popup"
 import { createPortal } from "react-dom"
 
+import Image from 'next/image';
+import coinImage from "@/public/images/notcoin.png";
+import coinManiaLogo from "@/public/images/coinmania.webp"
+import smallCoinImage from "@/public/images/coin.png";
+
 interface RootState {
     user: {
         data: any;
@@ -342,11 +347,11 @@ const CoinMania: React.FC = () => {
                 {/* Header */}
                 <div className={styles.header}>
                     <div className="text-center relative">
-                        <img
-                            src='/images/coinmania.webp'
+                        <Image
+                            src={coinManiaLogo}
                             alt="COINMANIA"
-                            className={styles.headerImage}
-                            width={300}
+                            priority
+                            className={`${styles.headerImage} w-[300px]`}
                         />
                     </div>
                 </div>
@@ -355,7 +360,12 @@ const CoinMania: React.FC = () => {
                 <div className={styles.scoreSection}>
                     <div className="text-center">
                         <div className={styles.score}>
-                            <img src='/images/coin.png' width={30} alt="Coin" className={styles.scoreImage} />
+                            <Image
+                                src={smallCoinImage}
+                                alt="Coin"
+                                quality={90}
+                                className={`${styles.scoreImage} w-[30px]`}
+                            />
                             <span className="text-3xl font-bold">{userData.scores.toLocaleString()}</span>
                         </div>
                     </div>
@@ -433,17 +443,19 @@ const CoinMania: React.FC = () => {
                                 width: '65%',
                             }}
                         >
-                            <img
-                                src='/images/notcoin.png'
+                            <Image
+                                src={coinImage}
                                 alt="notcoin"
+                                quality={90}
+                                decoding="sync"
+                                priority
                                 draggable="false"
-                                width="100%"
                                 style={{
                                     userSelect: 'none',
                                     transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) ${isPressed ? 'scale(0.95)' : 'scale(1)'}`,
                                     transition: 'transform 0.1s',
                                 }}
-                                className={`${styles.coinImage} select-none pointer-events-none mx-auto`}
+                                className={`${styles.coinImage} select-none pointer-events-none mx-auto w-full`}
                             />
                         </div>
 
