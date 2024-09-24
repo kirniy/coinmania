@@ -27,6 +27,7 @@ import Image from 'next/image';
 import coinImage from "@/public/images/notcoin.png";
 import coinManiaLogo from "@/public/images/coinmania.webp"
 import smallCoinImage from "@/public/images/coin.png";
+import { AmountDisplay } from "@/components/common/AmountDisplay";
 
 interface RootState {
     user: {
@@ -360,13 +361,7 @@ const CoinMania: React.FC = () => {
                 <div className={styles.scoreSection}>
                     <div className="text-center">
                         <div className={styles.score}>
-                            <Image
-                                src={smallCoinImage}
-                                alt="Coin"
-                                quality={90}
-                                className={`${styles.scoreImage} w-[30px]`}
-                            />
-                            <span className="text-3xl font-bold">{userData.scores.toLocaleString()}</span>
+                            <AmountDisplay amount={userData.scores} coinSize={30} className="text-3xl font-bold" />
                         </div>
                     </div>
                 </div>
