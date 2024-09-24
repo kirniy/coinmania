@@ -22,6 +22,7 @@ import { PRIZES, RULES } from "@/constants/rules"
 import { lockScroll } from '@/helpers/manageScroll'
 import { PopupProps } from "@/types/popup"
 import { createPortal } from "react-dom"
+import { AmountDisplay } from "@/components/common/AmountDisplay";
 
 interface RootState {
     user: {
@@ -355,8 +356,7 @@ const CoinMania: React.FC = () => {
                 <div className={styles.scoreSection}>
                     <div className="text-center">
                         <div className={styles.score}>
-                            <img src='/images/coin.png' width={30} alt="Coin" className={styles.scoreImage} />
-                            <span className="text-3xl font-bold">{userData.scores.toLocaleString()}</span>
+                            <AmountDisplay amount={userData.scores} coinSize={30} className="text-3xl font-bold" />
                         </div>
                     </div>
                 </div>

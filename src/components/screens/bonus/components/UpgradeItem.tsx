@@ -1,3 +1,4 @@
+import { AmountDisplay } from '@/components/common/AmountDisplay';
 import { ArrowUp } from 'lucide-react'
 import React from 'react'
 
@@ -28,7 +29,7 @@ const UpgradeItem: React.FC<UpgradeItemProps> = ({ isMax, title, level, maxLevel
       {!isMax ? (
         <button className="bg-yellow-400 text-black text-xs font-bold py-1 px-2 rounded-lg flex items-center" onClick={onClick}>
         <ArrowUp size={12} className="mr-1" />
-        Прокачать {cost} 🪙
+        Прокачать за <AmountDisplay amount={cost} coinSize={12} className='ml-1' />
       </button>
       ) : (<span className='text-xs font-bold flex items-cente'>
         Достигнут максимальный уровень!

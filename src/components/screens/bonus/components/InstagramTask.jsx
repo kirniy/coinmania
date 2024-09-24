@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from "react-redux"
 import ActionButton from './ActionButton'
 import { Popup } from '@/components/popup/Popup'
+import { AmountDisplay } from '@/components/common/AmountDisplay'
 
 const buttonStyle = {
     transition: 'all 0.3s ease',
@@ -133,8 +134,9 @@ const InstagramTask = ({task, index, isCompleted = false}) => {
                     </div>
                 ) : (
                     <div className="flex items-center bg-yellow-400 text-black px-2 py-1 rounded-full">
-                        <Coins size={14} className="mr-1" />
-                        <span className="text-xs font-bold">{task.reward}</span>
+                        <span className="text-xs font-bold">
+                            <AmountDisplay amount={task.reward} coinSize={15} />
+                        </span>
                     </div>
                 )}
             </button> 
@@ -144,7 +146,7 @@ const InstagramTask = ({task, index, isCompleted = false}) => {
                     <div className="flex items-center mb-4">
                         <h3 className="text-white text-xl font-bold">{task.name}</h3>
                     </div>
-                    <p className="text-white text-sm mb-4">Награда: {task.reward} 🪙</p>
+                    <p className="text-white text-sm mb-4 flex gap-2">Награда: <AmountDisplay amount={task.reward} coinSize={15} /></p>
                     <ActionButton
                         icon={Rocket}
                         label="Копировать и Подписаться"
