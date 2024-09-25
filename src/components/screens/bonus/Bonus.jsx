@@ -13,6 +13,7 @@ import Boosters from './components/Boosters'
 import InstagramTask from './components/InstagramTask'
 import { ReferralRewards } from './components/ReferralRewards'
 import { Upgrades } from './components/Upgrades'
+import { AmountDisplay } from '@/components/common/AmountDisplay';
 
 // STYLES
 
@@ -132,9 +133,10 @@ function Task({task, index, isBoost = false, isCompleted = false}) {
                         <span className="text-xs font-bold">Завершено</span>
                     </div>
                 ) : (
-                    <div className="flex items-center bg-yellow-400 text-black px-2 py-1 rounded-full">
-                        <Coins size={14} className="mr-1" />
-                        <span className="text-xs font-bold">{task.reward}</span>
+                    <div className="flex items-center gap-1 bg-yellow-400 text-black px-2 py-1 rounded-full">
+                        <div className="flex items-center text-xs font-bold">
+                            <AmountDisplay amount={task.reward} coinSize={12} />
+                        </div>
                     </div>
                 )}
             </button> 
@@ -144,7 +146,7 @@ function Task({task, index, isBoost = false, isCompleted = false}) {
                     <div className="flex items-center mb-4">
                         <h3 className="text-white text-xl font-bold">{task.name}</h3>
                     </div>
-                    <p className="text-white text-sm mb-4">Награда: {task.reward} 🪙</p>
+                    <p className="text-white text-sm mb-4 flex gap-2">Награда: <AmountDisplay amount={task.reward} coinSize={15} /></p>
                     <ActionButton icon={Rocket} label={isBoost ? 'Забустить' : 'Подписаться'} primary large isLink={true} link={task.link} />
                     
                     {isBoost ? (

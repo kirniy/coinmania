@@ -6,14 +6,16 @@ import { unlockScroll } from '@/helpers/manageScroll'
 import { RootState } from "@/store/rootReducer"
 import { updateUserReferred, updateUserScores } from "@/store/userSlice"
 import { referredUserRecord, UserData } from "@/types/user"
-import axios from "axios"
+import axios from "axios" 
 import { ChevronDown, ChevronUp, Users, XCircle } from 'lucide-react'
 import { useContext, useEffect, useState } from 'react'
 import { createPortal } from "react-dom"
 import { useDispatch, useSelector } from 'react-redux'
-import styles from './FriendsPage.module.css'; // Импортируем стили
+import styles from './ProfilePage.module.css'; // Импортируем стили
+import { AmountDisplay } from "@/components/common/AmountDisplay"
 
-const FriendsPage = () => {
+const ProfilePage = () => {
+    document.body.classList.add('!overflow-hidden')
     const {app} = useContext(webAppContext);
     const userData = useSelector((state: RootState) => state.user.data);
     const { isLoading, setLoading } = useContext(LoadingContext);
@@ -151,7 +153,26 @@ const FriendsPage = () => {
                         <h3 className={styles.userName}>{app.initDataUnsafe.user?.first_name}</h3>
                         <span className={styles.userTitle}>Участник клуба VNVNC</span>
                     </div>
-                    <ScoreboardDisplay icon="/images/coin.png" iconType="img" value={userData?.scores || 0} color="#f8cc46" fontSize="1.8rem" width="100%" />
+                    <div
+                        style={{
+                            fontSize: '1.8rem',
+                            fontWeight: 'bold',
+                            color: '#f8cc46',
+                            textAlign: 'center',
+                            textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+                            background: 'rgba(0,0,0,0.3)',
+                            borderRadius: '10px',
+                            padding: '5px 10px',
+                            margin: '5px auto',
+                            border: `2px solid #f8cc46`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '100%',
+                        }}
+                    >
+                        <AmountDisplay amount={userData?.scores || 0} coinSize={28} />
+                    </div>
                     <ScoreboardDisplay icon="⚡️" value={userData?.energy + '/' + userData?.maxenergy } color="#ffffff" fontSize="1.2rem" width="60%" />
                     <h4 className={styles.statsTitle}>📊 Статистика:</h4>
                     <div className={styles.stats}>
@@ -185,10 +206,7 @@ const FriendsPage = () => {
                         <Users size={20} style={{ marginRight: '10px' }} /> Пригласить друзей
                     </a>
                     <p className={`${styles.inviteText}`}>
-                        Приглашай друзей и получай по 20, 000
-                        <span className="inline-flex items-center">
-                            <img src='/images/coin.png' width={10} alt="Coin" className="mx-1 inline" />
-                        </span>
+                        Приглашай друзей и получай по <AmountDisplay amount={2e4} coinSize={10} className="mx-1" />
                         за каждого друга, который зайдет в игру по твоей ссылке!
                     </p>
                 </div>
@@ -215,8 +233,7 @@ const FriendsPage = () => {
                                             className={styles.getRewardButton}
                                             onClick={() => handleGetRewardClick(referral)}
                                         >
-                                            20,000
-                                            <img src='/images/coin.png' width={15} alt="Coin" className='ml-1' />
+                                            <AmountDisplay amount={2e4} coinSize={15} />
                                         </button>
                                     </div>
                             ))}
@@ -302,9 +319,9 @@ const FriendsPage = () => {
                                 </div>
                             )})}
                         </div>
-                        <p className={styles.leaderboardFooterText}>
+                        {/* <p className={styles.leaderboardFooterText}>
                             В полной версии отображается топ-30 игроков
-                        </p>
+                        </p> */}
                     </div>
                 </div>
             )}
@@ -320,4 +337,4 @@ const FriendsPage = () => {
     );
 };
 
-export default FriendsPage;
+export default ProfilePage;
