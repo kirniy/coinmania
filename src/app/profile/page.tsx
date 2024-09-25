@@ -1,7 +1,7 @@
 "use client";
 
 import Loader from "@/components/loader/loader"
-import Frens from "@/components/screens/frens/Frens"
+import Profile from "@/components/screens/profile/Profile"
 import { useContext } from "react"
 import { webAppContext } from "../context"
 import { LoadingContext } from '../context/LoaderContext'
@@ -29,7 +29,7 @@ export default function Home() {
 
             <>
                 {app.version ? (
-                    <Frens />
+                    <Profile />
                 ) : (
                     <Loader loading={isLoading} />
                 )}
